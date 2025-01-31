@@ -4,7 +4,10 @@ import (
 	"io"
 	"log/slog"
 	"os"
+	"os/signal"
+	"syscall"
 
+	"github.com/pillowskiy/postique/sso/internal/app"
 	"github.com/pillowskiy/postique/sso/internal/config"
 	"github.com/pillowskiy/postique/sso/pkg/logger"
 )
@@ -14,7 +17,14 @@ func main() {
 
 	log := setupLogger(os.Stdout, cfg.Logger)
 
-	log.Info("Starting application", slog.Int("port", cfg.Server.Port))
+	app := app.New(log, cfg)
+
+	go app.MustRun()
+	stop := make(chan os.Signal, 1)
+	signal.Notify(stop, syscall.SIGTERM, syscall.SIGINT)
+	sign := <-stop
+	log.Info("Stopping application", slog.String("signal", sign.String()))
+	app.GracefulStop()
 }
 
 func setupLogger(w io.Writer, cfg config.Logger) *slog.Logger {
