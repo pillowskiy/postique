@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package auth;
 
-import "protoc-gen-validate/validate/validate.proto";
+import "_gen-validate/validate/validate.proto";
 
 option go_package = "postique.sso.v1;ssov1";
 

@@ -4,7 +4,7 @@ CONTRACTS_DIR := ../proto
 PROTOC_GO_OUT := ./gen
 
 # Find all .proto files recursively
-PROTO_FILES := $(shell find $(CONTRACTS_DIR) -name "*.proto")
+PROTO_FILES := $(shell find ../proto -type f -name "*.proto" ! -path "*/_*/*")
 
 protoc:
 	@echo "Compiling Protobuf files with validation..."
