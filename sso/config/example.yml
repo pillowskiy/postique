@@ -1,0 +1,18 @@
+server:
+  port: 4000
+  timeout: 10s
+
+postgres:
+  host: postgres
+  port: 5432
+  user: postique
+  password: postique
+  database: sso
+  ssl: false
+
+logger:
+  mode: development
+  disable_caller: false
+  disable_stacktrace: false
+  encoding: pretty
+  level: info
