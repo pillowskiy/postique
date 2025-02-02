@@ -1,26 +1,23 @@
 package domain
 
 import (
-	"fmt"
-
-	"github.com/google/uuid"
+	"github.com/pillowskiy/postique/sso/internal/domain/service/gen"
 )
 
-type ID string
+type (
+	// Potential ID - necessary to point to the child ID type, since we can change the policy
+	// and switch from UUID to Snowflake ID, for example, this will save us the problem
+	// of switching and changing the entire delivery layer
+	PID = string
+	ID  PID
+)
 
 func GenID() (ID, error) {
-	uuid, err := uuid.NewRandom()
-	if err != nil {
-		return "", fmt.Errorf("failed to generate id: %w", err)
-	}
-	return ID(uuid.String()), nil
+	id, err := gen.Generate()
+	return ID(id), err
 }
 
 func NewID(str string) (ID, error) {
-	uuid, err := uuid.Parse(str)
-	if err != nil {
-		return "", fmt.Errorf("invalid id format: %w", err)
-	}
-
-	return ID(uuid.String()), nil
+	id, err := gen.Parse(str)
+	return ID(id), err
 }

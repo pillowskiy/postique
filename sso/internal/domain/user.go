@@ -1,7 +1,9 @@
 package domain
 
 import (
-	"golang.org/x/crypto/bcrypt"
+	"errors"
+
+	"github.com/pillowskiy/postique/sso/internal/domain/service/crypto"
 )
 
 type User struct {
@@ -35,15 +37,23 @@ func NewUser(email, password string) (*User, error) {
 	return user, nil
 }
 
-type Password string
+type Password []byte
 
 func NewPassword(str string) (Password, error) {
-	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(str), bcrypt.DefaultCost)
-	return Password(hashedPassword), err
+	pwd, err := crypto.Hash(str)
+	return Password(pwd), err
+}
+
+func (p Password) Compare(str string) (err error) {
+	return crypto.Compare(p, str)
 }
 
 type Email string
 
 func NewEmail(str string) (Email, error) {
+	if str == "" {
+		return "", errors.New("email cannot be empty")
+	}
+
 	return Email(str), nil
 }
