@@ -1,0 +1,40 @@
+syntax = "proto3";
+
+package auth;
+
+import "_protovalidate/proto/protovalidate/buf/validate/validate.proto";
+
+option go_package = "postique.sso.v1;pb";
+
+service Auth {
+    rpc Register (RegisterRequest) returns (RegisterResponse);
+    rpc Login (LoginRequest) returns (LoginResponse);
+    rpc IsAdmin (IsAdminRequest) returns (IsAdminResponse);
+}
+
+message RegisterRequest {
+    string email = 1 [(buf.validate.field).string = {email: true, max_len: 256}];
+    string password = 2 [(buf.validate.field).string = {min_len: 6, max_len: 64}];
+}
+
+message RegisterResponse {
+    string user_id = 1;
+}
+
+message LoginRequest {
+    string email = 1 [(buf.validate.field).string = {email: true}];
+    string password = 2 [(buf.validate.field).string = {min_len: 6}];
+    string app_id = 3 [(buf.validate.field).string = {uuid: true}];
+}
+
+message LoginResponse {
+    string token = 1;
+}
+
+message IsAdminRequest {
+    string user_id = 1 [(buf.validate.field).string = {uuid: true}];
+}
+
+message IsAdminResponse {
+    bool is_admin = 1;
+}
