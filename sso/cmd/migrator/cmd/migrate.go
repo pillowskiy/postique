@@ -12,10 +12,11 @@ import (
 )
 
 func RunMigrateFromType(log *slog.Logger, mType string) {
-	var dbURI, migrationsDir, migrationsTable string
+	var dbURI, migrationsDir, migrationsTable, ssl string
 	flag.StringVar(&dbURI, "uri", "", "Database connection string")
 	flag.StringVar(&migrationsDir, "dir", "migrations", "Path to directory with migrations")
 	flag.StringVar(&migrationsTable, "table", "migrations", "Name of migrations table")
+	flag.StringVar(&ssl, "ssl", "disable", "SSL Mode")
 	flag.Parse()
 
 	if dbURI == "" || migrationsDir == "" || migrationsTable == "" {
@@ -25,7 +26,7 @@ func RunMigrateFromType(log *slog.Logger, mType string) {
 
 	m, err := migrate.New(
 		"file://"+migrationsDir,
-		fmt.Sprintf("%s?x-migrations-table=%s", dbURI, migrationsTable),
+		fmt.Sprintf("%s?sslmode=%s&x-migrations-table=%s", dbURI, ssl, migrationsTable),
 	)
 	if err != nil {
 		log.Error(
@@ -49,12 +50,13 @@ func RunMigrateFromType(log *slog.Logger, mType string) {
 	}
 
 	if migErr != nil {
-		if errors.Is(err, migrate.ErrNoChange) {
+		if errors.Is(migErr, migrate.ErrNoChange) {
 			log.Info("No migrations to apply")
 			return
 		}
 
 		log.Error("Failed to run migration", slog.String("error", migErr.Error()))
+		return
 	}
 
 	log.Info("Migrations applied")

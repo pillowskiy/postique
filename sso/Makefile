@@ -6,7 +6,7 @@ dev:
 
 .PHONY: migrator
 
-DB_URI := postgres://postgres:postgres@localhost:5432/postique_sso?sslmode=disable
+DB_URI := postgres://postique:postique@localhost:5432/sso
 MIGRATION_DIR := ./migrations
 
 pg_migrate:
