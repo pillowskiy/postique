@@ -3,13 +3,13 @@ package domain
 import (
 	"errors"
 
-	"github.com/pillowskiy/postique/sso/internal/domain/service/crypto"
+	"github.com/pillowskiy/postique/sso/internal/lib/crypto"
 )
 
 type User struct {
 	ID       ID
 	Email    Email
-	Password Password
+	Password Password `db:"pass_hash" json:"-"`
 }
 
 func NewUser(email, password string) (*User, error) {
@@ -37,7 +37,7 @@ func NewUser(email, password string) (*User, error) {
 	return user, nil
 }
 
-type Password []byte
+type Password string
 
 func NewPassword(str string) (Password, error) {
 	pwd, err := crypto.Hash(str)
@@ -45,7 +45,7 @@ func NewPassword(str string) (Password, error) {
 }
 
 func (p Password) Compare(str string) (err error) {
-	return crypto.Compare(p, str)
+	return crypto.Compare([]byte(p), str)
 }
 
 type Email string

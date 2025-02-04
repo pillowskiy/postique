@@ -7,16 +7,15 @@ import (
 	"github.com/pillowskiy/postique/sso/internal/domain"
 )
 
-func NewToken(user *domain.User, app *domain.App, key string, duration time.Duration) (string, error) {
+func NewToken(user *domain.User, decryptedSecret *domain.DecryptedSecret, duration time.Duration) (string, error) {
 	token := jwt.New(jwt.SigningMethodHS256)
 
 	claims := token.Claims.(jwt.MapClaims)
 	claims["uid"] = user.ID
 	claims["email"] = user.Email
 	claims["exp"] = time.Now().Add(duration).Unix()
-	claims["aid"] = app.ID
 
-	secret, err := app.Secret.AsString(key)
+	secret, err := decryptedSecret.Release()
 	if err != nil {
 		return "", err
 	}

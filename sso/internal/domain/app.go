@@ -2,8 +2,10 @@ package domain
 
 import (
 	"errors"
+	"fmt"
 
-	"github.com/pillowskiy/postique/sso/internal/domain/service/crypto"
+	"github.com/pillowskiy/postique/sso/internal/lib/crypto"
+	"github.com/pillowskiy/postique/sso/internal/lib/gen"
 )
 
 type App struct {
@@ -12,7 +14,7 @@ type App struct {
 	Secret Secret
 }
 
-func NewApp(name, secret, key string) (*App, error) {
+func NewApp(name, decryptKey string) (*App, error) {
 	appID, err := GenID()
 	if err != nil {
 		return nil, err
@@ -23,7 +25,12 @@ func NewApp(name, secret, key string) (*App, error) {
 		return nil, err
 	}
 
-	appSecret, err := NewSecret(secret, key)
+	secret, err := gen.GenerateRand256()
+	if err != nil {
+		return nil, err
+	}
+
+	appSecret, err := NewSecret(secret, decryptKey)
 	if err != nil {
 		return nil, err
 	}
@@ -46,16 +53,40 @@ func NewSecret(plain, key string) (Secret, error) {
 
 	secret, err := crypto.EncryptStr(plain, key)
 	if err != nil {
-		return "", errors.New("failed to encrypt secret")
+		return "", fmt.Errorf("failed to encrypt secret: %w", err)
 	}
 
 	return Secret(secret), nil
 }
 
-func (s Secret) AsString(key string) (string, error) {
+func (s Secret) Decrypt(key string) (*DecryptedSecret, error) {
 	plain, err := crypto.DecryptStr(string(s), key)
 	if err != nil {
-		return "", errors.New("failed to decrypt secret")
+		return nil, errors.New("failed to decrypt secret")
 	}
-	return plain, nil
+	return NewDecryptedSecret(plain), nil
+}
+
+type DecryptedSecret struct {
+	val      string
+	released bool
+}
+
+func NewDecryptedSecret(s string) *DecryptedSecret {
+	return &DecryptedSecret{val: s}
+}
+
+func (k *DecryptedSecret) Release() (string, error) {
+	if k.released {
+		return "", errors.New("already released")
+	}
+
+	if k.val == "" {
+		return "", errors.New("secret is empty")
+	}
+
+	k.released = true
+	s := k.val
+	k.val = ""
+	return s, nil
 }
