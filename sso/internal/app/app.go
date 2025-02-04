@@ -5,6 +5,8 @@ import (
 
 	"github.com/pillowskiy/postique/sso/internal/app/grpc"
 	"github.com/pillowskiy/postique/sso/internal/config"
+	"github.com/pillowskiy/postique/sso/internal/storage/pg"
+	"github.com/pillowskiy/postique/sso/internal/usecase"
 )
 
 type App struct {
@@ -12,7 +14,15 @@ type App struct {
 }
 
 func New(log *slog.Logger, cfg *config.Config) *App {
-	grpcApp := grpc.NewApp(log, cfg.Server)
+	pgStorage := pg.MustConnect(cfg.Postgres)
+
+	appRepo := pg.NewAppStorage(pgStorage)
+	appUC := usecase.NewAppUseCase(appRepo, cfg.Session, log)
+
+	authRepo := pg.NewUserStorage(pgStorage)
+	authUC := usecase.NewAuthUseCase(authRepo, appUC, log)
+
+	grpcApp := grpc.NewApp(log, cfg.Server, appUC, authUC)
 
 	return &App{grpcApp: grpcApp}
 }

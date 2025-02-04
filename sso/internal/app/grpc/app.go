@@ -16,10 +16,11 @@ type App struct {
 	cfg        config.Server
 }
 
-func NewApp(log *slog.Logger, cfg config.Server) *App {
+func NewApp(log *slog.Logger, cfg config.Server, appUC server.AppUseCase, authUC server.AuthUseCase) *App {
 	grpcServer := grpc.NewServer()
 
-	server.RegisterAuthServer(grpcServer)
+	server.RegisterAppServer(grpcServer, appUC)
+	server.RegisterAuthServer(grpcServer, authUC)
 
 	return &App{log: log, grpcServer: grpcServer, cfg: cfg}
 }

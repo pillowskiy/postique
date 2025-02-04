@@ -2,13 +2,17 @@ server:
   port: 4000
   timeout: 10s
 
+session:
+  token_ttl: 48h
+  secret: secretsecretsecr
+
 postgres:
   host: postgres
   port: 5432
   user: postique
   password: postique
   database: sso
-  ssl: false
+  ssl: disable
 
 logger:
   mode: development

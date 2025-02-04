@@ -10,6 +10,7 @@ import (
 
 type Config struct {
 	Server   Server   `yaml:"server"`
+	Session  Session  `yaml:"session"`
 	Postgres Postgres `yaml:"postgres"`
 	Logger   Logger   `yaml:"logger"`
 }
@@ -19,13 +20,21 @@ type Server struct {
 	Timeout time.Duration `yaml:"timeout" env-default:"15s"`
 }
 
+type Session struct {
+	TokenTTL time.Duration `yaml:"token_ttl" env-default:"48h"`
+	Secret   string        `yaml:"secret" env-required:"true"`
+}
+
 type Postgres struct {
-	Host     string `yaml:"host" env-required:"true"`
-	Port     int    `yaml:"port" env-required:"true"`
-	User     string `yaml:"user" env-required:"true"`
-	Password string `yaml:"password" env-required:"true"`
-	Database string `yaml:"database" env-required:"true"`
-	SSL      string `yaml:"ssl" env-default:"false"`
+	Host         string        `yaml:"host" env-required:"true"`
+	Port         int           `yaml:"port" env-required:"true"`
+	User         string        `yaml:"user" env-required:"true"`
+	Password     string        `yaml:"password" env-required:"true"`
+	Database     string        `yaml:"database" env-required:"true"`
+	SSL          string        `yaml:"ssl" env-default:"false"`
+	Timeout      time.Duration `yaml:"timeout" env-default:"30s"`
+	MaxIdleConns int           `yaml:"max_idle_conns" env-default:"1"`
+	MaxOpenConns int           `yaml:"max_open_conns" env-default:"20"`
 }
 
 type Logger struct {
