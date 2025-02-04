@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+package app;
+
+import "_protovalidate/proto/protovalidate/buf/validate/validate.proto";
+
+option go_package = "postique.sso.v1;pb";
+
+service App {
+    rpc CreateApp (CreateAppRequest) returns (CreateAppResponse);
+}
+
+message CreateAppRequest {
+    string name = 1 [(buf.validate.field).string = {min_len: 2, max_len: 128}];
+}
+
+message CreateAppResponse {
+    string app_id = 1;
+}

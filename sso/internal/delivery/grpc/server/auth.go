@@ -3,7 +3,7 @@ package server
 import (
 	"context"
 
-	pb "github.com/pillowskiy/postique/sso/gen/v1/sso"
+	pb "github.com/pillowskiy/postique/pb/v1/sso"
 	"github.com/pillowskiy/postique/sso/internal/domain"
 	"github.com/pillowskiy/postique/sso/internal/dto"
 	"github.com/pillowskiy/postique/sso/pkg/validator"
@@ -25,7 +25,6 @@ var authRulesMessages = ValidationRulesMap{
 type AuthUseCase interface {
 	Login(ctx context.Context, dto *dto.LoginUserDTO) (string, error)
 	Register(ctx context.Context, dto *dto.RegisterUserDTO) (domain.ID, error)
-	IsAdmin(ctx context.Context, dto *dto.IsAdminDTO) (bool, error)
 }
 
 type authServer struct {
@@ -45,7 +44,7 @@ func (s *authServer) Login(ctx context.Context, req *pb.LoginRequest) (*pb.Login
 	dto := &dto.LoginUserDTO{
 		Email:    req.GetEmail(),
 		Password: req.GetPassword(),
-		AppID:    req.GetAppId(),
+		AppName:  req.GetAppName(),
 	}
 
 	token, err := s.authUC.Login(ctx, dto)
@@ -72,19 +71,4 @@ func (s *authServer) Register(ctx context.Context, req *pb.RegisterRequest) (*pb
 	}
 
 	return &pb.RegisterResponse{UserId: string(userID)}, nil
-}
-
-func (s *authServer) IsAdmin(ctx context.Context, req *pb.IsAdminRequest) (*pb.IsAdminResponse, error) {
-	if err := validator.ValidateGRPC(req); err != nil {
-		return nil, formatValidationError(err, authRulesMessages)
-	}
-
-	dto := &dto.IsAdminDTO{UserID: req.GetUserId()}
-
-	isAdmin, err := s.authUC.IsAdmin(ctx, dto)
-	if err != nil {
-		return nil, status.Errorf(codes.Internal, "Unknown error occurred, please wait and try again later")
-	}
-
-	return &pb.IsAdminResponse{IsAdmin: isAdmin}, nil
 }

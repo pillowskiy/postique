@@ -9,7 +9,6 @@ option go_package = "postique.sso.v1;pb";
 service Auth {
     rpc Register (RegisterRequest) returns (RegisterResponse);
     rpc Login (LoginRequest) returns (LoginResponse);
-    rpc IsAdmin (IsAdminRequest) returns (IsAdminResponse);
 }
 
 message RegisterRequest {
@@ -24,17 +23,9 @@ message RegisterResponse {
 message LoginRequest {
     string email = 1 [(buf.validate.field).string = {email: true}];
     string password = 2 [(buf.validate.field).string = {min_len: 6}];
-    string app_id = 3 [(buf.validate.field).string = {uuid: true}];
+    string app_name = 3 [(buf.validate.field).string = {min_len: 2}];
 }
 
 message LoginResponse {
     string token = 1;
-}
-
-message IsAdminRequest {
-    string user_id = 1 [(buf.validate.field).string = {uuid: true}];
-}
-
-message IsAdminResponse {
-    bool is_admin = 1;
 }
