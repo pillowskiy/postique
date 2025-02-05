@@ -21,8 +21,9 @@ type Server struct {
 }
 
 type Session struct {
-	TokenTTL time.Duration `yaml:"token_ttl" env-default:"48h"`
-	Secret   string        `yaml:"secret" env-required:"true"`
+	TokenTTL          time.Duration `yaml:"token_ttl" env-default:"48h"`
+	EncryptionSecret  string        `yaml:"encryption_secret" env-required:"true"`
+	AccessTokenSecret string        `yaml:"access_token_secret" env-required:"true"`
 }
 
 type Postgres struct {

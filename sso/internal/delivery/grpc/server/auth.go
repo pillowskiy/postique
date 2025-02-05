@@ -2,10 +2,11 @@ package server
 
 import (
 	"context"
+	"errors"
 
 	pb "github.com/pillowskiy/postique/pb/v1/sso"
-	"github.com/pillowskiy/postique/sso/internal/domain"
 	"github.com/pillowskiy/postique/sso/internal/dto"
+	"github.com/pillowskiy/postique/sso/internal/usecase"
 	"github.com/pillowskiy/postique/sso/pkg/validator"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
@@ -23,8 +24,8 @@ var authRulesMessages = ValidationRulesMap{
 }
 
 type AuthUseCase interface {
-	Login(ctx context.Context, dto *dto.LoginUserDTO) (string, error)
-	Register(ctx context.Context, dto *dto.RegisterUserDTO) (domain.ID, error)
+	Login(ctx context.Context, dto *dto.LoginUserInput) (*dto.Session, error)
+	Register(ctx context.Context, dto *dto.RegisterUserInput) (*dto.RegisterUserResult, error)
 }
 
 type authServer struct {
@@ -41,18 +42,25 @@ func (s *authServer) Login(ctx context.Context, req *pb.LoginRequest) (*pb.Login
 		return nil, formatValidationError(err, authRulesMessages)
 	}
 
-	dto := &dto.LoginUserDTO{
+	dto := &dto.LoginUserInput{
 		Email:    req.GetEmail(),
 		Password: req.GetPassword(),
 		AppName:  req.GetAppName(),
 	}
 
-	token, err := s.authUC.Login(ctx, dto)
+	session, err := s.authUC.Login(ctx, dto)
 	if err != nil {
-		return nil, status.Errorf(codes.Internal, "Unknown error occurred, please wait and try again later")
+		return nil, s.parseUseCaseErr(err)
 	}
 
-	return &pb.LoginResponse{Token: token}, nil
+	return &pb.LoginResponse{
+		Session: &pb.Session{
+			RefreshToken: session.Token,
+			AccessToken:  session.AccessToken,
+			TokenType:    session.TokenType,
+			ExpiresIn:    int64(session.ExpiresIn.Seconds()),
+		},
+	}, nil
 }
 
 func (s *authServer) Register(ctx context.Context, req *pb.RegisterRequest) (*pb.RegisterResponse, error) {
@@ -60,15 +68,26 @@ func (s *authServer) Register(ctx context.Context, req *pb.RegisterRequest) (*pb
 		return nil, formatValidationError(err, authRulesMessages)
 	}
 
-	dto := &dto.RegisterUserDTO{
+	dto := &dto.RegisterUserInput{
 		Email:    req.GetEmail(),
 		Password: req.GetPassword(),
 	}
 
-	userID, err := s.authUC.Register(ctx, dto)
+	res, err := s.authUC.Register(ctx, dto)
 	if err != nil {
-		return nil, status.Errorf(codes.Internal, "Unknown error occurred, please wait and try again later")
+		return nil, s.parseUseCaseErr(err)
 	}
 
-	return &pb.RegisterResponse{UserId: string(userID)}, nil
+	return &pb.RegisterResponse{UserId: res.UserID}, nil
+}
+
+func (s *authServer) parseUseCaseErr(err error) error {
+	switch {
+	case errors.Is(err, usecase.ErrUserAlreadyExists):
+		return status.Error(codes.AlreadyExists, "user already exists")
+	case errors.Is(err, usecase.ErrInvalidCredentials):
+		return status.Error(codes.Unauthenticated, "invalid credentials")
+	default:
+		return status.Error(codes.Internal, "internal error occurred")
+	}
 }

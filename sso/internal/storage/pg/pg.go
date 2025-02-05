@@ -15,8 +15,6 @@ import (
 
 var psql = sq.StatementBuilder.PlaceholderFormat(sq.Dollar)
 
-var ErrNotFound = errors.New("not found")
-
 type (
 	InTxQueryCall        func(tx *sqlx.Tx) (*sqlx.Rows, error)
 	InTxQueryCallContext func(ctx context.Context, tx *sqlx.Tx) (*sqlx.Rows, error)

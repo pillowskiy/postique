@@ -3,8 +3,9 @@ server:
   timeout: 10s
 
 session:
-  token_ttl: 48h
-  secret: secretsecretsecr
+  token_ttl: 720h
+  encryption_secret: 1234567890123456
+  access_token_secret: secret
 
 postgres:
   host: postgres

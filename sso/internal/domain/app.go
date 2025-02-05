@@ -59,34 +59,10 @@ func NewSecret(plain, key string) (Secret, error) {
 	return Secret(secret), nil
 }
 
-func (s Secret) Decrypt(key string) (*DecryptedSecret, error) {
-	plain, err := crypto.DecryptStr(string(s), key)
+func (s Secret) Decrypt(key string) (string, error) {
+	plainSecret, err := crypto.DecryptStr(string(s), key)
 	if err != nil {
-		return nil, errors.New("failed to decrypt secret")
+		return "", errors.New("failed to decrypt secret")
 	}
-	return NewDecryptedSecret(plain), nil
-}
-
-type DecryptedSecret struct {
-	val      string
-	released bool
-}
-
-func NewDecryptedSecret(s string) *DecryptedSecret {
-	return &DecryptedSecret{val: s}
-}
-
-func (k *DecryptedSecret) Release() (string, error) {
-	if k.released {
-		return "", errors.New("already released")
-	}
-
-	if k.val == "" {
-		return "", errors.New("secret is empty")
-	}
-
-	k.released = true
-	s := k.val
-	k.val = ""
-	return s, nil
+	return plainSecret, nil
 }

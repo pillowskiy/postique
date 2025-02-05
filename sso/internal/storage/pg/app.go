@@ -2,10 +2,13 @@ package pg
 
 import (
 	"context"
+	"database/sql"
+	"errors"
 	"fmt"
 
 	sq "github.com/Masterminds/squirrel"
 	"github.com/pillowskiy/postique/sso/internal/domain"
+	"github.com/pillowskiy/postique/sso/internal/storage"
 )
 
 type AppStorage struct {
@@ -25,6 +28,9 @@ func (s *AppStorage) App(ctx context.Context, name domain.Name) (*domain.App, er
 
 	app := new(domain.App)
 	if err := s.pg.Ext(ctx).QueryRowxContext(ctx, q, args...).StructScan(app); err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, storage.ErrAppNotFound
+		}
 		return nil, fmt.Errorf("%s: %w", op, err)
 	}
 
@@ -38,12 +44,12 @@ func (s *AppStorage) SaveApp(ctx context.Context, app *domain.App) (domain.ID, e
 		Values(app.ID, app.Secret, app.Name).
 		Suffix("RETURNING \"id\"").ToSql()
 	if err != nil {
-		return domain.EmptyID, fmt.Errorf("%s: %w", op, err)
+		return "", fmt.Errorf("%s: %w", op, err)
 	}
 
 	var id domain.ID
 	if err := s.pg.Ext(ctx).QueryRowxContext(ctx, q, args...).Scan(&id); err != nil {
-		return domain.EmptyID, fmt.Errorf("%s: %w", op, err)
+		return "", fmt.Errorf("%s: %w", op, err)
 	}
 
 	return id, nil

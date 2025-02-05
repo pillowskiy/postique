@@ -22,8 +22,8 @@ type AuthRepository interface {
 }
 
 type AuthAppUseCase interface {
-	GenerateToken(ctx context.Context, user *domain.User, appName domain.Name) (string, error)
-	App(ctx context.Context, appName string) (*domain.App, error)
+	CreateSession(ctx context.Context, payload *dto.UserPayload, appName string) (*dto.Session, error)
+	App(ctx context.Context, appName string) (*dto.AppResult, error)
 }
 
 type authUseCase struct {
@@ -40,72 +40,66 @@ func NewAuthUseCase(authRepo AuthRepository, appUC AuthAppUseCase, log *slog.Log
 	}
 }
 
-func (uc *authUseCase) Login(ctx context.Context, dto *dto.LoginUserDTO) (string, error) {
+func (uc *authUseCase) Login(ctx context.Context, input *dto.LoginUserInput) (*dto.Session, error) {
 	const op = "usecase.authUseCase.Login"
-	log := uc.log.With(slog.String("op", op), slog.String("email", dto.Email), slog.String("appName", dto.AppName))
+	log := uc.log.With(slog.String("op", op), slog.String("email", input.Email), slog.String("appName", input.AppName))
 
 	log.Debug("Attempting to login user")
-	email, err := domain.NewEmail(dto.Email)
+	email, err := domain.NewEmail(input.Email)
 	if err != nil {
 		log.Warn("Failed to create domain email", slog.String("error", err.Error()))
-		return "", fmt.Errorf("%s: %w", op, err)
-	}
-
-	appName, err := domain.NewName(dto.AppName)
-	if err != nil {
-		log.Warn("Failed to parse application id", slog.String("error", err.Error()))
-		return "", fmt.Errorf("%s: %w", op, err)
+		return nil, fmt.Errorf("%s: %w", op, err)
 	}
 
 	user, err := uc.authRepo.User(ctx, email)
 	if err != nil {
 		if errors.Is(err, storage.ErrUserNotFound) {
-			return "", fmt.Errorf("%s: %w", op, ErrInvalidCredentials)
+			return nil, fmt.Errorf("%s: %w", op, ErrInvalidCredentials)
 		}
 
 		log.Error("Failed to get user", slog.String("error", err.Error()))
-		return "", fmt.Errorf("%s: %w", op, err)
+		return nil, fmt.Errorf("%s: %w", op, err)
 	}
 
-	if err := user.Password.Compare(dto.Password); err != nil {
+	if err := user.Password.Compare(input.Password); err != nil {
 		log.Info("Invalid credentials", slog.String("error", err.Error()))
-		return "", fmt.Errorf("%s: %w", op, ErrInvalidCredentials)
+		return nil, fmt.Errorf("%s: %w", op, ErrInvalidCredentials)
 	}
 
-	token, err := uc.appUC.GenerateToken(ctx, user, appName)
+	payload := &dto.UserPayload{UserID: string(user.ID)}
+	session, err := uc.appUC.CreateSession(ctx, payload, input.AppName)
 	if err != nil {
-		return "", fmt.Errorf("%s: %w", op, err)
+		return nil, fmt.Errorf("%s: %w", op, err)
 	}
 
 	log.Debug("User logged in successfully")
 
-	return token, nil
+	return session, nil
 }
 
-func (uc *authUseCase) Register(ctx context.Context, dto *dto.RegisterUserDTO) (domain.ID, error) {
+func (uc *authUseCase) Register(ctx context.Context, input *dto.RegisterUserInput) (*dto.RegisterUserResult, error) {
 	const op = "usecase.authUseCase.Register"
-	log := uc.log.With(slog.String("op", op), slog.String("email", dto.Email))
+	log := uc.log.With(slog.String("op", op), slog.String("email", input.Email))
 
 	log.Debug("Registering user")
-	user, err := domain.NewUser(dto.Email, dto.Password)
+	user, err := domain.NewUser(input.Email, input.Password)
 	if err != nil {
 		log.Warn("Failed to create domain user", slog.String("error", err.Error()))
-		return "", fmt.Errorf("%s: %w", op, err)
+		return nil, fmt.Errorf("%s: %w", op, err)
 	}
 
 	storedUser, err := uc.authRepo.User(ctx, user.Email)
 	if storedUser != nil || err == nil {
-		log.Debug("User already exists", slog.String("error", err.Error()))
-		return "", fmt.Errorf("%s: %w", op, ErrUserAlreadyExists)
+		return nil, fmt.Errorf("%s: %w", op, ErrUserAlreadyExists)
 	}
 
 	userID, err := uc.authRepo.SaveUser(ctx, user)
 	if err != nil {
 		log.Error("Failed to save user", slog.String("error", err.Error()), slog.Any("userID", user.ID))
-		return "", fmt.Errorf("%s: %w", op, err)
+		return nil, fmt.Errorf("%s: %w", op, err)
 	}
 
 	log.Debug("Successfully registered user", slog.Any("userID", user.ID))
 
-	return userID, nil
+	return &dto.RegisterUserResult{UserID: string(userID)}, nil
 }

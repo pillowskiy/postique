@@ -8,6 +8,7 @@ import (
 
 	sq "github.com/Masterminds/squirrel"
 	"github.com/pillowskiy/postique/sso/internal/domain"
+	"github.com/pillowskiy/postique/sso/internal/storage"
 )
 
 type UserStorage struct {
@@ -29,7 +30,7 @@ func (s *UserStorage) User(ctx context.Context, email domain.Email) (*domain.Use
 	rowx := s.pg.Ext(ctx).QueryRowxContext(ctx, q, args...)
 	if err := rowx.StructScan(user); err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return nil, fmt.Errorf("user %w", ErrNotFound)
+			return nil, storage.ErrUserNotFound
 		}
 		return nil, fmt.Errorf("%s: %w", op, err)
 	}
@@ -44,12 +45,12 @@ func (s *UserStorage) SaveUser(ctx context.Context, user *domain.User) (domain.I
 		Values(user.ID, user.Email, user.Password).
 		Suffix(`RETURNING "id"`).ToSql()
 	if err != nil {
-		return domain.EmptyID, fmt.Errorf("%s: %w", op, err)
+		return "", fmt.Errorf("%s: %w", op, err)
 	}
 
 	var id domain.ID
 	if err := s.pg.Ext(ctx).QueryRowxContext(ctx, q, args...).Scan(&id); err != nil {
-		return domain.EmptyID, fmt.Errorf("%s: %w", op, err)
+		return "", fmt.Errorf("%s: %w", op, err)
 	}
 
 	return id, nil
