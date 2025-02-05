@@ -9,6 +9,7 @@ option go_package = "postique.sso.v1;pb";
 service Auth {
     rpc Register (RegisterRequest) returns (RegisterResponse);
     rpc Login (LoginRequest) returns (LoginResponse);
+    rpc Refresh (RefreshRequest) returns (RefreshResponse);
 }
 
 message RegisterRequest {
@@ -27,5 +28,18 @@ message LoginRequest {
 }
 
 message LoginResponse {
-    string token = 1;
+    Session session = 1;
+}
+
+message RefreshRequest {}
+
+message RefreshResponse {
+    Session session = 1;
+}
+
+message Session {
+    string access_token = 1;
+    string refresh_token = 2;
+    string token_type = 3;
+    int64  expires_in = 4;
 }
