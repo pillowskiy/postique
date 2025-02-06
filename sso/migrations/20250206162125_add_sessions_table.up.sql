@@ -1,0 +1,8 @@
+CREATE TABLE IF NOT EXISTS sessions (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    app_id UUID NOT NULL REFERENCES apps (id) ON DELETE CASCADE,
+    token TEXT NOT NULL,
+    valid BOOLEAN NOT NULL DEFAULT TRUE,
+    fingerprint TEXT DEFAULT NULL,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
