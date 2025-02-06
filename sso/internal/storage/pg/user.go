@@ -12,11 +12,11 @@ import (
 )
 
 type UserStorage struct {
-	pg *Storage
+	*Storage
 }
 
 func NewUserStorage(pg *Storage) *UserStorage {
-	return &UserStorage{pg: pg}
+	return &UserStorage{Storage: pg}
 }
 
 func (s *UserStorage) User(ctx context.Context, email domain.Email) (*domain.User, error) {
@@ -27,7 +27,7 @@ func (s *UserStorage) User(ctx context.Context, email domain.Email) (*domain.Use
 	}
 
 	user := new(domain.User)
-	rowx := s.pg.Ext(ctx).QueryRowxContext(ctx, q, args...)
+	rowx := s.ext(ctx).QueryRowxContext(ctx, q, args...)
 	if err := rowx.StructScan(user); err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, storage.ErrUserNotFound
@@ -49,7 +49,7 @@ func (s *UserStorage) SaveUser(ctx context.Context, user *domain.User) (domain.I
 	}
 
 	var id domain.ID
-	if err := s.pg.Ext(ctx).QueryRowxContext(ctx, q, args...).Scan(&id); err != nil {
+	if err := s.ext(ctx).QueryRowxContext(ctx, q, args...).Scan(&id); err != nil {
 		return "", fmt.Errorf("%s: %w", op, err)
 	}
 

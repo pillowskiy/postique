@@ -58,11 +58,7 @@ func MustConnect(cfg config.Postgres) *Storage {
 	return &Storage{__db: db}
 }
 
-func (s *Storage) Close() error {
-	return s.__db.Close()
-}
-
-func (s *Storage) Ext(ctx context.Context) Ext {
+func (s *Storage) ext(ctx context.Context) Ext {
 	pgExt, ok := ctx.Value(txKey{}).(Ext)
 	if !ok {
 		return s.__db

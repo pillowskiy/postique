@@ -6,8 +6,9 @@ import (
 )
 
 var (
-	ErrUserNotFound = errors.New("user not found")
-	ErrAppNotFound  = errors.New("app not found")
+	ErrUserNotFound    = errors.New("user not found")
+	ErrAppNotFound     = errors.New("app not found")
+	ErrSessionNotFound = errors.New("session not found")
 )
 
 type InTransactionalCall func(ctx context.Context) error

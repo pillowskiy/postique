@@ -12,11 +12,11 @@ import (
 )
 
 type AppStorage struct {
-	pg *Storage
+	*Storage
 }
 
 func NewAppStorage(pg *Storage) *AppStorage {
-	return &AppStorage{pg: pg}
+	return &AppStorage{Storage: pg}
 }
 
 func (s *AppStorage) App(ctx context.Context, name domain.Name) (*domain.App, error) {
@@ -27,7 +27,7 @@ func (s *AppStorage) App(ctx context.Context, name domain.Name) (*domain.App, er
 	}
 
 	app := new(domain.App)
-	if err := s.pg.Ext(ctx).QueryRowxContext(ctx, q, args...).StructScan(app); err != nil {
+	if err := s.ext(ctx).QueryRowxContext(ctx, q, args...).StructScan(app); err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, storage.ErrAppNotFound
 		}
@@ -48,7 +48,7 @@ func (s *AppStorage) SaveApp(ctx context.Context, app *domain.App) (domain.ID, e
 	}
 
 	var id domain.ID
-	if err := s.pg.Ext(ctx).QueryRowxContext(ctx, q, args...).Scan(&id); err != nil {
+	if err := s.ext(ctx).QueryRowxContext(ctx, q, args...).Scan(&id); err != nil {
 		return "", fmt.Errorf("%s: %w", op, err)
 	}
 
