@@ -17,4 +17,4 @@ type LoginUserInput struct {
 
 type LoginUserResult = TokenGenResult
 
-type RefreshUserResult = TokenGenResult
+type RefreshSessionResult = TokenGenResult

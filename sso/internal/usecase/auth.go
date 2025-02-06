@@ -22,8 +22,10 @@ type AuthRepository interface {
 }
 
 type AuthAppUseCase interface {
-	CreateSession(ctx context.Context, payload *dto.UserPayload, appName string) (*dto.Session, error)
-	App(ctx context.Context, appName string) (*dto.AppResult, error)
+	CreateSession(ctx context.Context, payload *dto.UserPayload, fingerprint *string, appName string) (*dto.Session, error)
+	VerifyAccess(ctx context.Context, token string) (*dto.UserPayload, error)
+	RefreshSession(ctx context.Context, token string, fingerprint *string, appName string) (*dto.Session, error)
+	App(ctx context.Context, appName string) (*dto.App, error)
 }
 
 type authUseCase struct {
@@ -40,9 +42,21 @@ func NewAuthUseCase(authRepo AuthRepository, appUC AuthAppUseCase, log *slog.Log
 	}
 }
 
-func (uc *authUseCase) Login(ctx context.Context, input *dto.LoginUserInput) (*dto.Session, error) {
+func (uc *authUseCase) Verify(ctx context.Context, token string) (*dto.UserPayload, error) {
+	return uc.appUC.VerifyAccess(ctx, token)
+}
+
+func (uc *authUseCase) Refresh(ctx context.Context, token string, fingerprint *string, appName string) (*dto.Session, error) {
+	return uc.appUC.RefreshSession(ctx, token, fingerprint, appName)
+}
+
+func (uc *authUseCase) Login(ctx context.Context, input *dto.LoginUserInput, fingerprint *string) (*dto.Session, error) {
 	const op = "usecase.authUseCase.Login"
-	log := uc.log.With(slog.String("op", op), slog.String("email", input.Email), slog.String("appName", input.AppName))
+	log := uc.log.With(
+		slog.String("op", op),
+		slog.String("email", input.Email),
+		slog.String("appName", input.AppName),
+	)
 
 	log.Debug("Attempting to login user")
 	email, err := domain.NewEmail(input.Email)
@@ -67,7 +81,7 @@ func (uc *authUseCase) Login(ctx context.Context, input *dto.LoginUserInput) (*d
 	}
 
 	payload := &dto.UserPayload{UserID: string(user.ID)}
-	session, err := uc.appUC.CreateSession(ctx, payload, input.AppName)
+	session, err := uc.appUC.CreateSession(ctx, payload, fingerprint, input.AppName)
 	if err != nil {
 		return nil, fmt.Errorf("%s: %w", op, err)
 	}

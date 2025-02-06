@@ -23,7 +23,9 @@ type AppRepository interface {
 }
 
 type AppSessionUseCase interface {
-	CreateSession(ctx context.Context, payload *dto.UserPayload, secret string) (*dto.Session, error)
+	Create(ctx context.Context, payload *dto.UserPayload, meta *dto.AppSessionMeta, secret string) (*dto.Session, error)
+	Refresh(ctx context.Context, appSession *dto.AppSession, secret string) (*dto.Session, error)
+	VerifyAccess(ctx context.Context, token string) (*dto.UserPayload, error)
 }
 
 type appUseCase struct {
@@ -37,8 +39,46 @@ func NewAppUseCase(appRepo AppRepository, sessionUC AppSessionUseCase, cfg confi
 	return &appUseCase{appRepo: appRepo, sessionUC: sessionUC, cfg: cfg, log: log}
 }
 
-func (uc *appUseCase) CreateSession(ctx context.Context, payload *dto.UserPayload, appName string) (*dto.Session, error) {
-	const op = "usecase.appUseCase.GenToken"
+func (uc *appUseCase) VerifyAccess(ctx context.Context, token string) (*dto.UserPayload, error) {
+	return uc.sessionUC.VerifyAccess(ctx, token)
+}
+
+func (uc *appUseCase) RefreshSession(ctx context.Context, token string, fingerprint *string, appName string) (*dto.Session, error) {
+	const op = "usecase.appUseCase.RefreshSession"
+	log := uc.log.With(
+		slog.String("op", op),
+		slog.String("appName", appName),
+	)
+
+	app, err := uc.app(ctx, appName)
+	if err != nil {
+		return nil, fmt.Errorf("%s: %w", op, err)
+	}
+
+	appSecret, err := app.Secret.Decrypt(uc.cfg.EncryptionSecret)
+	if err != nil {
+		log.Error("Failed to get app secret", slog.String("error", err.Error()))
+		return nil, fmt.Errorf("%s: %w", op, err)
+	}
+
+	appSession := &dto.AppSession{
+		AppSessionMeta: dto.AppSessionMeta{
+			AppID:       string(app.ID),
+			Fingerprint: fingerprint,
+		},
+		Token: token,
+	}
+	session, err := uc.sessionUC.Refresh(ctx, appSession, appSecret)
+	if err != nil {
+		log.Error("Failed to refresh session", slog.String("error", err.Error()))
+		return nil, fmt.Errorf("%s: %w", op, err)
+	}
+
+	return session, nil
+}
+
+func (uc *appUseCase) CreateSession(ctx context.Context, payload *dto.UserPayload, fingerprint *string, appName string) (*dto.Session, error) {
+	const op = "usecase.appUseCase.CreateSession"
 	log := uc.log.With(
 		slog.String("op", op),
 		slog.Any("payload", payload),
@@ -46,13 +86,19 @@ func (uc *appUseCase) CreateSession(ctx context.Context, payload *dto.UserPayloa
 	)
 
 	log.Debug("Creating new session")
-	appSecret, err := uc.appSecret(ctx, appName)
+	app, err := uc.app(ctx, appName)
+	if err != nil {
+		return nil, fmt.Errorf("%s: %w", op, err)
+	}
+
+	appSecret, err := app.Secret.Decrypt(uc.cfg.EncryptionSecret)
 	if err != nil {
 		log.Error("Failed to get app secret", slog.String("error", err.Error()))
 		return nil, fmt.Errorf("%s: %w", op, err)
 	}
 
-	session, err := uc.sessionUC.CreateSession(ctx, payload, appSecret)
+	meta := &dto.AppSessionMeta{AppID: string(app.ID), Fingerprint: fingerprint}
+	session, err := uc.sessionUC.Create(ctx, payload, meta, appSecret)
 	if err != nil {
 		log.Error("Failed to generate token", slog.String("error", err.Error()))
 		return nil, fmt.Errorf("%s: %w", op, err)
@@ -89,13 +135,13 @@ func (uc *appUseCase) CreateApp(ctx context.Context, input *dto.CreateAppInput) 
 	return &dto.CreateAppResult{AppID: string(appID)}, nil
 }
 
-func (uc *appUseCase) App(ctx context.Context, name string) (*dto.AppResult, error) {
+func (uc *appUseCase) App(ctx context.Context, name string) (*dto.App, error) {
 	app, err := uc.app(ctx, name)
 	if err != nil {
 		return nil, err
 	}
 
-	return &dto.AppResult{
+	return &dto.App{
 		ID:   string(app.ID),
 		Name: string(app.Name),
 	}, nil
@@ -121,20 +167,4 @@ func (uc *appUseCase) app(ctx context.Context, name string) (*domain.App, error)
 	}
 
 	return app, nil
-}
-
-func (uc *appUseCase) appSecret(ctx context.Context, appName string) (string, error) {
-	const op = "usecase.appUseCase.appSecret"
-
-	app, err := uc.app(ctx, appName)
-	if err != nil {
-		return "", fmt.Errorf("%s: %w", op, err)
-	}
-
-	appSecret, err := app.Secret.Decrypt(uc.cfg.EncryptionSecret)
-	if err != nil {
-		return "", fmt.Errorf("%s: %w", op, err)
-	}
-
-	return appSecret, nil
 }

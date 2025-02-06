@@ -1,6 +1,6 @@
 package dto
 
-type AppResult struct {
+type App struct {
 	ID   string
 	Name string
 }
