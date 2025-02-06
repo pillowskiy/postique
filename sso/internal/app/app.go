@@ -16,7 +16,8 @@ type App struct {
 func New(log *slog.Logger, cfg *config.Config) *App {
 	pgStorage := pg.MustConnect(cfg.Postgres)
 
-	sessionUC := usecase.NewSessionUseCase(cfg.Session, log)
+	sessionRepo := pg.NewSessionStorage(pgStorage)
+	sessionUC := usecase.NewSessionUseCase(sessionRepo, cfg.Session, log)
 
 	appRepo := pg.NewAppStorage(pgStorage)
 	appUC := usecase.NewAppUseCase(appRepo, sessionUC, cfg.Session, log)

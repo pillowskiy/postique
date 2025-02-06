@@ -5,6 +5,7 @@ import (
 	"errors"
 
 	pb "github.com/pillowskiy/postique/pb/v1/sso"
+	"github.com/pillowskiy/postique/sso/internal/delivery/grpc/interceptor"
 	"github.com/pillowskiy/postique/sso/internal/dto"
 	"github.com/pillowskiy/postique/sso/internal/usecase"
 	"github.com/pillowskiy/postique/sso/pkg/validator"
@@ -24,8 +25,10 @@ var authRulesMessages = ValidationRulesMap{
 }
 
 type AuthUseCase interface {
-	Login(ctx context.Context, dto *dto.LoginUserInput) (*dto.Session, error)
+	Login(ctx context.Context, dto *dto.LoginUserInput, fingerprint *string) (*dto.Session, error)
 	Register(ctx context.Context, dto *dto.RegisterUserInput) (*dto.RegisterUserResult, error)
+	Verify(ctx context.Context, token string) (*dto.UserPayload, error)
+	Refresh(ctx context.Context, token string, fingerprint *string, appName string) (*dto.Session, error)
 }
 
 type authServer struct {
@@ -48,7 +51,7 @@ func (s *authServer) Login(ctx context.Context, req *pb.LoginRequest) (*pb.Login
 		AppName:  req.GetAppName(),
 	}
 
-	session, err := s.authUC.Login(ctx, dto)
+	session, err := s.authUC.Login(ctx, dto, nil)
 	if err != nil {
 		return nil, s.parseUseCaseErr(err)
 	}
@@ -79,6 +82,40 @@ func (s *authServer) Register(ctx context.Context, req *pb.RegisterRequest) (*pb
 	}
 
 	return &pb.RegisterResponse{UserId: res.UserID}, nil
+}
+
+func (s *authServer) Refresh(ctx context.Context, req *pb.RefreshRequest) (*pb.RefreshResponse, error) {
+	if err := validator.ValidateGRPC(req); err != nil {
+		return nil, formatValidationError(err, authRulesMessages)
+	}
+
+	session, err := s.authUC.Refresh(ctx, req.GetToken(), nil, req.GetAppName())
+	if err != nil {
+		return nil, s.parseUseCaseErr(err)
+	}
+
+	return &pb.RefreshResponse{
+		Session: &pb.Session{
+			RefreshToken: session.Token,
+			AccessToken:  session.AccessToken,
+			TokenType:    session.TokenType,
+			ExpiresIn:    int64(session.ExpiresIn.Seconds()),
+		},
+	}, nil
+}
+
+func (s *authServer) Verify(ctx context.Context, req *pb.VerifyRequest) (*pb.VerifyResponse, error) {
+	token, err := interceptor.TokenFromContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	res, err := s.authUC.Verify(ctx, token)
+	if err != nil {
+		return nil, s.parseUseCaseErr(err)
+	}
+
+	return &pb.VerifyResponse{UserId: res.UserID}, nil
 }
 
 func (s *authServer) parseUseCaseErr(err error) error {

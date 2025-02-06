@@ -10,6 +10,7 @@ service Auth {
     rpc Register (RegisterRequest) returns (RegisterResponse);
     rpc Login (LoginRequest) returns (LoginResponse);
     rpc Refresh (RefreshRequest) returns (RefreshResponse);
+    rpc Verify (VerifyRequest) returns (VerifyResponse);
 }
 
 message RegisterRequest {
@@ -31,7 +32,10 @@ message LoginResponse {
     Session session = 1;
 }
 
-message RefreshRequest {}
+message RefreshRequest {
+    string token = 1;
+    string app_name = 2 [(buf.validate.field).string = {min_len: 2}];
+}
 
 message RefreshResponse {
     Session session = 1;
@@ -42,4 +46,10 @@ message Session {
     string refresh_token = 2;
     string token_type = 3;
     int64  expires_in = 4;
+}
+
+message VerifyRequest {}
+
+message VerifyResponse {
+    string user_id = 1;
 }
