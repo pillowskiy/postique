@@ -18,8 +18,8 @@ var authRulesMessages = ValidationRulesMap{
 	"email.string.email_empty": "Email address shouldn't be empty",
 	"email.string.email":       "Email has incorrect format",
 	"email.string.max_len":     "The length of email address should be less than {{.RuleValue}}",
-	"password.string.min_len":  "Password should be longer than {{.RuleValue}} symbols",
-	"password.string.max_len":  "Password should be less than {{.RuleValue}} symbols",
+	"password.string.min_len":  "Password should be longer than {{.RuleValue}} characters",
+	"password.string.max_len":  "Password should be less than {{.RuleValue}} characters",
 	"app_id.string.uuid":       "App ID has incorrect format",
 	"user_id.string.uuid":      "User ID has incorrect format",
 }

@@ -9,8 +9,10 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
+type MapClaims = jwt.MapClaims
+
 func New(payload interface{}, secret string, duration time.Duration) (string, error) {
-	claims := &jwt.MapClaims{
+	claims := &MapClaims{
 		"exp": time.Now().Add(duration).Unix(),
 	}
 
@@ -51,7 +53,7 @@ func VerifyAndScan(token, secret string, dest interface{}) error {
 		return err
 	}
 
-	claims, ok := payload.(jwt.MapClaims)
+	claims, ok := payload.(MapClaims)
 	if !ok {
 		return fmt.Errorf("failed to assert payload as jwt.MapClaims")
 	}
