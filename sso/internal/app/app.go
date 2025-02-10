@@ -16,6 +16,12 @@ type App struct {
 func New(log *slog.Logger, cfg *config.Config) *App {
 	pgStorage := pg.MustConnect(cfg.Postgres)
 
+	roleRepo := pg.NewRoleStorage(pgStorage)
+	roleUC := usecase.NewRoleUseCase(roleRepo, log)
+
+	permRepo := pg.NewPermissionStorage(pgStorage)
+	permUC := usecase.NewPermissionUseCase(permRepo, roleUC, log)
+
 	sessionRepo := pg.NewSessionStorage(pgStorage)
 	sessionUC := usecase.NewSessionUseCase(sessionRepo, cfg.Session, log)
 
@@ -25,7 +31,7 @@ func New(log *slog.Logger, cfg *config.Config) *App {
 	authRepo := pg.NewUserStorage(pgStorage)
 	authUC := usecase.NewAuthUseCase(authRepo, appUC, log)
 
-	grpcApp := grpc.NewApp(log, cfg.Server, appUC, authUC)
+	grpcApp := grpc.NewApp(log, cfg.Server, appUC, authUC, permUC)
 
 	return &App{grpcApp: grpcApp}
 }

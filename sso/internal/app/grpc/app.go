@@ -6,6 +6,7 @@ import (
 	"net"
 
 	"github.com/pillowskiy/postique/sso/internal/config"
+	"github.com/pillowskiy/postique/sso/internal/delivery/grpc/interceptor"
 	"github.com/pillowskiy/postique/sso/internal/delivery/grpc/server"
 	"google.golang.org/grpc"
 )
@@ -16,11 +17,20 @@ type App struct {
 	cfg        config.Server
 }
 
-func NewApp(log *slog.Logger, cfg config.Server, appUC server.AppUseCase, authUC server.AuthUseCase) *App {
-	grpcServer := grpc.NewServer()
+func NewApp(
+	log *slog.Logger,
+	cfg config.Server,
+	appUC server.AppUseCase,
+	authUC server.AuthUseCase,
+	permUC server.PermissionUseCase,
+) *App {
+	grpcServer := grpc.NewServer(
+		interceptor.UnaryWithAuth(authUC)(interceptor.Method("permission", "*", "HasPermission")),
+	)
 
 	server.RegisterAppServer(grpcServer, appUC)
 	server.RegisterAuthServer(grpcServer, authUC)
+	server.RegisterPermissionServer(grpcServer, permUC)
 
 	return &App{log: log, grpcServer: grpcServer, cfg: cfg}
 }

@@ -2,9 +2,12 @@ package pg
 
 import (
 	"context"
+	"database/sql"
+	"errors"
 	"fmt"
 
 	"github.com/pillowskiy/postique/sso/internal/domain"
+	"github.com/pillowskiy/postique/sso/internal/storage"
 )
 
 type PermissionStorage struct {
@@ -25,6 +28,9 @@ func (s *PermissionStorage) GetPermission(ctx context.Context, name domain.PermN
 	perm := new(domain.Permission)
 	rowx := s.ext(ctx).QueryRowxContext(ctx, q, args...)
 	if err := rowx.StructScan(perm); err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, storage.ErrPermissionNotFound
+		}
 		return nil, fmt.Errorf("%s: %w", op, err)
 	}
 

@@ -5,7 +5,7 @@ type RolesHierarchy struct {
 	VirtualRoles []ID `db:"virtual_roles"`
 }
 
-func (rh *RolesHierarchy) HasAllowedPermissionRole(perms []*PermissionRole) bool {
+func (rh *RolesHierarchy) HasPermittedRole(perms []*PermissionRole) bool {
 	return !rh.hasDirectDeny(perms) && rh.hasVirtualAllow(perms)
 }
 
@@ -18,9 +18,9 @@ func (rh *RolesHierarchy) hasDirectDeny(perms []*PermissionRole) bool {
 			}
 
 			if pr.Allowed {
-				allowedHoist = pr.Hoist
+				allowedHoist = max(allowedHoist, pr.Hoist)
 			} else {
-				denyHoist = pr.Hoist
+				denyHoist = max(denyHoist, pr.Hoist)
 			}
 		}
 	}
