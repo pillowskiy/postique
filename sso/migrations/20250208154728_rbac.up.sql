@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS permissions (
     created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
-CREATE TABLE IF NOT EXISTS role_permissions(
+CREATE TABLE IF NOT EXISTS role_permissions (
     role_id UUID REFERENCES roles (id) ON DELETE CASCADE,
     permission_id UUID REFERENCES permissions (id) ON DELETE CASCADE,
     allowed BOOLEAN NOT NULL DEFAULT TRUE,
@@ -24,9 +24,13 @@ CREATE TABLE IF NOT EXISTS user_roles (
     PRIMARY KEY (user_id, role_id)
 );
 
-INSERT INTO roles (name, hoist) VALUES ('user', 0), ('moderator', 1), ('admin', 2);
+INSERT INTO roles (name, hoist) VALUES ('user', 0),
+('moderator', 1),
+('admin', 2);
 
 INSERT INTO user_roles (user_id, role_id)
-SELECT u.id, r.id
-FROM users u, roles r
+SELECT
+    u.id AS user_id,
+    r.id AS role_id
+FROM users AS u, roles AS r
 WHERE r.name = 'user';
