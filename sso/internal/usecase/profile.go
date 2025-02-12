@@ -75,7 +75,7 @@ func (uc *profileUseCase) Profile(ctx context.Context, userID domain.PID) (*dto.
 	return &dto.Profile{
 		UserID:     string(profile.UserID),
 		Username:   string(profile.Username),
-		AvatarPath: string(profile.AvatarPath),
+		AvatarPath: profile.AvatarPath.String(),
 		Bio:        string(profile.Bio),
 		CreatedAt:  profile.CreatedAt,
 	}, nil

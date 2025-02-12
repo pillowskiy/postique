@@ -25,7 +25,10 @@ func NewApp(
 	permUC server.PermissionUseCase,
 ) *App {
 	grpcServer := grpc.NewServer(
-		interceptor.UnaryWithAuth(authUC)(interceptor.Method("permission", "*", "HasPermission")),
+		interceptor.UnaryWithAuth(authUC)(
+			interceptor.Method("permission", "*", "HasPermission"),
+			interceptor.Method("auth", "*", "Verify"),
+		),
 	)
 
 	server.RegisterAppServer(grpcServer, appUC)

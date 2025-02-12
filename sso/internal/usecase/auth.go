@@ -31,6 +31,7 @@ type AuthAppUseCase interface {
 
 type AuthProfileUseCase interface {
 	CreateProfile(ctx context.Context, profile *dto.CreateProfileInput) (string, error)
+	Profile(ctx context.Context, userID domain.PID) (*dto.Profile, error)
 }
 
 type authUseCase struct {
@@ -49,8 +50,23 @@ func NewAuthUseCase(authRepo AuthRepository, appUC AuthAppUseCase, profileUC Aut
 	}
 }
 
-func (uc *authUseCase) Verify(ctx context.Context, token string) (*dto.UserPayload, error) {
-	return uc.appUC.VerifyAccess(ctx, token)
+func (uc *authUseCase) Verify(ctx context.Context, token string) (*dto.AuthUser, error) {
+	const op = "usecase.authUsecase.Verify"
+	payload, err := uc.appUC.VerifyAccess(ctx, token)
+	if err != nil {
+		return nil, fmt.Errorf("%s: %w", op, err)
+	}
+
+	profile, err := uc.profileUC.Profile(ctx, payload.UserID)
+	if err != nil {
+		return nil, fmt.Errorf("%s: %w", op, err)
+	}
+
+	return &dto.AuthUser{
+		UserID:     profile.UserID,
+		Username:   profile.Username,
+		AvatarPath: profile.AvatarPath,
+	}, nil
 }
 
 func (uc *authUseCase) Refresh(ctx context.Context, token string, fingerprint *string, appName string) (*dto.Session, error) {

@@ -34,12 +34,12 @@ func (s *permissionServer) HasPermission(ctx context.Context, req *pb.HasPermiss
 		return nil, formatValidationError(err, permissionRulesMessages)
 	}
 
-	userID, err := interceptor.UserFromContext(ctx)
+	user, err := interceptor.UserFromContext(ctx)
 	if err != nil {
 		return nil, status.Error(codes.Internal, "failed to get user from execution context")
 	}
 
-	hasPermission, err := s.permUC.HasPermission(ctx, userID, req.GetName())
+	hasPermission, err := s.permUC.HasPermission(ctx, user.UserID, req.GetName())
 	if err != nil {
 		return nil, status.Error(codes.PermissionDenied, "permission denied")
 	}

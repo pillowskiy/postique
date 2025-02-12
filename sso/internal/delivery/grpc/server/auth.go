@@ -27,7 +27,7 @@ var authRulesMessages = ValidationRulesMap{
 type AuthUseCase interface {
 	Login(ctx context.Context, dto *dto.LoginUserInput, fingerprint *string) (*dto.Session, error)
 	Register(ctx context.Context, dto *dto.RegisterUserInput) (*dto.RegisterUserResult, error)
-	Verify(ctx context.Context, token string) (*dto.UserPayload, error)
+	Verify(ctx context.Context, token string) (*dto.AuthUser, error)
 	Refresh(ctx context.Context, token string, fingerprint *string, appName string) (*dto.Session, error)
 }
 
@@ -105,17 +105,16 @@ func (s *authServer) Refresh(ctx context.Context, req *pb.RefreshRequest) (*pb.R
 }
 
 func (s *authServer) Verify(ctx context.Context, req *pb.VerifyRequest) (*pb.VerifyResponse, error) {
-	token, err := interceptor.TokenFromContext(ctx)
+	user, err := interceptor.UserFromContext(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	res, err := s.authUC.Verify(ctx, token)
-	if err != nil {
-		return nil, s.parseUseCaseErr(err)
-	}
-
-	return &pb.VerifyResponse{UserId: res.UserID}, nil
+	return &pb.VerifyResponse{
+		UserId:     user.UserID,
+		Username:   user.Username,
+		AvatarPath: user.AvatarPath,
+	}, nil
 }
 
 func (s *authServer) parseUseCaseErr(err error) error {

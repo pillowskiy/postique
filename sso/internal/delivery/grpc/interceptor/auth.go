@@ -17,7 +17,7 @@ type key struct{}
 var authUserKey key
 
 type AuthUseCase interface {
-	Verify(ctx context.Context, token string) (*dto.UserPayload, error)
+	Verify(ctx context.Context, token string) (*dto.AuthUser, error)
 }
 
 type AuthInterceptorFactory struct {
@@ -35,12 +35,12 @@ func UnaryWithAuth(authUC AuthUseCase) UnarySpecificMethod {
 			return nil, status.Error(codes.Unauthenticated, err.Error())
 		}
 
-		payload, err := authUC.Verify(ctx, token)
+		user, err := authUC.Verify(ctx, token)
 		if err != nil {
 			return nil, status.Error(codes.Unauthenticated, "failed to verify token")
 		}
 
-		ctx = context.WithValue(ctx, authUserKey, payload.UserID)
+		ctx = context.WithValue(ctx, authUserKey, *user)
 		return handler(ctx, req)
 	})
 }
@@ -64,11 +64,11 @@ func TokenFromContext(ctx context.Context) (string, error) {
 	return parts[1], nil
 }
 
-func UserFromContext(ctx context.Context) (string, error) {
-	userID, ok := ctx.Value(authUserKey).(string)
+func UserFromContext(ctx context.Context) (*dto.AuthUser, error) {
+	user, ok := ctx.Value(authUserKey).(dto.AuthUser)
 	if !ok {
-		return "", errors.New("cannot infer user id from incoming context")
+		return nil, errors.New("cannot infer user id from incoming context")
 	}
 
-	return userID, nil
+	return &user, nil
 }

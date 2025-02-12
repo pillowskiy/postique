@@ -32,6 +32,12 @@ type SessionRepository interface {
 	storage.Transactional
 }
 
+type SessionCache interface {
+	Set(ctx context.Context, id string, data *domain.Session, ttl int) error
+	Get(ctx context.Context, id string) (*domain.Session, error)
+	Del(ctx context.Context, id string)
+}
+
 type sessionUseCase struct {
 	sessionRepo SessionRepository
 	cfg         config.Session

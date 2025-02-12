@@ -938,6 +938,10 @@ func (m *VerifyResponse) validate(all bool) error {
 
 	// no validation rules for UserId
 
+	// no validation rules for Username
+
+	// no validation rules for AvatarPath
+
 	if len(errors) > 0 {
 		return VerifyResponseMultiError(errors)
 	}

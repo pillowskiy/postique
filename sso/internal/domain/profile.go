@@ -8,11 +8,11 @@ import (
 )
 
 type UserProfile struct {
-	UserID     ID         `db:"user_id"`
-	Username   Username   `db:"username"`
-	AvatarPath AvatarPath `db:"avatar_path"`
-	Bio        Bio        `db:"bio"`
-	CreatedAt  time.Time  `db:"created_at"`
+	UserID     ID          `db:"user_id"`
+	Username   Username    `db:"username"`
+	AvatarPath *AvatarPath `db:"avatar_path"`
+	Bio        Bio         `db:"bio"`
+	CreatedAt  time.Time   `db:"created_at"`
 }
 
 func NewUserProfile(userID PID, username, bio string) (*UserProfile, error) {
@@ -39,7 +39,7 @@ func NewUserProfile(userID PID, username, bio string) (*UserProfile, error) {
 	return &UserProfile{
 		UserID:     uid,
 		Username:   uname,
-		AvatarPath: avatarPath,
+		AvatarPath: &avatarPath,
 		Bio:        ubio,
 		CreatedAt:  time.Now(),
 	}, nil
@@ -60,6 +60,14 @@ func NewAvatarPath(str string) (AvatarPath, error) {
 func GenAvatarPath() (AvatarPath, error) {
 	path, err := gen.GenerateRand256()
 	return AvatarPath(path), err
+}
+
+func (ap *AvatarPath) String() string {
+	if ap == nil {
+		return ""
+	}
+
+	return string(*ap)
 }
 
 type Bio string
