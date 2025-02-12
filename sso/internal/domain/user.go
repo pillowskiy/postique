@@ -2,6 +2,7 @@ package domain
 
 import (
 	"errors"
+	"strings"
 
 	"github.com/pillowskiy/postique/sso/internal/lib/crypto"
 )
@@ -56,4 +57,21 @@ func NewEmail(str string) (Email, error) {
 	}
 
 	return Email(str), nil
+}
+
+func (e Email) AsUsername() string {
+	prts := strings.Split(string(e), "@")
+	uname := prts[0]
+	if len(prts) > 1 {
+		domainPrts := strings.Split(prts[1], ".")
+		lastPart := ""
+		for _, dp := range domainPrts {
+			lastPart += string(dp[0])
+		}
+
+		if len(lastPart) > 0 {
+			uname += "_" + lastPart
+		}
+	}
+	return uname
 }

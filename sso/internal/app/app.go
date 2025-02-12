@@ -28,8 +28,11 @@ func New(log *slog.Logger, cfg *config.Config) *App {
 	appRepo := pg.NewAppStorage(pgStorage)
 	appUC := usecase.NewAppUseCase(appRepo, sessionUC, cfg.Session, log)
 
+	profileRepo := pg.NewProfileStorage(pgStorage)
+	profileUC := usecase.NewProfileUseCase(profileRepo, log)
+
 	authRepo := pg.NewUserStorage(pgStorage)
-	authUC := usecase.NewAuthUseCase(authRepo, appUC, log)
+	authUC := usecase.NewAuthUseCase(authRepo, appUC, profileUC, log)
 
 	grpcApp := grpc.NewApp(log, cfg.Server, appUC, authUC, permUC)
 

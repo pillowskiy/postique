@@ -19,6 +19,7 @@ var (
 type AuthRepository interface {
 	SaveUser(ctx context.Context, user *domain.User) (domain.ID, error)
 	User(ctx context.Context, email domain.Email) (*domain.User, error)
+	storage.Transactional
 }
 
 type AuthAppUseCase interface {
@@ -28,17 +29,23 @@ type AuthAppUseCase interface {
 	App(ctx context.Context, appName string) (*dto.App, error)
 }
 
-type authUseCase struct {
-	authRepo AuthRepository
-	appUC    AuthAppUseCase
-	log      *slog.Logger
+type AuthProfileUseCase interface {
+	CreateProfile(ctx context.Context, profile *dto.CreateProfileInput) (string, error)
 }
 
-func NewAuthUseCase(authRepo AuthRepository, appUC AuthAppUseCase, log *slog.Logger) *authUseCase {
+type authUseCase struct {
+	authRepo  AuthRepository
+	appUC     AuthAppUseCase
+	profileUC AuthProfileUseCase
+	log       *slog.Logger
+}
+
+func NewAuthUseCase(authRepo AuthRepository, appUC AuthAppUseCase, profileUC AuthProfileUseCase, log *slog.Logger) *authUseCase {
 	return &authUseCase{
-		authRepo: authRepo,
-		appUC:    appUC,
-		log:      log,
+		authRepo:  authRepo,
+		appUC:     appUC,
+		profileUC: profileUC,
+		log:       log,
 	}
 }
 
@@ -107,13 +114,29 @@ func (uc *authUseCase) Register(ctx context.Context, input *dto.RegisterUserInpu
 		return nil, fmt.Errorf("%s: %w", op, ErrUserAlreadyExists)
 	}
 
-	userID, err := uc.authRepo.SaveUser(ctx, user)
+	err = uc.authRepo.DoInTransaction(ctx, func(ctx context.Context) error {
+		userID, err := uc.authRepo.SaveUser(ctx, user)
+		if err != nil {
+			log.Error("Failed to save user", slog.String("error", err.Error()), slog.Any("userID", user.ID))
+			return fmt.Errorf("%s: %w", op, err)
+		}
+
+		profileInput := &dto.CreateProfileInput{
+			UserID:   domain.PID(userID),
+			Username: user.Email.AsUsername(),
+			Bio:      "",
+		}
+		if _, err := uc.profileUC.CreateProfile(ctx, profileInput); err != nil {
+			return fmt.Errorf("%s: %w", op, err)
+		}
+
+		return nil
+	})
 	if err != nil {
-		log.Error("Failed to save user", slog.String("error", err.Error()), slog.Any("userID", user.ID))
-		return nil, fmt.Errorf("%s: %w", op, err)
+		return nil, err
 	}
 
 	log.Debug("Successfully registered user", slog.Any("userID", user.ID))
 
-	return &dto.RegisterUserResult{UserID: string(userID)}, nil
+	return &dto.RegisterUserResult{UserID: domain.PID(user.ID)}, nil
 }

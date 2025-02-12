@@ -11,6 +11,8 @@ var (
 	ErrSessionNotFound = errors.New("session not found")
 
 	ErrPermissionNotFound = errors.New("permission not found")
+
+	ErrProfileNotFound = errors.New("profile not found")
 )
 
 type InTransactionalCall func(ctx context.Context) error
