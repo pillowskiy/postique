@@ -1,4 +1,4 @@
-import registry from './shared/infrastructure/registry/index.js';
+import registry from './registry/index.js';
 
 const server = registry.resolve('server');
 
