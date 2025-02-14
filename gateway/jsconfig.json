@@ -1,0 +1,16 @@
+{
+    "compilerOptions": {
+        "baseUrl": ".",
+        "paths": {
+            "#api/*": ["./src/api/*"],
+            "#shared/*": ["./src/shared/*"]
+        },
+        "moduleResolution": "bundler",
+        "checkJs": true,
+        "target": "ESNext",
+        "module": "ESNext",
+        "strictNullChecks": true,
+        "resolveJsonModule": true
+    },
+    "exclude": ["node_modules", "docs", "thinking"]
+}
