@@ -1,0 +1,22 @@
+{
+	"name": "@postique/pb",
+	"version": "1.0.0",
+	"sideEffects": false,
+	"private": true,
+	"exports": {
+		"./v1/*.pb": {
+			"types": "./v1/*.pb.d.ts",
+			"import": "./v1/*.pb.js",
+			"default": "./v1/*.pb.js"
+		}
+	},
+	"scripts": {
+		"postinstall": "npm link",
+		"build": "tsc --build tsconfig.esm.json"
+	},
+	"devDependencies": {
+		"@types/node": "^22.13.4",
+		"ts-proto": "^2.6.1",
+		"typescript": "^5.7.3"
+	}
+}

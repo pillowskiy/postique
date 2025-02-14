@@ -1,0 +1,12 @@
+{
+	"extends": "./tsconfig.json",
+	"compilerOptions": {
+		"rootDir": "./gen",
+		"module": "ESNext",
+		"moduleResolution": "Bundler",
+		"verbatimModuleSyntax": false,
+		"declaration": true
+	},
+	"include": ["./gen/**/*.ts"],
+	"exclude": ["./gen/_*", "./gen/google"] // Exclude plugins (starts with _, e.g _protovalidate), and google namespace
+}
