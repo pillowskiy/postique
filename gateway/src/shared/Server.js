@@ -22,10 +22,9 @@ export default class Server {
      * @param {AppConfig} config
      */
     constructor(router, logger, config) {
-        this.#instance = express();
         this.#logger = logger;
         this.#config = config;
-        this.#instance.use(router);
+        this.#instance = this.#init(router);
     }
 
     /**
@@ -69,5 +68,18 @@ export default class Server {
      */
     invoke() {
         return this.#instance;
+    }
+
+    /**
+     * @param {express.Router} router
+     * @returns {express.Express}
+     */
+    #init(router) {
+        const app = express();
+        app.set('view engine', 'ejs');
+        app.set('views', this.#config.viewsDir);
+        app.use(express.static(this.#config.staticDir));
+        app.use(router);
+        return app;
     }
 }

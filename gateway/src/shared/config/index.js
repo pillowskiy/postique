@@ -1,3 +1,5 @@
+import path from 'path';
+
 /**
  * @typedef {AppConfig & LoggerConfig} Config
  *
@@ -5,6 +7,8 @@
  * @property {number} port
  * @property {string} host
  * @property {'development' | 'production'} env
+ * @property {string} staticDir
+ * @property {string} viewsDir
  *
  * @typedef {Object} LoggerConfig
  * @property {Object} logger
@@ -12,10 +16,14 @@
  * @property {'pretty' | 'json'} logger.transport
  */
 
+const dirname = new URL('.', import.meta.url).pathname;
+
 /** @returns {Config} */
 export default function Config() {
     return {
         port: 5001,
+        staticDir: path.join(dirname, '../../../public'),
+        viewsDir: path.join(dirname, '../../../views'),
         host: '0.0.0.0',
         env: 'development',
         logger: {

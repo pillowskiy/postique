@@ -5,12 +5,17 @@
     "type": "module",
     "imports": {
         "#shared/*": "./src/shared/*",
-        "#api/*": "./src/api/*"
+        "#api/*": "./src/api/*",
+        "#lib/*": "./src/lib/*"
     },
     "scripts": {
-        "dev": "node src/index.js",
+        "dev": "DEBUG=express:* node src/index.js",
+        "purgecss": "purgecss --config purgecss.config.cjs",
+        "purge": "node scripts/purgecss.js",
+        "types": "node scripts/ejs-gen.js",
         "lint": "eslint --debug src/",
         "lint:write": "eslint --debug src/ --fix",
+        "lint:ejs": "./node_modules/.bin/ejslint views/",
         "format": "prettier --write .",
         "tidy": "depcheck"
     },
@@ -19,19 +24,25 @@
     "devDependencies": {
         "@trivago/prettier-plugin-sort-imports": "^5.2.2",
         "@types/express": "^5.0.0",
+        "@types/node": "^22.13.4",
         "@types/pino": "^7.0.4",
         "depcheck": "^1.4.7",
+        "ejs-lint": "^2.0.1",
         "eslint": "^8.57.1",
         "eslint-config-airbnb-base": "^15.0.0",
         "eslint-config-prettier": "^10.0.1",
         "eslint-plugin-import": "^2.31.0",
         "eslint-plugin-prettier": "^5.2.3",
-        "prettier": "^3.5.1"
+        "prettier": "^3.5.1",
+        "prettier-plugin-ejs": "^1.0.3",
+        "purgecss": "^7.0.2"
     },
     "dependencies": {
+        "@postique/pb": "file:../contracts/gen/js",
         "awilix": "^12.0.4",
         "body-parser": "^1.20.3",
         "compression": "^1.8.0",
+        "ejs": "^3.1.10",
         "express": "^4.21.2",
         "helmet": "^8.0.0",
         "pino": "^9.6.0",
