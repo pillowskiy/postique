@@ -1,4 +1,7 @@
+/* eslint-disable no-restricted-syntax */
+/* eslint-disable no-await-in-loop */
 import fs from 'fs';
+import minimist from 'minimist';
 import prettier from 'prettier';
 
 class EJSContentGenerator {
@@ -25,12 +28,12 @@ class EJSContentGenerator {
      * @returns {Promise<void>}
      */
     async generate() {
-        let content = `
+        const content = `
         /** AUTO-GENERATED - DO NOT CHANGE MANUALLY **/
 
-        declare namespace ejsView {
-            export type EjsVariable = string | number | boolean | null | undefined;
-            export interface EjsContent {${await this.#createEjsInterfaceFromPath(this.#targetDir)}};
+        declare namespace render {
+            export type Variable = string | number | boolean | null | undefined;
+            export interface Templates {${await this.#createEjsInterfaceFromPath(this.#targetDir)}};
         }
 
         /** AUTO-GENERATED - DO NOT CHANGE MANUALLY **/
@@ -52,6 +55,7 @@ class EJSContentGenerator {
             encoding: 'utf-8',
         });
 
+        // eslint-disable-next-line no-restricted-syntax
         for (const dirent of dirents) {
             if (dirent.isFile() && dirent.name.endsWith('.ejs')) {
                 content += await this.#ejsDirentValues(path, dirent);
@@ -83,6 +87,7 @@ class EJSContentGenerator {
 
         let match;
         while (
+            // eslint-disable-next-line no-cond-assign
             (match = EJSContentGenerator.VARIABLE_REGEXP.exec(ejsContent)) !==
             null
         ) {
@@ -98,7 +103,30 @@ class EJSContentGenerator {
             viewPath = viewPath.substring(1);
         }
 
-        return `'${viewPath}': { ${variableNames.map((v) => `${v.trim()}: EjsVariable`).join(';')} };`;
+        return `'${viewPath}': ${this.#ejsKeyValueObject(...variableNames)};`;
+    }
+
+    /**
+     * Generate the EJS key value object
+     * @param {string[]} variables
+     * @returns {string}
+     */
+    #ejsKeyValueObject(...variables) {
+        const typeObject = {};
+
+        for (const path of new Set(variables.map((v) => v.trim()))) {
+            path.split('.').reduce(
+                // eslint-disable-next-line no-return-assign
+                (obj, key, i, arr) =>
+                    (obj[key] =
+                        i === arr.length - 1 ? 'EjsVariable' : obj[key] || {}),
+                typeObject,
+            );
+        }
+
+        return JSON.stringify(typeObject)
+            .replace(/"EjsVariable"/g, 'EjsVariable')
+            .replace(/,/g, ';');
     }
 
     /**
@@ -116,4 +144,27 @@ class EJSContentGenerator {
     }
 }
 
-await new EJSContentGenerator('views', 'src/globals.d.ts').generate();
+const argv = minimist(process.argv.slice(2), {
+    string: ['targetDir', 'outFile', 'engine'],
+    default: {
+        dir: 'views',
+        output: 'src/globals.d.ts',
+        engine: 'ejs',
+    },
+});
+
+if (!argv.dir) {
+    throw new Error('Target directory is required');
+}
+
+if (!argv.output) {
+    throw new Error('Output file is required');
+}
+
+switch (argv.engine) {
+    case 'ejs':
+        await new EJSContentGenerator(argv.dir, argv.output).generate();
+        break;
+    default:
+        throw new Error(`Engine ${argv.engine} is not supported`);
+}
