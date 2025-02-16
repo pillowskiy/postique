@@ -5,7 +5,7 @@ declare namespace render {
     export interface Templates {
         index: {};
         layout: { title: EjsVariable };
-        'pages/login-errors.obb': {
+        'pages/login-errors.oob': {
             errors: { email: EjsVariable; password: EjsVariable };
         };
         'pages/login': {};
