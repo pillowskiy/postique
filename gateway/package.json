@@ -9,10 +9,12 @@
         "#lib/*": "./src/lib/*"
     },
     "scripts": {
-        "dev": "DEBUG=express:* node src/index.js",
-        "purgecss": "purgecss --config purgecss.config.cjs",
-        "purge": "node scripts/purgecss.js",
-        "types": "node scripts/ejs-gen.js",
+        "dev:prepare": "npm run types && npm run purgecss",
+        "dev:start": "DEBUG=express:router:router,express:router,express:application,express:view node src/index.js",
+        "dev": "nodemon --config nodemon.json",
+        "purgecss": "node scripts/purgecss.js --content './views/**/*.ejs' --css './public/**/*.css' --output ./public/styles/postique.min.css",
+        "types": "npm run types:views",
+        "types:views": "node scripts/safeviews.js --dir views --output src/views.d.ts --engine ejs",
         "lint": "eslint --debug src/",
         "lint:write": "eslint --debug src/ --fix",
         "lint:ejs": "./node_modules/.bin/ejslint views/",
@@ -33,6 +35,8 @@
         "eslint-config-prettier": "^10.0.1",
         "eslint-plugin-import": "^2.31.0",
         "eslint-plugin-prettier": "^5.2.3",
+        "minimist": "^1.2.8",
+        "nodemon": "^3.1.9",
         "prettier": "^3.5.1",
         "prettier-plugin-ejs": "^1.0.3",
         "purgecss": "^7.0.2"
