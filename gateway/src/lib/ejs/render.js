@@ -1,7 +1,7 @@
 /**
- * @template {keyof ejsView.EjsContent} T
+ * @template {keyof render.Templates} T
  * @param {T} targetPath
- * @param {ejsView.EjsContent[T] & { title?: string }} options
+ * @param {render.Templates[T] & { title?: string }} options
  * @returns {[string,object]}
  */
 export default function renderOpts(targetPath, options) {
@@ -16,65 +16,81 @@ export default function renderOpts(targetPath, options) {
 }
 
 /**
- * @template {keyof ejsView.EjsContent} T
- * @param {T} targetPath
- * @param {ejsView.EjsContent[T] & { title?: string }} options
+ * @param {import('express').Response} res
  */
-export function render(targetPath, options) {
-    let parent = 'layout';
-    let res = null;
+export function render(res) {
+    /**
+     * @typedef {Object} RenderNode
+     * @property {import('express').Response | null} res
+     * @property {keyof render.Templates | null} targetPath
+     * @property {string | null} parent
+     * @property {string} engine
+     * @property {render.Templates[keyof render.Templates] & { title?: string }} options
+     */
 
-    const exports = {
+    /** @type {RenderNode} */
+    const renderNode = {
+        res: null,
+        targetPath: null,
+        parent: 'layout',
+        engine: 'ejs',
+        options: { title: 'Postique' },
+    };
+
+    function renderCurrent() {
+        if (!renderNode.targetPath) {
+            return res.render('index', {});
+        }
+
+        const target = `${renderNode.targetPath}.${renderNode.engine}`;
+
+        if (renderNode.parent) {
+            return res.render(renderNode.parent, {
+                __renderTarget: target,
+                ...renderNode.options,
+            });
+        }
+
+        return res.render(target, renderNode.options);
+    }
+
+    const exports = /** @type {const} */ {
         /**
          * @param {string} str
          * @returns {typeof exports}
          */
         layout(str) {
-            parent = str;
-            return this;
-        },
-
-        target(target) {
-            targetPath = target;
-            return this;
+            renderNode.parent = str;
+            return exports;
         },
 
         /**
-         * @param {import('express').Response} response
+         * @template {keyof render.Templates} T
+         * @param {T} targetPath
+         * @param {render.Templates[T] & { title?: string }} options
          * @returns {typeof exports}
          */
-        with(response) {
-            res = response;
-            return this;
-        },
-
-        /**
-         * Execute the render
-         * @returns {void}
-         */
-        exec() {
-            if (res) {
-                return res.render(parent, {
-                    __renderTarget: targetPath,
-                    title: options.title ?? 'Postique',
-                    ...options,
-                });
+        template(targetPath, options) {
+            if (targetPath.split('.').length > 1) {
+                renderNode.parent = null;
             }
+            renderNode.targetPath = targetPath;
+            renderNode.options = Object.assign(renderNode.options, options);
+            return exports;
         },
 
         /**
-         * @param {(f: any, r: any) => any} _
+         * @param {(f: never, r: never) => never} _cb
          * @returns {Promise<void>}
          */
-        async then(_) {
-            if (res) {
-                return res.render(parent, {
-                    __renderTarget: targetPath,
-                    title: options.title ?? 'Postique',
-                    ...options,
-                });
-            }
-        },
+        // eslint-disable-next-line no-unused-vars
+        then: async (_cb) => renderCurrent(),
+
+        /**
+         * Execure the render function
+         * @returns {void}
+         */
+        exec: renderCurrent,
     };
 
     return exports;
