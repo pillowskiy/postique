@@ -14,7 +14,7 @@
         "dev": "nodemon --config nodemon.json",
         "purgecss": "node scripts/purgecss.js --content './views/**/*.ejs' --css './public/**/*.css' --output ./public/styles/postique.min.css",
         "types": "npm run types:views",
-        "types:views": "node scripts/safeviews.js --dir views --output src/views.d.ts --engine ejs",
+        "types:views": "node scripts/safeviews/index.js --dir views --output src/views.d.ts --engine ejs",
         "lint": "eslint --debug src/",
         "lint:write": "eslint --debug src/ --fix",
         "lint:ejs": "./node_modules/.bin/ejslint views/",
