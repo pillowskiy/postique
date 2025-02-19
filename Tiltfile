@@ -9,6 +9,13 @@ local_resource(
   dir='sso'
 )
 
+local_resource(
+  'www-generate',
+  cmd='npm run dev:prepare',
+  deps=['./gateway/views'],
+  dir='gateway'
+)
+
 docker_build_with_restart(
   'postique/sso',
   '.',
@@ -24,7 +31,9 @@ docker_build_with_restart(
 k8s_yaml([
   './infrastructure/dev/k8s/sso.deploy.yml',
   './infrastructure/dev/k8s/postgres.deploy.yml',
+  './infrastructure/dev/k8s/www.deploy.yml',
 ], False)
 
 k8s_resource('postgres', port_forwards='5432:5432')
 k8s_resource('sso', port_forwards=4000, resource_deps=['sso-compile', 'postgres'])
+k8s_resource('www', port_forwards=5001)
