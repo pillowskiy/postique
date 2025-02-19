@@ -1,18 +1,37 @@
+import ejs from 'ejs';
+
 /**
- * @template {keyof render.Templates} T
- * @param {T} targetPath
- * @param {render.Templates[T] & { title?: string }} options
- * @returns {[string,object]}
+ * @param {string} path
+ * @param {object} data
+ * @param {(err: Error | null, html: string) => void} cb
+ * @returns {Promise<void>}
  */
-export default function renderOpts(targetPath, options) {
-    return [
-        'layout',
-        {
-            __renderTarget: targetPath,
-            title: options.title ?? 'Postique',
-            ...options,
-        },
-    ];
+export async function ejsView(path, data, cb) {
+    try {
+        const html = await ejs.renderFile(path, data, {
+            async: true,
+            cache: true,
+        });
+        cb(null, html);
+    } catch (e) {
+        cb(e, '');
+    }
+}
+
+/**
+ * @param {import('express').Response} res
+ * @param {string} path
+ * @param {object} data
+ * @returns {void}
+ */
+function renderResponse(res, path, data) {
+    return res.render(path, data, (err, html) => {
+        if (err) {
+            return res.status(500).send(err);
+        }
+
+        return res.send(html);
+    });
 }
 
 /**
@@ -21,7 +40,6 @@ export default function renderOpts(targetPath, options) {
 export function render(res) {
     /**
      * @typedef {Object} RenderNode
-     * @property {import('express').Response | null} res
      * @property {keyof render.Templates | null} targetPath
      * @property {string | null} parent
      * @property {string} engine
@@ -30,28 +48,32 @@ export function render(res) {
 
     /** @type {RenderNode} */
     const renderNode = {
-        res: null,
         targetPath: null,
         parent: 'layout',
         engine: 'ejs',
         options: { title: 'Postique' },
     };
 
+    const defaultOptions = {
+        cache: true,
+    };
+
     function renderCurrent() {
         if (!renderNode.targetPath) {
-            return res.render('index', {});
+            return renderResponse(res, 'index', {});
         }
 
         const target = `${renderNode.targetPath}.${renderNode.engine}`;
 
         if (renderNode.parent) {
-            return res.render(renderNode.parent, {
+            return renderResponse(res, renderNode.parent, {
                 __renderTarget: target,
                 ...renderNode.options,
+                ...defaultOptions,
             });
         }
 
-        return res.render(target, renderNode.options);
+        return renderResponse(res, target, renderNode.options);
     }
 
     const exports = /** @type {const} */ {

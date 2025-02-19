@@ -1,3 +1,5 @@
+import { ejsView } from '#lib/ejs/render.js';
+
 import express from 'express';
 
 /** @typedef {import('./logger/index.js').Logger} Logger */
@@ -77,6 +79,7 @@ export default class Server {
     #init(router) {
         const app = express();
         app.set('view engine', 'ejs');
+        app.engine('ejs', ejsView);
         app.set('views', this.#config.viewsDir);
         app.use(express.static(this.#config.staticDir));
         app.use(router);
