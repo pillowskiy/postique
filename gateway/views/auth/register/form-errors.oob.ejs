@@ -1,0 +1,21 @@
+<small id="error-username" class="invalid-feedback d-inline" hx-swap-oob="true">
+    <% if (errors && errors.username) { %> <%= errors.username %> <% } %>
+</small>
+
+<small id="error-email" class="invalid-feedback d-inline" hx-swap-oob="true">
+    <% if (errors && errors.email) { %> <%= errors.email %> <% } %>
+</small>
+
+<small id="error-password" class="invalid-feedback d-inline" hx-swap-oob="true">
+    <% if (errors && errors.password) { %> <%= errors.password %> <% } %>
+</small>
+
+<small
+    id="error-password-confirm"
+    class="invalid-feedback d-inline"
+    hx-swap-oob="true"
+>
+    <% if (errors && errors.passwordConfirm) { %>
+    <%= errors.passwordConfirm %>
+    <% } %>
+</small>

@@ -1,7 +1,5 @@
-import bodyParser from 'body-parser';
 import compression from 'compression';
 import express from 'express';
-import helmet from 'helmet';
 
 /**
  * @param {import('express').Router} apiRouter
@@ -11,10 +9,9 @@ export default function Router(apiRouter) {
     const internalRouter = express.Router();
 
     internalRouter
-        .use(helmet())
-        .use(bodyParser.json())
-        .use(bodyParser.urlencoded({ extended: true }))
         .use(compression())
+        .use(express.json())
+        .use(express.urlencoded({ extended: true }))
         .use(apiRouter);
 
     return internalRouter;

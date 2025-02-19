@@ -11,7 +11,9 @@
     "scripts": {
         "dev:prepare": "npm run types && npm run purgecss",
         "dev:start": "DEBUG=express:router:router,express:router,express:application,express:view node src/index.js",
-        "dev": "nodemon --config nodemon.json",
+        "dev": "nodemon --config nodemon.local.json",
+        "dev:deploy": "nodemon --config nodemon.deploy.json",
+        "start": "node src/index.js",
         "purgecss": "node scripts/purgecss.js --content './views/**/*.ejs' --css './public/**/*.css' --output ./public/styles/postique.min.css",
         "types": "npm run types:views",
         "types:views": "node scripts/safeviews/index.js --dir views --output src/views.d.ts --engine ejs",
@@ -50,6 +52,7 @@
         "compression": "^1.8.0",
         "ejs": "^3.1.10",
         "express": "^4.21.2",
+        "express-validator": "^7.2.1",
         "helmet": "^8.0.0",
         "pino": "^9.6.0",
         "pino-pretty": "^13.0.0"

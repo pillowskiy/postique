@@ -1,0 +1,57 @@
+<%= hello %>
+asda
+<form hx-post="/register" hx-target="this" hx-swap="none" class="mb-4">
+    <div class="form-outline mb-4">
+        <label class="form-label" for="username">Username</label>
+        <input type="text" name="username" id="username" class="form-control" />
+        <small id="error-username" class="d-none"></small>
+    </div>
+
+    <div class="form-outline mb-4">
+        <label class="form-label" for="email">Email</label>
+        <input type="email" name="email" id="email" class="form-control" />
+        <small id="error-email" class="d-none"></small>
+    </div>
+
+    <div class="form-outline mb-4">
+        <label class="form-label" for="password">Password</label>
+        <input
+            type="password"
+            name="password"
+            id="password"
+            class="form-control"
+        />
+        <small id="error-password" class="d-none"></small>
+    </div>
+
+    <div class="form-outline mb-4">
+        <label class="form-label" for="passwordConfirm">
+            Repeat password
+        </label>
+        <input
+            type="password"
+            name="passwordConfirm"
+            id="passwordConfirm"
+            class="form-control"
+        />
+        <small id="error-password-confirm" class="d-none"></small>
+    </div>
+
+    <div class="form-check d-flex justify-content-center mb-4">
+        <input
+            class="form-check-input me-2"
+            type="checkbox"
+            value=""
+            id="terms"
+            aria-describedby="checkHelpText"
+            required
+        />
+        <label class="form-check-label" for="terms">
+            I have read and agree to the terms
+        </label>
+    </div>
+
+    <button type="submit" class="btn btn-primary d-block w-100 mb-3">
+        Sign in
+    </button>
+</form>
