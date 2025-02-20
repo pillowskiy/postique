@@ -1,7 +1,11 @@
+@import "variables.scss";
+@import "../../node_modules/bootstrap/scss/bootstrap";
+@import "overrides.scss";
+
 .global-container {
     min-height: 100svh;
     max-width: 1336px;
-    margin: 0 auto;
+    margin: 0 auto
 }
 
 .mw-md {
