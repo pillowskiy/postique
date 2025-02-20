@@ -14,9 +14,7 @@ declare namespace render {
                 passwordConfirm: Variable;
             };
         };
-        'auth/register/form': {
-            hello: Variable;
-        };
+        'auth/register/form': {};
         'auth/register/page': {};
         index: {};
         layout: {

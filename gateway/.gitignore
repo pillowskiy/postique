@@ -15,5 +15,7 @@ coverage
 build
 dist
 coverage
+static
+_static
 .idea
 .DS_Store

@@ -22,7 +22,7 @@ const dirname = new URL('.', import.meta.url).pathname;
 export default function Config() {
     return {
         port: 5001,
-        staticDir: path.join(dirname, '../../../public'),
+        staticDir: path.join(dirname, '../../../_static'),
         viewsDir: path.join(dirname, '../../../views'),
         host: '0.0.0.0',
         env: 'development',
