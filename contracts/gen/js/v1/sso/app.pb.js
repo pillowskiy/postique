@@ -1,4 +1,5 @@
 import { BinaryReader, BinaryWriter } from "@bufbuild/protobuf/wire";
+import { makeGenericClientConstructor, } from "@grpc/grpc-js";
 export const protobufPackage = "app";
 function createBaseCreateAppRequest() {
     return { name: "" };
@@ -102,21 +103,18 @@ export const CreateAppResponse = {
         return message;
     },
 };
-export const AppServiceName = "app.App";
-export class AppClientImpl {
-    rpc;
-    service;
-    constructor(rpc, opts) {
-        this.service = opts?.service || AppServiceName;
-        this.rpc = rpc;
-        this.CreateApp = this.CreateApp.bind(this);
-    }
-    CreateApp(request) {
-        const data = CreateAppRequest.encode(request).finish();
-        const promise = this.rpc.request(this.service, "CreateApp", data);
-        return promise.then((data) => CreateAppResponse.decode(new BinaryReader(data)));
-    }
-}
+export const AppService = {
+    createApp: {
+        path: "/app.App/CreateApp",
+        requestStream: false,
+        responseStream: false,
+        requestSerialize: (value) => Buffer.from(CreateAppRequest.encode(value).finish()),
+        requestDeserialize: (value) => CreateAppRequest.decode(value),
+        responseSerialize: (value) => Buffer.from(CreateAppResponse.encode(value).finish()),
+        responseDeserialize: (value) => CreateAppResponse.decode(value),
+    },
+};
+export const AppClient = makeGenericClientConstructor(AppService, "app.App");
 function isSet(value) {
     return value !== null && value !== undefined;
 }

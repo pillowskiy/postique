@@ -1,4 +1,5 @@
 import { BinaryReader, BinaryWriter } from "@bufbuild/protobuf/wire";
+import { type CallOptions, ChannelCredentials, Client, type ClientOptions, type ClientUnaryCall, type handleUnaryCall, Metadata, type ServiceError, type UntypedServiceImplementation } from "@grpc/grpc-js";
 export declare const protobufPackage = "app";
 export interface CreateAppRequest {
     name: string;
@@ -8,21 +9,31 @@ export interface CreateAppResponse {
 }
 export declare const CreateAppRequest: MessageFns<CreateAppRequest>;
 export declare const CreateAppResponse: MessageFns<CreateAppResponse>;
-export interface App {
-    CreateApp(request: CreateAppRequest): Promise<CreateAppResponse>;
+export type AppService = typeof AppService;
+export declare const AppService: {
+    readonly createApp: {
+        readonly path: "/app.App/CreateApp";
+        readonly requestStream: false;
+        readonly responseStream: false;
+        readonly requestSerialize: (value: CreateAppRequest) => Buffer<ArrayBuffer>;
+        readonly requestDeserialize: (value: Buffer) => CreateAppRequest;
+        readonly responseSerialize: (value: CreateAppResponse) => Buffer<ArrayBuffer>;
+        readonly responseDeserialize: (value: Buffer) => CreateAppResponse;
+    };
+};
+export interface AppServer extends UntypedServiceImplementation {
+    createApp: handleUnaryCall<CreateAppRequest, CreateAppResponse>;
 }
-export declare const AppServiceName = "app.App";
-export declare class AppClientImpl implements App {
-    private readonly rpc;
-    private readonly service;
-    constructor(rpc: Rpc, opts?: {
-        service?: string;
-    });
-    CreateApp(request: CreateAppRequest): Promise<CreateAppResponse>;
+export interface AppClient extends Client {
+    createApp(request: CreateAppRequest, callback: (error: ServiceError | null, response: CreateAppResponse) => void): ClientUnaryCall;
+    createApp(request: CreateAppRequest, metadata: Metadata, callback: (error: ServiceError | null, response: CreateAppResponse) => void): ClientUnaryCall;
+    createApp(request: CreateAppRequest, metadata: Metadata, options: Partial<CallOptions>, callback: (error: ServiceError | null, response: CreateAppResponse) => void): ClientUnaryCall;
 }
-interface Rpc {
-    request(service: string, method: string, data: Uint8Array): Promise<Uint8Array>;
-}
+export declare const AppClient: {
+    new (address: string, credentials: ChannelCredentials, options?: Partial<ClientOptions>): AppClient;
+    service: typeof AppService;
+    serviceName: string;
+};
 type Builtin = Date | Function | Uint8Array | string | number | boolean | undefined;
 export type DeepPartial<T> = T extends Builtin ? T : T extends globalThis.Array<infer U> ? globalThis.Array<DeepPartial<U>> : T extends ReadonlyArray<infer U> ? ReadonlyArray<DeepPartial<U>> : T extends {} ? {
     [K in keyof T]?: DeepPartial<T[K]>;

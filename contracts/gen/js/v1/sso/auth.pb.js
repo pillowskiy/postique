@@ -1,4 +1,5 @@
 import { BinaryReader, BinaryWriter } from "@bufbuild/protobuf/wire";
+import { makeGenericClientConstructor, } from "@grpc/grpc-js";
 export const protobufPackage = "auth";
 function createBaseRegisterRequest() {
     return { email: "", password: "" };
@@ -594,39 +595,45 @@ export const VerifyResponse = {
         return message;
     },
 };
-export const AuthServiceName = "auth.Auth";
-export class AuthClientImpl {
-    rpc;
-    service;
-    constructor(rpc, opts) {
-        this.service = opts?.service || AuthServiceName;
-        this.rpc = rpc;
-        this.Register = this.Register.bind(this);
-        this.Login = this.Login.bind(this);
-        this.Refresh = this.Refresh.bind(this);
-        this.Verify = this.Verify.bind(this);
-    }
-    Register(request) {
-        const data = RegisterRequest.encode(request).finish();
-        const promise = this.rpc.request(this.service, "Register", data);
-        return promise.then((data) => RegisterResponse.decode(new BinaryReader(data)));
-    }
-    Login(request) {
-        const data = LoginRequest.encode(request).finish();
-        const promise = this.rpc.request(this.service, "Login", data);
-        return promise.then((data) => LoginResponse.decode(new BinaryReader(data)));
-    }
-    Refresh(request) {
-        const data = RefreshRequest.encode(request).finish();
-        const promise = this.rpc.request(this.service, "Refresh", data);
-        return promise.then((data) => RefreshResponse.decode(new BinaryReader(data)));
-    }
-    Verify(request) {
-        const data = VerifyRequest.encode(request).finish();
-        const promise = this.rpc.request(this.service, "Verify", data);
-        return promise.then((data) => VerifyResponse.decode(new BinaryReader(data)));
-    }
-}
+export const AuthService = {
+    register: {
+        path: "/auth.Auth/Register",
+        requestStream: false,
+        responseStream: false,
+        requestSerialize: (value) => Buffer.from(RegisterRequest.encode(value).finish()),
+        requestDeserialize: (value) => RegisterRequest.decode(value),
+        responseSerialize: (value) => Buffer.from(RegisterResponse.encode(value).finish()),
+        responseDeserialize: (value) => RegisterResponse.decode(value),
+    },
+    login: {
+        path: "/auth.Auth/Login",
+        requestStream: false,
+        responseStream: false,
+        requestSerialize: (value) => Buffer.from(LoginRequest.encode(value).finish()),
+        requestDeserialize: (value) => LoginRequest.decode(value),
+        responseSerialize: (value) => Buffer.from(LoginResponse.encode(value).finish()),
+        responseDeserialize: (value) => LoginResponse.decode(value),
+    },
+    refresh: {
+        path: "/auth.Auth/Refresh",
+        requestStream: false,
+        responseStream: false,
+        requestSerialize: (value) => Buffer.from(RefreshRequest.encode(value).finish()),
+        requestDeserialize: (value) => RefreshRequest.decode(value),
+        responseSerialize: (value) => Buffer.from(RefreshResponse.encode(value).finish()),
+        responseDeserialize: (value) => RefreshResponse.decode(value),
+    },
+    verify: {
+        path: "/auth.Auth/Verify",
+        requestStream: false,
+        responseStream: false,
+        requestSerialize: (value) => Buffer.from(VerifyRequest.encode(value).finish()),
+        requestDeserialize: (value) => VerifyRequest.decode(value),
+        responseSerialize: (value) => Buffer.from(VerifyResponse.encode(value).finish()),
+        responseDeserialize: (value) => VerifyResponse.decode(value),
+    },
+};
+export const AuthClient = makeGenericClientConstructor(AuthService, "auth.Auth");
 function longToNumber(int64) {
     const num = globalThis.Number(int64.toString());
     if (num > globalThis.Number.MAX_SAFE_INTEGER) {

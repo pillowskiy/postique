@@ -25,14 +25,14 @@ protoc-js:
 	@protoc -I $(PROTO_DIR) \
 		--plugin=$(PROTOC_OUT)/js/node_modules/.bin/protoc-gen-ts_proto \
 		--ts_proto_out=$(JS_PROTO_OUT) \
+		--ts_proto_opt=outputServices=grpc-js \
+		--ts_proto_opt=outputClientImpl=grpc-js \
 		--ts_proto_opt=importSuffix=.js \
 		--ts_proto_opt=esModuleInterop=true \
-		--ts_proto_opt=useOptionals=none \
 		--ts_proto_opt=initializeFieldsAsUndefined=false \
-		--ts_proto_opt=addGrpcMetadata=false \
 		--ts_proto_opt=fileSuffix=.pb \
 		$(PROTO_FILES)
-	-npm --prefix $(PROTOC_OUT)/js run build
+	@npm --prefix $(PROTOC_OUT)/js run build
 	@rm -rf $(JS_PROTO_OUT)/*
 	@echo "[JS]: Protobuf compilation completed!"
 

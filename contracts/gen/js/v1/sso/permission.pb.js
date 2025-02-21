@@ -1,4 +1,5 @@
 import { BinaryReader, BinaryWriter } from "@bufbuild/protobuf/wire";
+import { makeGenericClientConstructor, } from "@grpc/grpc-js";
 export const protobufPackage = "permission";
 function createBaseHasPermissionRequest() {
     return { name: "" };
@@ -221,27 +222,27 @@ export const HasUserPermissionResponse = {
         return message;
     },
 };
-export const PermissionServiceName = "permission.Permission";
-export class PermissionClientImpl {
-    rpc;
-    service;
-    constructor(rpc, opts) {
-        this.service = opts?.service || PermissionServiceName;
-        this.rpc = rpc;
-        this.HasPermission = this.HasPermission.bind(this);
-        this.HasUserPermission = this.HasUserPermission.bind(this);
-    }
-    HasPermission(request) {
-        const data = HasPermissionRequest.encode(request).finish();
-        const promise = this.rpc.request(this.service, "HasPermission", data);
-        return promise.then((data) => HasPermissionResponse.decode(new BinaryReader(data)));
-    }
-    HasUserPermission(request) {
-        const data = HasUserPermissionRequest.encode(request).finish();
-        const promise = this.rpc.request(this.service, "HasUserPermission", data);
-        return promise.then((data) => HasUserPermissionResponse.decode(new BinaryReader(data)));
-    }
-}
+export const PermissionService = {
+    hasPermission: {
+        path: "/permission.Permission/HasPermission",
+        requestStream: false,
+        responseStream: false,
+        requestSerialize: (value) => Buffer.from(HasPermissionRequest.encode(value).finish()),
+        requestDeserialize: (value) => HasPermissionRequest.decode(value),
+        responseSerialize: (value) => Buffer.from(HasPermissionResponse.encode(value).finish()),
+        responseDeserialize: (value) => HasPermissionResponse.decode(value),
+    },
+    hasUserPermission: {
+        path: "/permission.Permission/HasUserPermission",
+        requestStream: false,
+        responseStream: false,
+        requestSerialize: (value) => Buffer.from(HasUserPermissionRequest.encode(value).finish()),
+        requestDeserialize: (value) => HasUserPermissionRequest.decode(value),
+        responseSerialize: (value) => Buffer.from(HasUserPermissionResponse.encode(value).finish()),
+        responseDeserialize: (value) => HasUserPermissionResponse.decode(value),
+    },
+};
+export const PermissionClient = makeGenericClientConstructor(PermissionService, "permission.Permission");
 function isSet(value) {
     return value !== null && value !== undefined;
 }

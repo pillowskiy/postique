@@ -2,6 +2,7 @@
 	"extends": "./tsconfig.json",
 	"compilerOptions": {
 		"rootDir": "./gen",
+		"outDir": ".",
 		"module": "ESNext",
 		"moduleResolution": "Bundler",
 		"verbatimModuleSyntax": false,
