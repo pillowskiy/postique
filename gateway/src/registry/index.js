@@ -1,9 +1,16 @@
 import { InjectionMode, createContainer } from 'awilix';
 
-import { coreRegistries } from './core.js';
-import { deliveryRegistries } from './delivery.js';
+import controllerRegistries from './controllers.js';
+import coreRegistries from './core.js';
+import serviceRegistries from './providers.js';
+import routeRegistries from './routes.js';
 
-/** @typedef {typeof coreRegistries & typeof deliveryRegistries} Registries */
+/** @typedef {typeof coreRegistries & typeof routeRegistries & typeof controllerRegistries & typeof serviceRegistries} Registries */
+
+/**
+ * @template T
+ * @typedef {(ioc: Partial<Registries>) => any} InjectableCallback
+ */
 
 /**
  * @type {import('awilix').AwilixContainer<Registries>}
@@ -12,8 +19,10 @@ const container = createContainer({
     injectionMode: InjectionMode.CLASSIC,
     strict: true,
 })
+    .register(controllerRegistries)
+    .register(serviceRegistries)
     .register(coreRegistries)
-    .register(deliveryRegistries);
+    .register(routeRegistries);
 
 /** @namespace registry */
 export default Object.freeze({

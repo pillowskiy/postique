@@ -1,7 +1,7 @@
 import path from 'path';
 
 /**
- * @typedef {AppConfig & LoggerConfig} Config
+ * @typedef {AppConfig & LoggerConfig & AuthServiceConfig} Config
  *
  * @typedef {Object} AppConfig
  * @property {number} port
@@ -14,6 +14,11 @@ import path from 'path';
  * @property {Object} logger
  * @property {'debug' | 'info' | 'warn' | 'error' | 'fatal'} logger.level
  * @property {'pretty' | 'json'} logger.transport
+ *
+ * @typedef {Object} AuthServiceConfig
+ * @property {Object} authService
+ * @property {string} authService.address
+ * @property {string} authService.appName
  */
 
 const dirname = new URL('.', import.meta.url).pathname;
@@ -29,6 +34,10 @@ export default function Config() {
         logger: {
             level: 'debug',
             transport: 'pretty',
+        },
+        authService: {
+            appName: 'www',
+            address: 'sso:4000',
         },
     };
 }

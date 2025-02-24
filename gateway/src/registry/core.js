@@ -6,9 +6,11 @@ import { PinoLogger } from '#shared/logger/index.js';
 
 import { asClass, asFunction } from 'awilix';
 
-export const coreRegistries = /** @type {const} */ {
+const coreRegistries = /** @type {const} */ {
     router: asFunction(Router).singleton(),
     server: asClass(Server).singleton(),
     logger: asClass(PinoLogger).singleton(),
     config: asFunction(Config).singleton(),
 };
+
+export default coreRegistries;
