@@ -26,9 +26,7 @@ protoc-js:
 		--plugin=$(PROTOC_OUT)/js/node_modules/.bin/protoc-gen-ts_proto \
 		--ts_proto_out=$(JS_PROTO_OUT) \
 		--ts_proto_opt=outputServices=grpc-js \
-		--ts_proto_opt=outputClientImpl=grpc-js \
 		--ts_proto_opt=importSuffix=.js \
-		--ts_proto_opt=esModuleInterop=true \
 		--ts_proto_opt=initializeFieldsAsUndefined=false \
 		--ts_proto_opt=fileSuffix=.pb \
 		$(PROTO_FILES)
