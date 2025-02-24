@@ -1,0 +1,9 @@
+<% let tab = 'login' %>
+<main
+    class="min-vh-100 d-flex align-items-center justify-content-center overflow-hidden"
+>
+    <div class="mw-lg w-100 p-4">
+        <%- await include('../auth-anchor-tabs.ejs', { tab }) %> <%- await
+        include('./form.ejs') %>
+    </div>
+</main>
