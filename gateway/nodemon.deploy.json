@@ -1,5 +1,5 @@
 {
-    "watch": ["src", "scripts"],
+    "watch": ["src", "views", "scripts"],
     "ext": "js,json,ts,ejs,html,css,scss,md",
     "ignore": ["dist", "node_modules", "src/views.d.ts", "*.d.ts"],
     "exec": "npm run dev:start",

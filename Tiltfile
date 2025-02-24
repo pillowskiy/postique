@@ -12,7 +12,8 @@ local_resource(
 local_resource(
   'www-generate',
   cmd='npm run dev:prepare',
-  deps=['./gateway/views'],
+  deps=['./gateway/views', './gateway/src', './gateway/public'],
+  ignore=['./gateway/src/views.d.ts'],
   dir='gateway'
 )
 
@@ -36,4 +37,4 @@ k8s_yaml([
 
 k8s_resource('postgres', port_forwards='5432:5432')
 k8s_resource('sso', port_forwards=4000, resource_deps=['sso-compile', 'postgres'])
-k8s_resource('www', port_forwards=5001)
+k8s_resource('www', port_forwards=5001, resource_deps=['www-generate'])
