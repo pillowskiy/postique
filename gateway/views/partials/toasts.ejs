@@ -1,0 +1,32 @@
+<div
+    id="toasts"
+    class="toast-container position-fixed bottom-0 end-0 p-3"
+></div>
+
+<script defer>
+    const toastsContainer = document.getElementById('toasts');
+    if (!toastsContainer) {
+        throw new Error('toastsContainer not found');
+    }
+
+    function popToasts() {
+        const toastNode = toastsContainer.lastElementChild;
+        Array.from(toastsContainer.children).forEach((toastNode) => {
+            const toast = bootstrap.Toast.getOrCreateInstance(toastNode);
+            toastNode.setAttribute('data-show', true);
+            toast.show();
+        });
+    }
+
+    document.addEventListener('htmx:oobAfterSwap', function (event) {
+        const { shouldSwap, target } = event.detail;
+        if (shouldSwap && target === toastsContainer) {
+            popToasts();
+        }
+    });
+
+    document.addEventListener('hidden.bs.toast', function (event) {
+        console.log('Destroyin toast');
+        event.target.remove();
+    });
+</script>
