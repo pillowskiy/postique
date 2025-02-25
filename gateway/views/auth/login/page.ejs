@@ -1,9 +1,15 @@
-<% let tab = 'login' %>
 <main
     class="min-vh-100 d-flex align-items-center justify-content-center overflow-hidden"
 >
-    <div class="mw-lg w-100 p-4">
-        <%- await include('../auth-anchor-tabs.ejs', { tab }) %> <%- await
-        include('./form.ejs') %>
-    </div>
+    <section
+        class="auth-container d-flex border shadow rounded-4 d-flex m-4 p-4"
+    >
+        <div class="col-md-6 pe-md-4">
+            <div
+                class="rounded-4 h-100"
+                style="background-color: #000000"
+            ></div>
+        </div>
+        <div class="col-md-6 py-2"><%- await include('./form.ejs') %></div>
+    </section>
 </main>
