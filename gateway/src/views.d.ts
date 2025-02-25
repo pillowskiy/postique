@@ -3,9 +3,14 @@
 declare namespace render {
     export type Variable = string | number | boolean | null | undefined;
     export interface Templates {
-        'auth/auth-anchor-tabs': {
-            tab: Variable;
+        'auth/auth-container': {
+            __renderChild: Variable;
         };
+        'auth/login/form-errors.oob': {
+            errors: { email: Variable; password: Variable };
+        };
+        'auth/login/form': {};
+        'auth/login/page': {};
         'auth/register/form-errors.oob': {
             errors: {
                 username: Variable;
@@ -16,6 +21,10 @@ declare namespace render {
         };
         'auth/register/form': {};
         'auth/register/page': {};
+        'components/toast.oob': {
+            initiator: Variable;
+            message: Variable;
+        };
         index: {};
         layout: {
             title: Variable;
@@ -26,6 +35,7 @@ declare namespace render {
         };
         'pages/login': {};
         'partials/head': {};
+        'partials/toasts': {};
     }
 }
 

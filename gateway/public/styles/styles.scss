@@ -1,11 +1,11 @@
-@import "variables.scss";
-@import "../../node_modules/bootstrap/scss/bootstrap";
-@import "overrides.scss";
+@import 'variables.scss';
+@import '../../node_modules/bootstrap/scss/bootstrap';
+@import 'overrides.scss';
 
 .global-container {
     min-height: 100svh;
     max-width: 1336px;
-    margin: 0 auto
+    margin: 0 auto;
 }
 
 .mw-md {
@@ -18,4 +18,12 @@
     @media (min-width: 576px) {
         max-width: 416px;
     }
+}
+
+.auth-container {
+    max-width: 1080px;
+    width: 100%;
+    margin: 0 auto;
+    min-height: 650px;
+    height: fit-content;
 }
