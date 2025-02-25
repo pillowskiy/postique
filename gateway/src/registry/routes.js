@@ -1,4 +1,3 @@
-/* eslint-disable prettier/prettier */
 import * as routes from '#app/routes/index.js';
 
 import * as awilix from 'awilix';

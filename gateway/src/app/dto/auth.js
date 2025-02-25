@@ -2,14 +2,17 @@
 
 export class RegisterDTO {
     /**
+     * @param {string} username
      * @param {string} email
      * @param {string} password
      */
-    constructor(email, password) {
+    constructor(username, email, password) {
         /** @type {string} */
         this.email = email;
         /** @type {string} */
         this.password = password;
+        /** @type {string} */
+        this.username = username;
     }
 }
 

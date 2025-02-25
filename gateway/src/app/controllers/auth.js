@@ -1,10 +1,14 @@
 /** @typedef {import('express').Request} Request */
 /** @typedef {import('express').Response} Response */
+import { LoginDTO, RegisterDTO } from '#app/dto/index.js';
 import { render } from '#lib/ejs/render.js';
+import { validate } from '#lib/validator/validator.js';
 
 export class AuthController {
     /** @type {import("#app/services").AuthService} */
     #authService;
+
+    #refreshTokenLifetime = 30 * 24 * 60 * 60 * 1000; // 30 days
 
     /**
      * @param {import("#app/services").AuthService} authService
@@ -34,10 +38,29 @@ export class AuthController {
      * @param {Response} res
      */
     async registerUser(req, res) {
-        const input = req.body;
-        await this.#authService.register(input);
+        const errors = validate(req);
+        if (!errors.isEmpty()) {
+            return render(res).template('auth/register/form-errors.oob', {
+                errors: errors.mapped(),
+            });
+        }
 
-        return res.redirect('/');
+        try {
+            const dto = new RegisterDTO(
+                req.body.username,
+                req.body.email,
+                req.body.password,
+            );
+            await this.#authService.register(dto);
+            return this.loginUser(req, res);
+        } catch (err) {
+            return render(res).template('components/toast.oob', {
+                initiator: 'Authentication',
+                message:
+                    err.message ||
+                    'Something went wrong, please wait and try again later.',
+            });
+        }
     }
 
     /**
@@ -45,12 +68,26 @@ export class AuthController {
      * @param {Response} res
      */
     async loginUser(req, res) {
-        const input = req.body;
-        const session = await this.#authService.login(input);
+        const errors = validate(req);
+        if (!errors.isEmpty()) {
+            return render(res).template('auth/register/form-errors.oob', {
+                errors: errors.mapped(),
+            });
+        }
 
-        this.#storeSession(res, session);
-
-        return res.redirect('/');
+        try {
+            const dto = new LoginDTO(req.body.email, req.body.password);
+            const session = await this.#authService.login(dto);
+            this.#storeSession(res, session);
+            return res.set('HX-Redirect', '/ping').status(200).send('OK');
+        } catch (err) {
+            return render(res).template('components/toast.oob', {
+                initiator: 'Authentication',
+                message:
+                    err.message ||
+                    'Something went wrong, please wait and try again later.',
+            });
+        }
     }
 
     /**
@@ -81,6 +118,7 @@ export class AuthController {
         res.cookie('refresh_token', session.refreshToken, {
             domain: res.locals.hostname,
             httpOnly: true,
+            maxAge: this.#refreshTokenLifetime,
             path: '/',
             sameSite: 'strict',
             secure: res.locals.secure,

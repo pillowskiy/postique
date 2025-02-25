@@ -2,10 +2,11 @@ import { InjectionMode, createContainer } from 'awilix';
 
 import controllerRegistries from './controllers.js';
 import coreRegistries from './core.js';
+import middlewareRegistries from './middlewares.js';
 import serviceRegistries from './providers.js';
 import routeRegistries from './routes.js';
 
-/** @typedef {typeof coreRegistries & typeof routeRegistries & typeof controllerRegistries & typeof serviceRegistries} Registries */
+/** @typedef {typeof coreRegistries & typeof routeRegistries & typeof controllerRegistries & typeof serviceRegistries & typeof middlewareRegistries} Registries */
 
 /**
  * @template T
@@ -22,6 +23,7 @@ const container = createContainer({
     .register(controllerRegistries)
     .register(serviceRegistries)
     .register(coreRegistries)
+    .register(middlewareRegistries)
     .register(routeRegistries);
 
 /** @namespace registry */
