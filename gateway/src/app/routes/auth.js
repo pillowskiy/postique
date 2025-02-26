@@ -1,13 +1,15 @@
 import express from 'express';
 import { body } from 'express-validator';
 
+import handler from './common/handler.js';
+
 /**
  * @param {import("#app/controllers").AuthController} authController
  */
 export function AuthRoutes(authController) {
     const authRouter = express.Router();
 
-    authRouter.get('/login', (req, res) => authController.loginView(req, res));
+    authRouter.get('/login', handler(authController, 'loginView'));
     authRouter.post(
         '/login',
         [
@@ -22,12 +24,10 @@ export function AuthRoutes(authController) {
                 .isLength({ max: 256 })
                 .withMessage('Password must be at most 256 characters'),
         ],
-        authController.loginUser.bind(authController),
+        handler(authController, 'loginUser'),
     );
 
-    authRouter.get('/register', (req, res) =>
-        authController.registerView(req, res),
-    );
+    authRouter.get('/register', handler(authController, 'registerView'));
     authRouter.post(
         '/register',
         [
@@ -54,7 +54,7 @@ export function AuthRoutes(authController) {
                 return true;
             }),
         ],
-        authController.registerUser.bind(authController),
+        handler(authController, 'registerUser'),
     );
 
     return authRouter;
