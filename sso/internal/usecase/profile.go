@@ -47,9 +47,14 @@ func (uc *profileUseCase) CreateProfile(ctx context.Context, input *dto.CreatePr
 	profile, err := domain.NewUserProfile(input.UserID, input.Username, input.Bio)
 	if err != nil {
 		log.Warn("Failed to parse domain user profile", slog.String("error", err.Error()))
-		return "", fmt.Errorf("%s: %w", op, err)
+		return "", parseDomainErr(err)
 	}
 	log.Debug("Profile created successfully")
+
+	if err := uc.profileRepo.SaveProfile(ctx, profile); err != nil {
+		log.Error("Failed to save profile", slog.String("error", err.Error()))
+		return "", fmt.Errorf("%s: %w", op, err)
+	}
 
 	return domain.PID(profile.UserID), nil
 }
@@ -60,7 +65,7 @@ func (uc *profileUseCase) Profile(ctx context.Context, userID domain.PID) (*dto.
 
 	uid, err := domain.NewID(userID)
 	if err != nil {
-		return nil, err
+		return nil, parseDomainErr(err)
 	}
 
 	profile, err := uc.profileRepo.Profile(ctx, uid)
