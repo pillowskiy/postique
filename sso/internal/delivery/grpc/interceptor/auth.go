@@ -3,6 +3,7 @@ package interceptor
 import (
 	"context"
 	"errors"
+	"log"
 	"strings"
 
 	"github.com/pillowskiy/postique/sso/internal/dto"
@@ -32,13 +33,17 @@ func UnaryWithAuth(authUC AuthUseCase) UnarySpecificMethod {
 	return unarySpecificMethod(func(ctx context.Context, req any, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (resp any, err error) {
 		token, err := TokenFromContext(ctx)
 		if err != nil {
+			log.Printf("Token: %v", err)
 			return nil, status.Error(codes.Unauthenticated, err.Error())
 		}
 
 		user, err := authUC.Verify(ctx, token)
 		if err != nil {
+			log.Printf("Auth verify: %v", err)
 			return nil, status.Error(codes.Unauthenticated, "failed to verify token")
 		}
+
+		log.Printf("User: %v", user)
 
 		ctx = context.WithValue(ctx, authUserKey, *user)
 		return handler(ctx, req)

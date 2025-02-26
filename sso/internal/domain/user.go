@@ -2,10 +2,13 @@ package domain
 
 import (
 	"errors"
+	"regexp"
 	"strings"
 
 	"github.com/pillowskiy/postique/sso/internal/lib/crypto"
 )
+
+var emailRegex = regexp.MustCompile(`^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$`)
 
 type User struct {
 	ID       ID
@@ -41,6 +44,14 @@ func NewUser(email, password string) (*User, error) {
 type Password string
 
 func NewPassword(str string) (Password, error) {
+	if len(str) < 6 {
+		return "", errors.New("password must be at least 6 characters")
+	}
+
+	if len(str) > 256 {
+		return "", errors.New("password must be at most 256 characters")
+	}
+
 	pwd, err := crypto.Hash(str)
 	return Password(pwd), err
 }
@@ -54,6 +65,10 @@ type Email string
 func NewEmail(str string) (Email, error) {
 	if str == "" {
 		return "", errors.New("email cannot be empty")
+	}
+
+	if !emailRegex.MatchString(str) {
+		return "", errors.New("invalid email format")
 	}
 
 	return Email(str), nil

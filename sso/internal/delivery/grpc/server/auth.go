@@ -8,21 +8,10 @@ import (
 	"github.com/pillowskiy/postique/sso/internal/delivery/grpc/interceptor"
 	"github.com/pillowskiy/postique/sso/internal/dto"
 	"github.com/pillowskiy/postique/sso/internal/usecase"
-	"github.com/pillowskiy/postique/sso/pkg/validator"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
-
-var authRulesMessages = ValidationRulesMap{
-	"email.string.email_empty": "Email address shouldn't be empty",
-	"email.string.email":       "Email has incorrect format",
-	"email.string.max_len":     "The length of email address should be less than {{.RuleValue}}",
-	"password.string.min_len":  "Password should be longer than {{.RuleValue}} characters",
-	"password.string.max_len":  "Password should be less than {{.RuleValue}} characters",
-	"app_id.string.uuid":       "App ID has incorrect format",
-	"user_id.string.uuid":      "User ID has incorrect format",
-}
 
 type AuthUseCase interface {
 	Login(ctx context.Context, dto *dto.LoginUserInput, fingerprint *string) (*dto.Session, error)
@@ -41,10 +30,6 @@ func RegisterAuthServer(server *grpc.Server, authUC AuthUseCase) {
 }
 
 func (s *authServer) Login(ctx context.Context, req *pb.LoginRequest) (*pb.LoginResponse, error) {
-	if err := validator.ValidateGRPC(req); err != nil {
-		return nil, formatValidationError(err, authRulesMessages)
-	}
-
 	dto := &dto.LoginUserInput{
 		Email:    req.GetEmail(),
 		Password: req.GetPassword(),
@@ -67,10 +52,6 @@ func (s *authServer) Login(ctx context.Context, req *pb.LoginRequest) (*pb.Login
 }
 
 func (s *authServer) Register(ctx context.Context, req *pb.RegisterRequest) (*pb.RegisterResponse, error) {
-	if err := validator.ValidateGRPC(req); err != nil {
-		return nil, formatValidationError(err, authRulesMessages)
-	}
-
 	dto := &dto.RegisterUserInput{
 		Email:    req.GetEmail(),
 		Password: req.GetPassword(),
@@ -85,10 +66,6 @@ func (s *authServer) Register(ctx context.Context, req *pb.RegisterRequest) (*pb
 }
 
 func (s *authServer) Refresh(ctx context.Context, req *pb.RefreshRequest) (*pb.RefreshResponse, error) {
-	if err := validator.ValidateGRPC(req); err != nil {
-		return nil, formatValidationError(err, authRulesMessages)
-	}
-
 	session, err := s.authUC.Refresh(ctx, req.GetToken(), nil, req.GetAppName())
 	if err != nil {
 		return nil, s.parseUseCaseErr(err)
@@ -124,6 +101,6 @@ func (s *authServer) parseUseCaseErr(err error) error {
 	case errors.Is(err, usecase.ErrInvalidCredentials):
 		return status.Error(codes.Unauthenticated, "invalid credentials")
 	default:
-		return status.Error(codes.Internal, "internal error occurred")
+		return parseUseCaseException(err)
 	}
 }

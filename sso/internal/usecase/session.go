@@ -123,6 +123,7 @@ func (uc *sessionUseCase) VerifyAccess(ctx context.Context, token string) (*dto.
 
 func (uc *sessionUseCase) createAppSession(ctx context.Context, payload *dto.UserPayload, meta *dto.AppSessionMeta, secret string) (*domain.Session, error) {
 	const op = "usecase.sessionUseCase.CreateAppSession"
+    log := uc.log.With(slog.Any("payload", payload), slog.Any("meta", meta))
 
 	token, err := jwt.New(payload, secret, uc.cfg.TokenTTL)
 	if err != nil {
@@ -131,7 +132,8 @@ func (uc *sessionUseCase) createAppSession(ctx context.Context, payload *dto.Use
 
 	session, err := domain.NewSession(token, meta.Fingerprint, meta.AppID)
 	if err != nil {
-		return nil, fmt.Errorf("%s: %w", op, err)
+        log.Warn("Failed to generate session", slog.String("error", err.Error()))
+		return nil, parseDomainErr(err)
 	}
 
 	if err := uc.sessionRepo.CreateSession(ctx, session); err != nil {
@@ -146,7 +148,7 @@ func (uc *sessionUseCase) appSession(ctx context.Context, token string, appID do
 
 	domainAppID, err := domain.NewID(appID)
 	if err != nil {
-		return nil, fmt.Errorf("%s: %w", op, err)
+		return nil, parseDomainErr(err)
 	}
 
 	session, err := uc.sessionRepo.AppSession(ctx, token, domainAppID)

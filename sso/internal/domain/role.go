@@ -1,5 +1,7 @@
 package domain
 
+import "errors"
+
 type RolesHierarchy struct {
 	LeadingRoles []ID `db:"leading_roles"`
 	VirtualRoles []ID `db:"virtual_roles"`
@@ -64,11 +66,26 @@ func NewRole(name string, hoist int) (*Role, error) {
 type RoleName string
 
 func NewRoleName(str string) (RoleName, error) {
+	if str == "" {
+		return "", errors.New("role name cannot be empty")
+	}
+
+	if len(str) > 256 {
+		return "", errors.New("role name must be at most 256 characters")
+	}
 	return RoleName(str), nil
 }
 
 type RoleHoist int
 
 func NewRoleHoist(val int) (RoleHoist, error) {
+	if val < 0 {
+		return 0, errors.New("role hoist cannot be negative")
+	}
+
+	if val > 255 {
+		return 0, errors.New("role hoist cannot be greater than 255")
+	}
+
 	return RoleHoist(val), nil
 }

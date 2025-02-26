@@ -145,8 +145,6 @@ func TestAuth_Register_InvalidArgument(t *testing.T) {
 			grpcSt, ok := status.FromError(err)
 			require.True(t, ok, "Expected error to be a grpc status")
 			assert.Equal(t, grpcSt.Code(), codes.InvalidArgument)
-			details := grpcSt.Details()
-			assert.GreaterOrEqual(t, len(details), 1, "Expected 1 or more grpc status details")
 		})
 	}
 }
@@ -215,8 +213,6 @@ func TestAuth_Login_InvalidArgument(t *testing.T) {
 			grpcSt, ok := status.FromError(err)
 			require.True(t, ok, "Expected error to be a grpc status")
 			assert.Equal(t, grpcSt.Code(), codes.InvalidArgument)
-			details := grpcSt.Details()
-			assert.GreaterOrEqual(t, len(details), 1, "Expected 1 or more grpc status details")
 		})
 	}
 }
@@ -256,8 +252,6 @@ func TestAuth_Refresh_InvalidArgument(t *testing.T) {
 			grpcSt, ok := status.FromError(err)
 			require.True(t, ok, "Expected error to be a grpc status")
 			assert.Equal(t, grpcSt.Code(), codes.InvalidArgument)
-			details := grpcSt.Details()
-			assert.GreaterOrEqual(t, len(details), 1, "Expected 1 or more grpc status details")
 		})
 	}
 }

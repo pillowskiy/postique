@@ -1,5 +1,7 @@
 package domain
 
+import "errors"
+
 type Permission struct {
 	ID   ID
 	Name PermName
@@ -28,5 +30,13 @@ func NewPermission(name string) (*Permission, error) {
 type PermName string
 
 func NewPermName(str string) (PermName, error) {
+	if str == "" {
+		return "", errors.New("permission name cannot be empty")
+	}
+
+	if len(str) > 256 {
+		return "", errors.New("permission name must be at most 256 characters")
+	}
+
 	return PermName(str), nil
 }

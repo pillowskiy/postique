@@ -85,7 +85,7 @@ func (uc *authUseCase) Login(ctx context.Context, input *dto.LoginUserInput, fin
 	email, err := domain.NewEmail(input.Email)
 	if err != nil {
 		log.Warn("Failed to create domain email", slog.String("error", err.Error()))
-		return nil, fmt.Errorf("%s: %w", op, err)
+		return nil, parseDomainErr(err)
 	}
 
 	user, err := uc.authRepo.User(ctx, email)
@@ -122,7 +122,7 @@ func (uc *authUseCase) Register(ctx context.Context, input *dto.RegisterUserInpu
 	user, err := domain.NewUser(input.Email, input.Password)
 	if err != nil {
 		log.Warn("Failed to create domain user", slog.String("error", err.Error()))
-		return nil, fmt.Errorf("%s: %w", op, err)
+		return nil, parseDomainErr(err)
 	}
 
 	storedUser, err := uc.authRepo.User(ctx, user.Email)

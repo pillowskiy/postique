@@ -33,7 +33,7 @@ func (uc *roleUseCase) HasPermittedRole(ctx context.Context, userID domain.PID, 
 	uid, err := domain.NewID(userID)
 	if err != nil {
 		log.Warn("Failed to parse domain user id", slog.String("error", err.Error()))
-		return false, fmt.Errorf("%s: %w", op, err)
+		return false, parseDomainErr(err)
 	}
 
 	hier, err := uc.roleRepo.GetUserRolesHierarchy(ctx, uid)
@@ -45,7 +45,7 @@ func (uc *roleUseCase) HasPermittedRole(ctx context.Context, userID domain.PID, 
 	pid, err := domain.NewID(permID)
 	if err != nil {
 		log.Warn("Failed to parse domain permission id", slog.String("error", err.Error()))
-		return false, fmt.Errorf("%s: %w", op, err)
+		return false, parseDomainErr(err)
 	}
 
 	permRoles, err := uc.roleRepo.GetPermissionRoles(ctx, pid)

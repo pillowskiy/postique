@@ -1,6 +1,10 @@
 package domain
 
-import "github.com/pillowskiy/postique/sso/internal/lib/gen"
+import (
+	"fmt"
+
+	"github.com/pillowskiy/postique/sso/internal/lib/gen"
+)
 
 type (
 	// Potential ID - necessary to point to the child ID type, since we can change the policy
@@ -12,10 +16,16 @@ type (
 
 func GenID() (ID, error) {
 	id, err := gen.GenerateUUID()
-	return ID(id), err
+	if err != nil {
+		return "", fmt.Errorf("%w: %w", ErrPrivate, err)
+	}
+	return ID(id), nil
 }
 
 func NewID(str string) (ID, error) {
 	id, err := gen.ParseUUID(str)
-	return ID(id), err
+	if err != nil {
+		return "", fmt.Errorf("%w: %w", ErrPrivate, err)
+	}
+	return ID(id), nil
 }

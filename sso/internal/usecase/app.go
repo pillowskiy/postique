@@ -88,6 +88,7 @@ func (uc *appUseCase) CreateSession(ctx context.Context, payload *dto.UserPayloa
 	log.Debug("Creating new session")
 	app, err := uc.app(ctx, appName)
 	if err != nil {
+		log.Error("Failed to get app", slog.String("error", err.Error()))
 		return nil, fmt.Errorf("%s: %w", op, err)
 	}
 
@@ -116,7 +117,7 @@ func (uc *appUseCase) CreateApp(ctx context.Context, input *dto.CreateAppInput) 
 	app, err := domain.NewApp(input.Name, uc.cfg.EncryptionSecret)
 	if err != nil {
 		log.Warn("Failed to create domain app", slog.String("error", err.Error()))
-		return nil, fmt.Errorf("%s: %w", op, err)
+		return nil, parseDomainErr(err)
 	}
 
 	storedApp, err := uc.app(ctx, input.Name)
@@ -154,7 +155,7 @@ func (uc *appUseCase) app(ctx context.Context, name string) (*domain.App, error)
 	appName, err := domain.NewName(name)
 	if err != nil {
 		log.Warn("Failed to create domain app name", slog.String("error", err.Error()))
-		return nil, err
+		return nil, parseDomainErr(err)
 	}
 
 	app, err := uc.appRepo.App(ctx, appName)

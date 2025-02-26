@@ -69,7 +69,7 @@ func (uc *permissionUseCase) getPermission(ctx context.Context, name string) (*d
 	permName, err := domain.NewPermName(name)
 	if err != nil {
 		log.Warn("Failed to parse domain permission name", slog.String("error", err.Error()))
-		return nil, fmt.Errorf("%s: %w", op, err)
+		return nil, parseDomainErr(err)
 	}
 
 	perm, err := uc.permRepo.GetPermission(ctx, permName)

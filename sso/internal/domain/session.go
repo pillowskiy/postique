@@ -1,6 +1,7 @@
 package domain
 
 import (
+	"fmt"
 	"time"
 )
 
@@ -50,5 +51,15 @@ func (s *Session) IsValid() bool {
 type Fingerprint *string
 
 func NewFingerprint(str *string) (Fingerprint, error) {
+	if str != nil {
+		if *str == "" {
+			return nil, fmt.Errorf("fingerprint cannot be empty")
+		}
+
+		if len(*str) > 256 {
+			return nil, fmt.Errorf("fingerprint must be at most 256 characters")
+		}
+	}
+
 	return Fingerprint(str), nil
 }

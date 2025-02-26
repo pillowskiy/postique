@@ -5,16 +5,10 @@ import (
 
 	pb "github.com/pillowskiy/postique/pb/v1/sso"
 	"github.com/pillowskiy/postique/sso/internal/delivery/grpc/interceptor"
-	"github.com/pillowskiy/postique/sso/pkg/validator"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
-
-var permissionRulesMessages = ValidationRulesMap{
-	"user_id.string.uuid": "User ID has incorrect format",
-	"name.string.max_len": "Permission name should be less than {{.RuleValue}} characters",
-}
 
 type PermissionUseCase interface {
 	HasPermission(ctx context.Context, userID string, permissionName string) (bool, error)
@@ -30,10 +24,6 @@ func RegisterPermissionServer(server *grpc.Server, permUC PermissionUseCase) {
 }
 
 func (s *permissionServer) HasPermission(ctx context.Context, req *pb.HasPermissionRequest) (*pb.HasPermissionResponse, error) {
-	if err := validator.ValidateGRPC(req); err != nil {
-		return nil, formatValidationError(err, permissionRulesMessages)
-	}
-
 	user, err := interceptor.UserFromContext(ctx)
 	if err != nil {
 		return nil, status.Error(codes.Internal, "failed to get user from execution context")
@@ -48,10 +38,6 @@ func (s *permissionServer) HasPermission(ctx context.Context, req *pb.HasPermiss
 }
 
 func (s *permissionServer) HasUserPermission(ctx context.Context, req *pb.HasUserPermissionRequest) (*pb.HasUserPermissionResponse, error) {
-	if err := validator.ValidateGRPC(req); err != nil {
-		return nil, formatValidationError(err, permissionRulesMessages)
-	}
-
 	hasPermission, err := s.permUC.HasPermission(ctx, req.GetUserId(), req.GetName())
 	if err != nil {
 		return nil, status.Error(codes.PermissionDenied, "permission denied")
