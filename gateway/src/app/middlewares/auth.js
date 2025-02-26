@@ -1,5 +1,7 @@
 /** @typedef{import("#shared/logger").Logger} Logger */
 /** @typedef{import("#app/services").AuthService} AuthService */
+import { ClientException } from '#app/common/error.js';
+
 import cookieParser from 'cookie-parser';
 
 export class AuthMiddlewares {
@@ -31,7 +33,12 @@ export class AuthMiddlewares {
         return this.#cookieParser(req, res, async () => {
             const accessToken = this.#tokenFromCookie(req);
             if (!accessToken) {
-                return res.status(401).send('Unauthorized');
+                return void next(
+                    new ClientException(
+                        'Only authorizied users can access this resource',
+                        401,
+                    ),
+                );
             }
 
             try {
@@ -40,10 +47,15 @@ export class AuthMiddlewares {
                 req.user = user;
             } catch (err) {
                 this.#logger.error({ ...err }, 'Failed to verify access token');
-                return res.status(401).send('Unauthorized');
+                return void next(
+                    new ClientException(
+                        'Only authorizied users can access this resource',
+                        401,
+                    ),
+                );
             }
 
-            return next();
+            return void next();
         });
     }
 

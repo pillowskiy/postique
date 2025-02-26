@@ -16,6 +16,8 @@
     "rules": {
         "prettier/prettier": "error",
         "strict": ["error", "global"],
+        "no-void": "off",
+        "consistent-return": "off",
         "no-console": "warn",
         "no-var": "error",
         "prefer-const": "error",
