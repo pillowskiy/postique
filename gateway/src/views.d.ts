@@ -36,6 +36,10 @@ declare namespace render {
         'pages/login': {};
         'partials/head': {};
         'partials/toasts': {};
+        'shared/error': {
+            status: Variable;
+            message: Variable;
+        };
     }
 }
 

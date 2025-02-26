@@ -45,22 +45,13 @@ export class AuthController {
             });
         }
 
-        try {
-            const dto = new RegisterDTO(
-                req.body.username,
-                req.body.email,
-                req.body.password,
-            );
-            await this.#authService.register(dto);
-            return this.loginUser(req, res);
-        } catch (err) {
-            return render(res).template('components/toast.oob', {
-                initiator: 'Authentication',
-                message:
-                    err.message ||
-                    'Something went wrong, please wait and try again later.',
-            });
-        }
+        const dto = new RegisterDTO(
+            req.body.username,
+            req.body.email,
+            req.body.password,
+        );
+        await this.#authService.register(dto);
+        return this.loginUser(req, res);
     }
 
     /**
@@ -75,19 +66,10 @@ export class AuthController {
             });
         }
 
-        try {
-            const dto = new LoginDTO(req.body.email, req.body.password);
-            const session = await this.#authService.login(dto);
-            this.#storeSession(res, session);
-            return res.set('HX-Redirect', '/ping').status(200).send('OK');
-        } catch (err) {
-            return render(res).template('components/toast.oob', {
-                initiator: 'Authentication',
-                message:
-                    err.message ||
-                    'Something went wrong, please wait and try again later.',
-            });
-        }
+        const dto = new LoginDTO(req.body.email, req.body.password);
+        const session = await this.#authService.login(dto);
+        this.#storeSession(res, session);
+        res.set('HX-Redirect', '/ping').status(200).send('OK');
     }
 
     /**

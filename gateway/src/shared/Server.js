@@ -35,9 +35,11 @@ export default class Server {
      */
     async start() {
         return new Promise((resolve) => {
-            this.http = this.#instance.listen(this.#config.port, () => {
-                const { port } = this.http.address();
-                this.#logger.info({ port }, 'Gateway started');
+            this.#http = this.#instance.listen(this.#config.port, () => {
+                this.#logger.info(
+                    { port: this.#config.port },
+                    'Gateway started',
+                );
                 resolve();
             });
         });
