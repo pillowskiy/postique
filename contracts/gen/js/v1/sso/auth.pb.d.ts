@@ -1,9 +1,10 @@
 import { BinaryReader, BinaryWriter } from "@bufbuild/protobuf/wire";
 import { type CallOptions, ChannelCredentials, Client, type ClientOptions, type ClientUnaryCall, type handleUnaryCall, Metadata, type ServiceError, type UntypedServiceImplementation } from "@grpc/grpc-js";
-export declare const protobufPackage = "auth";
+export declare const protobufPackage = "soo.auth";
 export interface RegisterRequest {
     email: string;
     password: string;
+    username?: string | undefined;
 }
 export interface RegisterResponse {
     userId: string;
@@ -48,7 +49,7 @@ export declare const VerifyResponse: MessageFns<VerifyResponse>;
 export type AuthService = typeof AuthService;
 export declare const AuthService: {
     readonly register: {
-        readonly path: "/auth.Auth/Register";
+        readonly path: "/soo.auth.Auth/Register";
         readonly requestStream: false;
         readonly responseStream: false;
         readonly requestSerialize: (value: RegisterRequest) => Buffer<ArrayBuffer>;
@@ -57,7 +58,7 @@ export declare const AuthService: {
         readonly responseDeserialize: (value: Buffer) => RegisterResponse;
     };
     readonly login: {
-        readonly path: "/auth.Auth/Login";
+        readonly path: "/soo.auth.Auth/Login";
         readonly requestStream: false;
         readonly responseStream: false;
         readonly requestSerialize: (value: LoginRequest) => Buffer<ArrayBuffer>;
@@ -66,7 +67,7 @@ export declare const AuthService: {
         readonly responseDeserialize: (value: Buffer) => LoginResponse;
     };
     readonly refresh: {
-        readonly path: "/auth.Auth/Refresh";
+        readonly path: "/soo.auth.Auth/Refresh";
         readonly requestStream: false;
         readonly responseStream: false;
         readonly requestSerialize: (value: RefreshRequest) => Buffer<ArrayBuffer>;
@@ -75,7 +76,7 @@ export declare const AuthService: {
         readonly responseDeserialize: (value: Buffer) => RefreshResponse;
     };
     readonly verify: {
-        readonly path: "/auth.Auth/Verify";
+        readonly path: "/soo.auth.Auth/Verify";
         readonly requestStream: false;
         readonly responseStream: false;
         readonly requestSerialize: (value: VerifyRequest) => Buffer<ArrayBuffer>;

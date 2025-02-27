@@ -19,10 +19,10 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	Auth_Register_FullMethodName = "/auth.Auth/Register"
-	Auth_Login_FullMethodName    = "/auth.Auth/Login"
-	Auth_Refresh_FullMethodName  = "/auth.Auth/Refresh"
-	Auth_Verify_FullMethodName   = "/auth.Auth/Verify"
+	Auth_Register_FullMethodName = "/soo.auth.Auth/Register"
+	Auth_Login_FullMethodName    = "/soo.auth.Auth/Login"
+	Auth_Refresh_FullMethodName  = "/soo.auth.Auth/Refresh"
+	Auth_Verify_FullMethodName   = "/soo.auth.Auth/Verify"
 )
 
 // AuthClient is the client API for Auth service.
@@ -210,7 +210,7 @@ func _Auth_Verify_Handler(srv interface{}, ctx context.Context, dec func(interfa
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var Auth_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "auth.Auth",
+	ServiceName: "soo.auth.Auth",
 	HandlerType: (*AuthServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{

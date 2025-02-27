@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package auth;
+package soo.auth;
 
 option go_package = "postique.sso.v1;pb";
 

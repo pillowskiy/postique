@@ -19,8 +19,8 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	Permission_HasPermission_FullMethodName     = "/permission.Permission/HasPermission"
-	Permission_HasUserPermission_FullMethodName = "/permission.Permission/HasUserPermission"
+	Permission_HasPermission_FullMethodName     = "/soo.permission.Permission/HasPermission"
+	Permission_HasUserPermission_FullMethodName = "/soo.permission.Permission/HasUserPermission"
 )
 
 // PermissionClient is the client API for Permission service.
@@ -142,7 +142,7 @@ func _Permission_HasUserPermission_Handler(srv interface{}, ctx context.Context,
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var Permission_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "permission.Permission",
+	ServiceName: "soo.permission.Permission",
 	HandlerType: (*PermissionServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{

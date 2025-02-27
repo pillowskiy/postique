@@ -1,13 +1,16 @@
 import { BinaryReader, BinaryWriter } from "@bufbuild/protobuf/wire";
 import { makeGenericClientConstructor, } from "@grpc/grpc-js";
-export const protobufPackage = "sso.app";
+export const protobufPackage = "files.app";
 function createBaseCreateAppRequest() {
-    return { name: "" };
+    return { name: "", bucket: "" };
 }
 export const CreateAppRequest = {
     encode(message, writer = new BinaryWriter()) {
         if (message.name !== "") {
             writer.uint32(10).string(message.name);
+        }
+        if (message.bucket !== "") {
+            writer.uint32(18).string(message.bucket);
         }
         return writer;
     },
@@ -25,6 +28,13 @@ export const CreateAppRequest = {
                     message.name = reader.string();
                     continue;
                 }
+                case 2: {
+                    if (tag !== 18) {
+                        break;
+                    }
+                    message.bucket = reader.string();
+                    continue;
+                }
             }
             if ((tag & 7) === 4 || tag === 0) {
                 break;
@@ -34,12 +44,18 @@ export const CreateAppRequest = {
         return message;
     },
     fromJSON(object) {
-        return { name: isSet(object.name) ? globalThis.String(object.name) : "" };
+        return {
+            name: isSet(object.name) ? globalThis.String(object.name) : "",
+            bucket: isSet(object.bucket) ? globalThis.String(object.bucket) : "",
+        };
     },
     toJSON(message) {
         const obj = {};
         if (message.name !== "") {
             obj.name = message.name;
+        }
+        if (message.bucket !== "") {
+            obj.bucket = message.bucket;
         }
         return obj;
     },
@@ -49,16 +65,17 @@ export const CreateAppRequest = {
     fromPartial(object) {
         const message = createBaseCreateAppRequest();
         message.name = object.name ?? "";
+        message.bucket = object.bucket ?? "";
         return message;
     },
 };
 function createBaseCreateAppResponse() {
-    return { appId: "" };
+    return { token: "" };
 }
 export const CreateAppResponse = {
     encode(message, writer = new BinaryWriter()) {
-        if (message.appId !== "") {
-            writer.uint32(10).string(message.appId);
+        if (message.token !== "") {
+            writer.uint32(10).string(message.token);
         }
         return writer;
     },
@@ -73,7 +90,7 @@ export const CreateAppResponse = {
                     if (tag !== 10) {
                         break;
                     }
-                    message.appId = reader.string();
+                    message.token = reader.string();
                     continue;
                 }
             }
@@ -85,12 +102,12 @@ export const CreateAppResponse = {
         return message;
     },
     fromJSON(object) {
-        return { appId: isSet(object.appId) ? globalThis.String(object.appId) : "" };
+        return { token: isSet(object.token) ? globalThis.String(object.token) : "" };
     },
     toJSON(message) {
         const obj = {};
-        if (message.appId !== "") {
-            obj.appId = message.appId;
+        if (message.token !== "") {
+            obj.token = message.token;
         }
         return obj;
     },
@@ -99,13 +116,13 @@ export const CreateAppResponse = {
     },
     fromPartial(object) {
         const message = createBaseCreateAppResponse();
-        message.appId = object.appId ?? "";
+        message.token = object.token ?? "";
         return message;
     },
 };
 export const AppService = {
     createApp: {
-        path: "/sso.app.App/CreateApp",
+        path: "/files.app.App/CreateApp",
         requestStream: false,
         responseStream: false,
         requestSerialize: (value) => Buffer.from(CreateAppRequest.encode(value).finish()),
@@ -114,7 +131,7 @@ export const AppService = {
         responseDeserialize: (value) => CreateAppResponse.decode(value),
     },
 };
-export const AppClient = makeGenericClientConstructor(AppService, "sso.app.App");
+export const AppClient = makeGenericClientConstructor(AppService, "files.app.App");
 function isSet(value) {
     return value !== null && value !== undefined;
 }

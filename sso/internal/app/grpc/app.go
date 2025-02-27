@@ -26,8 +26,8 @@ func NewApp(
 ) *App {
 	grpcServer := grpc.NewServer(
 		interceptor.UnaryWithAuth(authUC)(
-			interceptor.Method("permission", "*", "HasPermission"),
-			interceptor.Method("auth", "*", "Verify"),
+			interceptor.Method("sso.permission", "*", "HasPermission"),
+			interceptor.Method("sso.auth", "*", "Verify"),
 		),
 	)
 

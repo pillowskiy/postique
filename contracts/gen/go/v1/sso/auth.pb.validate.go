@@ -61,6 +61,10 @@ func (m *RegisterRequest) validate(all bool) error {
 
 	// no validation rules for Password
 
+	if m.Username != nil {
+		// no validation rules for Username
+	}
+
 	if len(errors) > 0 {
 		return RegisterRequestMultiError(errors)
 	}

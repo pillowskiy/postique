@@ -1,0 +1,28 @@
+syntax = "proto3";
+
+package files.file;
+
+option go_package = "postique.file.v1;pb";
+
+service File {
+    rpc Upload(UploadRequest) returns (UploadResponse);
+    rpc Delete(DeleteRequest) returns (DeleteResponse);
+}
+
+message UploadRequest {
+    bytes data = 1;
+    string filename = 2;
+    string content_type = 3;
+}
+
+message UploadResponse {
+    string path = 1;
+}
+
+message DeleteRequest {
+    string path = 1;
+}
+
+message DeleteResponse {
+    string path = 1;
+}

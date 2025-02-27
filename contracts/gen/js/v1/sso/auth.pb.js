@@ -1,6 +1,6 @@
 import { BinaryReader, BinaryWriter } from "@bufbuild/protobuf/wire";
 import { makeGenericClientConstructor, } from "@grpc/grpc-js";
-export const protobufPackage = "auth";
+export const protobufPackage = "soo.auth";
 function createBaseRegisterRequest() {
     return { email: "", password: "" };
 }
@@ -11,6 +11,9 @@ export const RegisterRequest = {
         }
         if (message.password !== "") {
             writer.uint32(18).string(message.password);
+        }
+        if (message.username !== undefined) {
+            writer.uint32(26).string(message.username);
         }
         return writer;
     },
@@ -35,6 +38,13 @@ export const RegisterRequest = {
                     message.password = reader.string();
                     continue;
                 }
+                case 3: {
+                    if (tag !== 26) {
+                        break;
+                    }
+                    message.username = reader.string();
+                    continue;
+                }
             }
             if ((tag & 7) === 4 || tag === 0) {
                 break;
@@ -47,6 +57,7 @@ export const RegisterRequest = {
         return {
             email: isSet(object.email) ? globalThis.String(object.email) : "",
             password: isSet(object.password) ? globalThis.String(object.password) : "",
+            username: isSet(object.username) ? globalThis.String(object.username) : undefined,
         };
     },
     toJSON(message) {
@@ -57,6 +68,9 @@ export const RegisterRequest = {
         if (message.password !== "") {
             obj.password = message.password;
         }
+        if (message.username !== undefined) {
+            obj.username = message.username;
+        }
         return obj;
     },
     create(base) {
@@ -66,6 +80,7 @@ export const RegisterRequest = {
         const message = createBaseRegisterRequest();
         message.email = object.email ?? "";
         message.password = object.password ?? "";
+        message.username = object.username ?? undefined;
         return message;
     },
 };
@@ -597,7 +612,7 @@ export const VerifyResponse = {
 };
 export const AuthService = {
     register: {
-        path: "/auth.Auth/Register",
+        path: "/soo.auth.Auth/Register",
         requestStream: false,
         responseStream: false,
         requestSerialize: (value) => Buffer.from(RegisterRequest.encode(value).finish()),
@@ -606,7 +621,7 @@ export const AuthService = {
         responseDeserialize: (value) => RegisterResponse.decode(value),
     },
     login: {
-        path: "/auth.Auth/Login",
+        path: "/soo.auth.Auth/Login",
         requestStream: false,
         responseStream: false,
         requestSerialize: (value) => Buffer.from(LoginRequest.encode(value).finish()),
@@ -615,7 +630,7 @@ export const AuthService = {
         responseDeserialize: (value) => LoginResponse.decode(value),
     },
     refresh: {
-        path: "/auth.Auth/Refresh",
+        path: "/soo.auth.Auth/Refresh",
         requestStream: false,
         responseStream: false,
         requestSerialize: (value) => Buffer.from(RefreshRequest.encode(value).finish()),
@@ -624,7 +639,7 @@ export const AuthService = {
         responseDeserialize: (value) => RefreshResponse.decode(value),
     },
     verify: {
-        path: "/auth.Auth/Verify",
+        path: "/soo.auth.Auth/Verify",
         requestStream: false,
         responseStream: false,
         requestSerialize: (value) => Buffer.from(VerifyRequest.encode(value).finish()),
@@ -633,7 +648,7 @@ export const AuthService = {
         responseDeserialize: (value) => VerifyResponse.decode(value),
     },
 };
-export const AuthClient = makeGenericClientConstructor(AuthService, "auth.Auth");
+export const AuthClient = makeGenericClientConstructor(AuthService, "soo.auth.Auth");
 function longToNumber(int64) {
     const num = globalThis.Number(int64.toString());
     if (num > globalThis.Number.MAX_SAFE_INTEGER) {

@@ -1,18 +1,19 @@
 import { BinaryReader, BinaryWriter } from "@bufbuild/protobuf/wire";
 import { type CallOptions, ChannelCredentials, Client, type ClientOptions, type ClientUnaryCall, type handleUnaryCall, Metadata, type ServiceError, type UntypedServiceImplementation } from "@grpc/grpc-js";
-export declare const protobufPackage = "sso.app";
+export declare const protobufPackage = "files.app";
 export interface CreateAppRequest {
     name: string;
+    bucket: string;
 }
 export interface CreateAppResponse {
-    appId: string;
+    token: string;
 }
 export declare const CreateAppRequest: MessageFns<CreateAppRequest>;
 export declare const CreateAppResponse: MessageFns<CreateAppResponse>;
 export type AppService = typeof AppService;
 export declare const AppService: {
     readonly createApp: {
-        readonly path: "/sso.app.App/CreateApp";
+        readonly path: "/files.app.App/CreateApp";
         readonly requestStream: false;
         readonly responseStream: false;
         readonly requestSerialize: (value: CreateAppRequest) => Buffer<ArrayBuffer>;

@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.5.1
 // - protoc             v5.28.2
-// source: v1/sso/app.proto
+// source: v1/files/app.proto
 
 package pb
 
@@ -19,7 +19,7 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	App_CreateApp_FullMethodName = "/sso.app.App/CreateApp"
+	App_CreateApp_FullMethodName = "/files.app.App/CreateApp"
 )
 
 // AppClient is the client API for App service.
@@ -108,7 +108,7 @@ func _App_CreateApp_Handler(srv interface{}, ctx context.Context, dec func(inter
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var App_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "sso.app.App",
+	ServiceName: "files.app.App",
 	HandlerType: (*AppServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
@@ -117,5 +117,5 @@ var App_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "v1/sso/app.proto",
+	Metadata: "v1/files/app.proto",
 }

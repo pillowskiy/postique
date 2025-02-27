@@ -1,8 +1,8 @@
 syntax = "proto3";
 
-package sso.app;
+package files.app;
 
-option go_package = "postique.sso.v1;pb";
+option go_package = "postique.file.v1;pb";
 
 service App {
     rpc CreateApp (CreateAppRequest) returns (CreateAppResponse);
@@ -10,8 +10,9 @@ service App {
 
 message CreateAppRequest {
     string name = 1;
+    string bucket = 2;
 }
 
 message CreateAppResponse {
-    string app_id = 1;
+    string token = 1;
 }
