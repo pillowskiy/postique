@@ -1,0 +1,14 @@
+server:
+  port: 6000
+  timeout: 10s
+
+decrypt_key: secret
+
+s3:
+  endpoint: http://minio:9000
+  region: us-east-1
+  access_key: iA7ASGHhKMvEMNda92uE
+  secret_key: GUMxyMId0w4XxJCYw3n8XT8clTmroCoN9rahfwmS
+  force_path_style: true
+  upload_buffer_size_mb: 5
+  multipart_chunk_size_mb: 5
