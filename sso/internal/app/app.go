@@ -34,7 +34,7 @@ func New(log *slog.Logger, cfg *config.Config) *App {
 	authRepo := pg.NewUserStorage(pgStorage)
 	authUC := usecase.NewAuthUseCase(authRepo, appUC, profileUC, log)
 
-	grpcApp := grpc.NewApp(log, cfg.Server, appUC, authUC, permUC)
+	grpcApp := grpc.NewApp(log, cfg.Server, appUC, authUC, permUC, profileUC)
 
 	return &App{grpcApp: grpcApp}
 }

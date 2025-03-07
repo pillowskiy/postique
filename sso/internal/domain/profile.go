@@ -26,7 +26,7 @@ type UserProfile struct {
 	CreatedAt  time.Time   `db:"created_at"`
 }
 
-func NewUserProfile(userID PID, username, bio string) (*UserProfile, error) {
+func NewUserProfile(userID PID, username, avatarPath, bio string) (*UserProfile, error) {
 	uid, err := NewID(userID)
 	if err != nil {
 		return nil, err
@@ -42,7 +42,7 @@ func NewUserProfile(userID PID, username, bio string) (*UserProfile, error) {
 		return nil, err
 	}
 
-	avatarPath, err := GenAvatarPath("")
+	uAvatarPath, err := NewAvatarPath(avatarPath)
 	if err != nil {
 		return nil, err
 	}
@@ -50,7 +50,7 @@ func NewUserProfile(userID PID, username, bio string) (*UserProfile, error) {
 	return &UserProfile{
 		UserID:     uid,
 		Username:   uname,
-		AvatarPath: &avatarPath,
+		AvatarPath: &uAvatarPath,
 		Bio:        ubio,
 		CreatedAt:  time.Now(),
 	}, nil
@@ -78,7 +78,7 @@ type AvatarPath string
 
 func NewAvatarPath(str string) (AvatarPath, error) {
 	if str == "" {
-		return "", errors.New("avatar path cannot be empty")
+		return AvatarPath(""), nil
 	}
 
 	parts := strings.Split(str, ".")

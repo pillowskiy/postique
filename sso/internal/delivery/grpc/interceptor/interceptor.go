@@ -29,19 +29,18 @@ func parsePattern(prefix, str string) string {
 	return prefix + regexp.QuoteMeta(str)
 }
 
-type UnarySpecificMethod = func(methods ...*MethodPattern) grpc.ServerOption
+type UnarySpecificMethod = func(methods ...*MethodPattern) grpc.UnaryServerInterceptor
 
 func unarySpecificMethod(intercept grpc.UnaryServerInterceptor) UnarySpecificMethod {
-	return func(methods ...*MethodPattern) grpc.ServerOption {
-		return grpc.UnaryInterceptor(
-			func(ctx context.Context, req any, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (resp any, err error) {
-				if !isMethodAllowed(info.FullMethod, methods) {
-					return handler(ctx, req)
-				}
+	return func(methods ...*MethodPattern) grpc.UnaryServerInterceptor {
+		return func(ctx context.Context, req any, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (resp any, err error) {
+            if !isMethodAllowed(info.FullMethod, methods) {
+                return handler(ctx, req)
+            }
 
-				return intercept(ctx, req, info, handler)
-			},
-		)
+            return intercept(ctx, req, info, handler)
+        }
+		
 	}
 }
 

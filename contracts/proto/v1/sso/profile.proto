@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+package sso.profile;
+
+option go_package = "postique.sso.v1;pb";
+
+service Profile {
+    rpc UpdateProfile (UpdateProfileRequest) returns (UpdateProfileResponse);
+}
+
+message UpdateProfileRequest {
+    string user_id = 1;
+    optional string username = 2;
+    optional string avatar_path = 3;
+    optional string bio = 4;
+}
+
+message UpdateProfileResponse {
+    UserProfile profile = 1;
+}
+
+message UserProfile {
+    string username = 1;
+    string avatar_path = 2;
+    string bio = 3;
+}

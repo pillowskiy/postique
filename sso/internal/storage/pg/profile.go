@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/Masterminds/squirrel"
 	"github.com/pillowskiy/postique/sso/internal/domain"
 	"github.com/pillowskiy/postique/sso/internal/storage"
 )
@@ -18,7 +19,7 @@ func NewProfileStorage(pg *Storage) *ProfileStorage {
 	return &ProfileStorage{Storage: pg}
 }
 
-func (s *ProfileStorage) SaveProfile(ctx context.Context, profile *domain.UserProfile) error {
+func (s *ProfileStorage) CreateProfile(ctx context.Context, profile *domain.UserProfile) error {
 	const op = "pg.ProfileStorage.SaveProfile"
 	q, args, err := psql.
 		Insert("profiles").Columns("user_id", "username", "avatar_path", "bio", "created_at").
@@ -33,6 +34,27 @@ func (s *ProfileStorage) SaveProfile(ctx context.Context, profile *domain.UserPr
 	}
 
 	return nil
+}
+
+func (s *ProfileStorage) SaveProfile(ctx context.Context, userID domain.ID, profile *domain.UserProfile) error {
+    const op = "pg.ProfileStorage.SaveProfile"
+    q, args, err := psql.
+        Update("profiles").
+        Set("username", squirrel.Expr("COALESCE(NULLIF(?, ''), username)", profile.Username)).
+        Set("avatar_path", squirrel.Expr("COALESCE(NULLIF(?, ''), avatar_path)", profile.AvatarPath)).
+        Set("bio", squirrel.Expr("COALESCE(NULLIF(?, ''), bio)", profile.Bio)).
+        Where("user_id = ?", userID).
+        ToSql()
+
+    if err != nil {
+        return fmt.Errorf("%s: %w", op, err)
+    }
+
+    if _, err := s.ext(ctx).ExecContext(ctx, q, args...); err != nil {
+        return fmt.Errorf("%s: %w", op, err)
+    }
+
+    return nil
 }
 
 func (s *ProfileStorage) Profile(ctx context.Context, userID domain.ID) (*domain.UserProfile, error) {

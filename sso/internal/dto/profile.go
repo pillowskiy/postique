@@ -8,6 +8,12 @@ type CreateProfileInput struct {
 	Bio      string
 }
 
+type UpdateProfileInput struct {
+    AvatarPath string
+    Username string
+    Bio string
+}
+
 type Profile struct {
 	UserID     string
 	Username   string
