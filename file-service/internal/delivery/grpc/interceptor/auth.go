@@ -28,7 +28,7 @@ func UnaryWithAuth(authUC AuthAppUseCase, log *slog.Logger) grpc.UnaryServerInte
 		const op = "interceptor.UnaryWithAuth"
 		log := log.With(slog.String("method", info.FullMethod), slog.String("op", op))
 		defer func(start time.Time) {
-			log.Info("Handled", slog.Duration("elapsed", time.Since(start)))
+			log.Info("Handled", slog.String("elapsed", time.Since(start).String()))
 		}(time.Now())
 
 		token, err := TokenFromContext(ctx)
@@ -40,7 +40,7 @@ func UnaryWithAuth(authUC AuthAppUseCase, log *slog.Logger) grpc.UnaryServerInte
 		payload, err := authUC.DecryptApp(ctx, token)
 		if err != nil {
 			if errors.Is(err, usecase.ErrAppNotFound) {
-				slog.Warn("app not found")
+                log.Warn("app not found")
 				return nil, status.Error(codes.Unauthenticated, "app not found")
 			}
 			log.Error("failed to decrypt token", slog.String("error", err.Error()))

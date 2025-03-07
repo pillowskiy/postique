@@ -18,7 +18,7 @@ func NewApp(log *slog.Logger, cfg *config.Config) *App {
 	s3Storage := s3.MustConnect(cfg.S3)
 
 	fileStorage := s3.NewFileStorage(s3Storage)
-	fileUseCase := usecase.NewFileService(fileStorage)
+	fileUseCase := usecase.NewFileService(fileStorage, log)
 	appUseCase := usecase.NewAppUseCase(fileUseCase, cfg.DecryptKey, log)
 
 	grpcApp := grpc.NewApp(log, cfg.Server, appUseCase, fileUseCase)
