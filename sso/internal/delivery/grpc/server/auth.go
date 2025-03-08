@@ -100,6 +100,8 @@ func (s *authServer) parseUseCaseErr(err error) error {
 		return status.Error(codes.AlreadyExists, "user already exists")
 	case errors.Is(err, usecase.ErrInvalidCredentials):
 		return status.Error(codes.Unauthenticated, "invalid credentials")
+    case errors.Is(err, usecase.ErrInvalidSession):
+        return status.Error(codes.Unauthenticated, "invalid session")
 	default:
 		return parseUseCaseException(err)
 	}

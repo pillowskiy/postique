@@ -23,24 +23,24 @@ func NewApp(
 	appUC server.AppUseCase,
 	authUC server.AuthUseCase,
 	permUC server.PermissionUseCase,
-    profileUC server.ProfileUseCase,
+	profileUC server.ProfileUseCase,
 ) *App {
 	grpcServer := grpc.NewServer(
-        grpc.ChainUnaryInterceptor(
-            interceptor.UnaryWithAuth(authUC)(
-                interceptor.Method("sso.permission", "*", "HasPermission"),
-                interceptor.Method("sso.auth", "*", "Verify"),
-            ),
-            interceptor.UnarySelfOrHasPermission(permUC, log, "edit:user")(
-                interceptor.Method("sso.profile", "*", "UpdateProfile"),
-            ),
-        ),
+		grpc.ChainUnaryInterceptor(
+			interceptor.UnaryWithAuth(authUC)(
+				interceptor.Method("sso.permission", "*", "HasPermission"),
+				interceptor.Method("sso.auth", "*", "Verify"),
+			),
+			interceptor.UnarySelfOrHasPermission(permUC, log, "edit:user")(
+				interceptor.Method("sso.profile", "*", "UpdateProfile"),
+			),
+		),
 	)
 
 	server.RegisterAppServer(grpcServer, appUC)
 	server.RegisterAuthServer(grpcServer, authUC)
 	server.RegisterPermissionServer(grpcServer, permUC)
-    server.RegisterProfileServer(grpcServer, profileUC)
+	server.RegisterProfileServer(grpcServer, profileUC)
 
 	return &App{log: log, grpcServer: grpcServer, cfg: cfg}
 }
