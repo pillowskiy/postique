@@ -2,6 +2,8 @@
     <h2 class="mb-4">Create an account</h2>
 
     <div>
+        <input type="hidden" name="csrfToken" value="<%= csrfToken %>" />
+
         <div class="form-outline mb-4">
             <label class="form-label" for="username">Username</label>
             <input

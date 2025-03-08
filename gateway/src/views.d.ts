@@ -9,7 +9,9 @@ declare namespace render {
         'auth/login/form-errors.oob': {
             errors: { email: Variable; password: Variable };
         };
-        'auth/login/form': {};
+        'auth/login/form': {
+            csrfToken: Variable;
+        };
         'auth/login/page': {};
         'auth/register/form-errors.oob': {
             errors: {
@@ -19,7 +21,9 @@ declare namespace render {
                 passwordConfirm: Variable;
             };
         };
-        'auth/register/form': {};
+        'auth/register/form': {
+            csrfToken: Variable;
+        };
         'auth/register/page': {};
         'components/toast.oob': {
             initiator: Variable;

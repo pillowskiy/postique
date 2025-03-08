@@ -5,13 +5,19 @@ import handler from './common/handler.js';
 
 /**
  * @param {import("#app/controllers").AuthController} authController
+ * @param {import("#app/middlewares").CSRFMiddlewares} csrfMiddlewares
  */
-export function AuthRoutes(authController) {
+export function AuthRoutes(authController, csrfMiddlewares) {
     const authRouter = express.Router();
 
-    authRouter.get('/login', handler(authController, 'loginView'));
+    authRouter.get(
+        '/login',
+        csrfMiddlewares.withCSRF.bind(csrfMiddlewares),
+        handler(authController, 'loginView'),
+    );
     authRouter.post(
         '/login',
+        csrfMiddlewares.verifyCsrfToken.bind(csrfMiddlewares),
         [
             body('email')
                 .isEmail()
@@ -27,9 +33,15 @@ export function AuthRoutes(authController) {
         handler(authController, 'loginUser'),
     );
 
-    authRouter.get('/register', handler(authController, 'registerView'));
+    authRouter.get(
+        '/register',
+        csrfMiddlewares.withCSRF.bind(csrfMiddlewares),
+        handler(authController, 'registerView'),
+    );
+
     authRouter.post(
         '/register',
+        csrfMiddlewares.verifyCsrfToken.bind(csrfMiddlewares),
         [
             body('username')
                 .isString()

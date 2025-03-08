@@ -47,6 +47,17 @@ export class GeneralMiddlewares {
      * @param {import('express').NextFunction} _
      */
     async exception(err, req, res, _) {
+        if (err instanceof Error) {
+            this.#logger.error(
+                {
+                    message: err.message,
+                    cause: err.cause,
+                    stack: err.stack,
+                },
+                'The following exception has been catched',
+            );
+        }
+
         const exception = ClientException.fromError(err);
         this.#logger.debug(
             {
