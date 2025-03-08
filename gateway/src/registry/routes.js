@@ -1,4 +1,4 @@
-import * as routes from '#app/routes/index.js';
+import * as routes from '#app/delivery/routes/index.js';
 
 import * as awilix from 'awilix';
 

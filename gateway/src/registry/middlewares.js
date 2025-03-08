@@ -1,4 +1,4 @@
-import * as mw from '#app/middlewares/index.js';
+import * as mw from '#app/delivery/middlewares/index.js';
 
 import * as awilix from 'awilix';
 

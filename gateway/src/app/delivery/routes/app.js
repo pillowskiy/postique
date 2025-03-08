@@ -2,8 +2,8 @@ import express from 'express';
 
 /**
  * @param {express.Router} authRouter
- * @param {import("#app/middlewares").AuthMiddlewares} authMiddlewares
- * @param {import("#app/middlewares").GeneralMiddlewares} middlewares
+ * @param {import("#app/delivery/middlewares").AuthMiddlewares} authMiddlewares
+ * @param {import("#app/delivery/middlewares").GeneralMiddlewares} middlewares
  */
 export function AppRoutes(authRouter, authMiddlewares, middlewares) {
     const appRouter = express.Router();

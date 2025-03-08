@@ -1,11 +1,11 @@
 import express from 'express';
 import { body } from 'express-validator';
 
-import handler from './common/handler.js';
+import handler from '../common/handler.js';
 
 /**
- * @param {import("#app/controllers").AuthController} authController
- * @param {import("#app/middlewares").CSRFMiddlewares} csrfMiddlewares
+ * @param {import("#app/delivery/controllers").AuthController} authController
+ * @param {import("#app/delivery/middlewares").CSRFMiddlewares} csrfMiddlewares
  */
 export function AuthRoutes(authController, csrfMiddlewares) {
     const authRouter = express.Router();

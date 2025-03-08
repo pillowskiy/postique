@@ -1,4 +1,4 @@
-import { AuthController } from '#app/controllers/auth.js';
+import { AuthController } from '#app/delivery/controllers/index.js';
 
 import { asClass } from 'awilix';
 

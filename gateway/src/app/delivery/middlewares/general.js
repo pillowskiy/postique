@@ -51,10 +51,8 @@ export class GeneralMiddlewares {
             this.#logger.error(
                 {
                     message: err.message,
-                    cause: err.cause,
-                    stack: err.stack,
                 },
-                'The following exception has been catched',
+                'The following error has been catched',
             );
         }
 

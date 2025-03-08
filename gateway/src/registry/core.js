@@ -1,4 +1,3 @@
-/* eslint-disable prettier/prettier */
 import Router from '#shared/Router.js';
 import Server from '#shared/Server.js';
 import Config from '#shared/config/index.js';
