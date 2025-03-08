@@ -1,12 +1,6 @@
 import { BinaryReader, BinaryWriter } from "@bufbuild/protobuf/wire";
 import { type CallOptions, ChannelCredentials, Client, type ClientOptions, type ClientUnaryCall, type handleUnaryCall, Metadata, type ServiceError, type UntypedServiceImplementation } from "@grpc/grpc-js";
 export declare const protobufPackage = "sso.profile";
-export interface GetProfileRequest {
-    username: string;
-}
-export interface GetProfileResponse {
-    profile: UserProfile | undefined;
-}
 export interface UpdateProfileRequest {
     userId: string;
     username?: string | undefined;
@@ -21,22 +15,11 @@ export interface UserProfile {
     avatarPath: string;
     bio: string;
 }
-export declare const GetProfileRequest: MessageFns<GetProfileRequest>;
-export declare const GetProfileResponse: MessageFns<GetProfileResponse>;
 export declare const UpdateProfileRequest: MessageFns<UpdateProfileRequest>;
 export declare const UpdateProfileResponse: MessageFns<UpdateProfileResponse>;
 export declare const UserProfile: MessageFns<UserProfile>;
 export type ProfileService = typeof ProfileService;
 export declare const ProfileService: {
-    readonly getProfile: {
-        readonly path: "/sso.profile.Profile/GetProfile";
-        readonly requestStream: false;
-        readonly responseStream: false;
-        readonly requestSerialize: (value: GetProfileRequest) => Buffer<ArrayBuffer>;
-        readonly requestDeserialize: (value: Buffer) => GetProfileRequest;
-        readonly responseSerialize: (value: GetProfileResponse) => Buffer<ArrayBuffer>;
-        readonly responseDeserialize: (value: Buffer) => GetProfileResponse;
-    };
     readonly updateProfile: {
         readonly path: "/sso.profile.Profile/UpdateProfile";
         readonly requestStream: false;
@@ -48,13 +31,9 @@ export declare const ProfileService: {
     };
 };
 export interface ProfileServer extends UntypedServiceImplementation {
-    getProfile: handleUnaryCall<GetProfileRequest, GetProfileResponse>;
     updateProfile: handleUnaryCall<UpdateProfileRequest, UpdateProfileResponse>;
 }
 export interface ProfileClient extends Client {
-    getProfile(request: GetProfileRequest, callback: (error: ServiceError | null, response: GetProfileResponse) => void): ClientUnaryCall;
-    getProfile(request: GetProfileRequest, metadata: Metadata, callback: (error: ServiceError | null, response: GetProfileResponse) => void): ClientUnaryCall;
-    getProfile(request: GetProfileRequest, metadata: Metadata, options: Partial<CallOptions>, callback: (error: ServiceError | null, response: GetProfileResponse) => void): ClientUnaryCall;
     updateProfile(request: UpdateProfileRequest, callback: (error: ServiceError | null, response: UpdateProfileResponse) => void): ClientUnaryCall;
     updateProfile(request: UpdateProfileRequest, metadata: Metadata, callback: (error: ServiceError | null, response: UpdateProfileResponse) => void): ClientUnaryCall;
     updateProfile(request: UpdateProfileRequest, metadata: Metadata, options: Partial<CallOptions>, callback: (error: ServiceError | null, response: UpdateProfileResponse) => void): ClientUnaryCall;

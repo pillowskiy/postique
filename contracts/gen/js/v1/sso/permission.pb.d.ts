@@ -1,6 +1,6 @@
 import { BinaryReader, BinaryWriter } from "@bufbuild/protobuf/wire";
 import { type CallOptions, ChannelCredentials, Client, type ClientOptions, type ClientUnaryCall, type handleUnaryCall, Metadata, type ServiceError, type UntypedServiceImplementation } from "@grpc/grpc-js";
-export declare const protobufPackage = "soo.permission";
+export declare const protobufPackage = "sso.permission";
 export interface HasPermissionRequest {
     name: string;
 }
@@ -21,7 +21,7 @@ export declare const HasUserPermissionResponse: MessageFns<HasUserPermissionResp
 export type PermissionService = typeof PermissionService;
 export declare const PermissionService: {
     readonly hasPermission: {
-        readonly path: "/soo.permission.Permission/HasPermission";
+        readonly path: "/sso.permission.Permission/HasPermission";
         readonly requestStream: false;
         readonly responseStream: false;
         readonly requestSerialize: (value: HasPermissionRequest) => Buffer<ArrayBuffer>;
@@ -30,7 +30,7 @@ export declare const PermissionService: {
         readonly responseDeserialize: (value: Buffer) => HasPermissionResponse;
     };
     readonly hasUserPermission: {
-        readonly path: "/soo.permission.Permission/HasUserPermission";
+        readonly path: "/sso.permission.Permission/HasUserPermission";
         readonly requestStream: false;
         readonly responseStream: false;
         readonly requestSerialize: (value: HasUserPermissionRequest) => Buffer<ArrayBuffer>;

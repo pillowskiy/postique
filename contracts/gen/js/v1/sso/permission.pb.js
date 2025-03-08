@@ -1,6 +1,6 @@
 import { BinaryReader, BinaryWriter } from "@bufbuild/protobuf/wire";
 import { makeGenericClientConstructor, } from "@grpc/grpc-js";
-export const protobufPackage = "soo.permission";
+export const protobufPackage = "sso.permission";
 function createBaseHasPermissionRequest() {
     return { name: "" };
 }
@@ -224,7 +224,7 @@ export const HasUserPermissionResponse = {
 };
 export const PermissionService = {
     hasPermission: {
-        path: "/soo.permission.Permission/HasPermission",
+        path: "/sso.permission.Permission/HasPermission",
         requestStream: false,
         responseStream: false,
         requestSerialize: (value) => Buffer.from(HasPermissionRequest.encode(value).finish()),
@@ -233,7 +233,7 @@ export const PermissionService = {
         responseDeserialize: (value) => HasPermissionResponse.decode(value),
     },
     hasUserPermission: {
-        path: "/soo.permission.Permission/HasUserPermission",
+        path: "/sso.permission.Permission/HasUserPermission",
         requestStream: false,
         responseStream: false,
         requestSerialize: (value) => Buffer.from(HasUserPermissionRequest.encode(value).finish()),
@@ -242,7 +242,7 @@ export const PermissionService = {
         responseDeserialize: (value) => HasUserPermissionResponse.decode(value),
     },
 };
-export const PermissionClient = makeGenericClientConstructor(PermissionService, "soo.permission.Permission");
+export const PermissionClient = makeGenericClientConstructor(PermissionService, "sso.permission.Permission");
 function isSet(value) {
     return value !== null && value !== undefined;
 }

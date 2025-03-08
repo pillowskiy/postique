@@ -1,6 +1,6 @@
 import { BinaryReader, BinaryWriter } from "@bufbuild/protobuf/wire";
 import { makeGenericClientConstructor, } from "@grpc/grpc-js";
-export const protobufPackage = "soo.auth";
+export const protobufPackage = "sso.auth";
 function createBaseRegisterRequest() {
     return { email: "", password: "" };
 }
@@ -612,7 +612,7 @@ export const VerifyResponse = {
 };
 export const AuthService = {
     register: {
-        path: "/soo.auth.Auth/Register",
+        path: "/sso.auth.Auth/Register",
         requestStream: false,
         responseStream: false,
         requestSerialize: (value) => Buffer.from(RegisterRequest.encode(value).finish()),
@@ -621,7 +621,7 @@ export const AuthService = {
         responseDeserialize: (value) => RegisterResponse.decode(value),
     },
     login: {
-        path: "/soo.auth.Auth/Login",
+        path: "/sso.auth.Auth/Login",
         requestStream: false,
         responseStream: false,
         requestSerialize: (value) => Buffer.from(LoginRequest.encode(value).finish()),
@@ -630,7 +630,7 @@ export const AuthService = {
         responseDeserialize: (value) => LoginResponse.decode(value),
     },
     refresh: {
-        path: "/soo.auth.Auth/Refresh",
+        path: "/sso.auth.Auth/Refresh",
         requestStream: false,
         responseStream: false,
         requestSerialize: (value) => Buffer.from(RefreshRequest.encode(value).finish()),
@@ -639,7 +639,7 @@ export const AuthService = {
         responseDeserialize: (value) => RefreshResponse.decode(value),
     },
     verify: {
-        path: "/soo.auth.Auth/Verify",
+        path: "/sso.auth.Auth/Verify",
         requestStream: false,
         responseStream: false,
         requestSerialize: (value) => Buffer.from(VerifyRequest.encode(value).finish()),
@@ -648,7 +648,7 @@ export const AuthService = {
         responseDeserialize: (value) => VerifyResponse.decode(value),
     },
 };
-export const AuthClient = makeGenericClientConstructor(AuthService, "soo.auth.Auth");
+export const AuthClient = makeGenericClientConstructor(AuthService, "sso.auth.Auth");
 function longToNumber(int64) {
     const num = globalThis.Number(int64.toString());
     if (num > globalThis.Number.MAX_SAFE_INTEGER) {
