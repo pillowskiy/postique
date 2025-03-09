@@ -53,11 +53,13 @@ k8s_yaml([
   './infrastructure/dev/k8s/file.deploy.yml',
   './infrastructure/dev/k8s/postgres.deploy.yml',
   './infrastructure/dev/k8s/www.deploy.yml',
-  './infrastructure/dev/k8s/minio.deploy.yml'
+  './infrastructure/dev/k8s/minio.deploy.yml',
+  './infrastructure/dev/k8s/rabbitmq.deploy.yml'
 ], False)
 
 k8s_resource('postgres', port_forwards='5432:5432')
 k8s_resource('minio', port_forwards=[9000, 9090])
+k8s_resource('rabbitmq', port_forwards=[5672, 15672])
 k8s_resource('sso', port_forwards=4000, resource_deps=['sso-compile', 'postgres'])
 k8s_resource('file', port_forwards=6000, resource_deps=['file-compile', 'minio'])
 k8s_resource('www', port_forwards=5001, resource_deps=['www-generate'])
