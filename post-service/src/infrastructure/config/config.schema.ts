@@ -1,0 +1,46 @@
+import { ValidationError } from '@nestjs/common';
+import {
+  IsNotEmpty,
+  IsString,
+  Length,
+  Matches,
+  validateSync,
+} from 'class-validator';
+import { plainToInstance } from 'class-transformer';
+
+export class Config {
+  static validate(config: Record<string, unknown>): Config {
+    const configInstance = plainToInstance(Config, config, {
+      enableImplicitConversion: true,
+    });
+
+    const errors = validateSync(configInstance);
+    if (errors?.length > 0) {
+      const formatted = errors.map((e) => {
+        const key = e.property;
+        const constraint = Object.values(e.constraints ?? []).at(-1);
+        const message = constraint ?? 'Unknown constraint';
+        return `\t- ${key}: ${message}`;
+      });
+
+      throw new Error(`Config validation failed. \n${formatted.join('\n')}`);
+    }
+
+    return configInstance;
+  }
+
+  @IsNotEmpty({ message: 'Cannot be empty' })
+  @IsString({ message: 'Must be a string' })
+  @Length(3, 50, {
+    message: 'Must be between 3 and 50 characters long',
+  })
+  RABBIT_MQ_POSTS_QUEUE: string;
+
+  @IsNotEmpty({ message: 'Cannot be empty' })
+  @IsString({ message: 'Must be a string' })
+  @Matches(/^amqp:\/\/.*$/, {
+    message:
+      'Must be a valid RabbitMQ URI (e.g., amqp://username:password@host:port)',
+  })
+  RABBIT_MQ_URI: string;
+}
