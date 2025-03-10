@@ -43,4 +43,12 @@ export class Config {
       'Must be a valid RabbitMQ URI (e.g., amqp://username:password@host:port)',
   })
   RABBIT_MQ_URI: string;
+
+  @IsNotEmpty({ message: 'Cannot be empty' })
+  @IsString({ message: 'Must be a string' })
+  @Matches(/^mongodb(\+srv)?:\/\/.*/, {
+    message:
+      'Must be a valid MongoDB URI (e.g., mongodb://username:password@host:port)',
+  })
+  MONGO_URI: string;
 }
