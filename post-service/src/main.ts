@@ -1,6 +1,6 @@
 import { NestFactory } from '@nestjs/core';
 import AppModule from '@/infrastructure/app.module';
-import { PostsRMQService } from './infrastructure/rabbitmq';
+import { PostsRMQService } from '@/infrastructure/rabbitmq';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);

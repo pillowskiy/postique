@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { RmqOptions, Transport } from '@nestjs/microservices';
-import { AppConfigService } from '../config/config.service';
+import { AppConfigService } from '@/infrastructure/config';
 
 @Injectable()
 export class PostsRMQService {
