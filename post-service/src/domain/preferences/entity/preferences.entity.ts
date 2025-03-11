@@ -1,6 +1,26 @@
-export class PostPreferences {
-  private readonly postsBlacklist: Set<string>;
-  private readonly authorBlacklist: Set<string>;
+import { EntityFactory } from '../../common/entity';
+import type {
+  IncomingPostPreferences,
+  IPostPreferences,
+} from './preferences.interface';
+import { PostPreferencesSchema } from './preferences.schema';
+
+export class PostPreferences implements IPostPreferences {
+  static create(preferences: IncomingPostPreferences): PostPreferences {
+    const validPreferences = EntityFactory.create(
+      PostPreferencesSchema,
+      preferences,
+    );
+    return new PostPreferences(validPreferences);
+  }
+
+  private constructor(preferences: IPostPreferences) {
+    this.postsBlacklist = preferences.postsBlacklist;
+    this.authorBlacklist = preferences.authorBlacklist;
+  }
+
+  public readonly postsBlacklist: Set<string>;
+  public readonly authorBlacklist: Set<string>;
 
   public mutePost(postId: string): void {
     if (this.isPostMuted(postId)) {

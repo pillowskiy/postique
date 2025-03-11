@@ -1,11 +1,24 @@
-import { PostStatus, PostVisibility } from '../enums/post';
+import { EntityFactory } from '../../common/entity';
+import {
+  IncomingPost,
+  IPost,
+  IPostContent,
+  PostStatus,
+  PostVisibility,
+} from './post.interface';
+import { PostSchema } from './post.schema';
 
-export class Post {
+export class PostAggregate implements IPost {
+  static create(post: IncomingPost): PostAggregate {
+    const validPost = EntityFactory.create(PostSchema, post);
+    return new PostAggregate(validPost);
+  }
+
   public readonly id: string;
   public readonly createdAt: Date;
   public readonly updatedAt: Date;
-  public readonly approved: boolean;
 
+  private _approved: boolean;
   private _content: PostContent;
   private _owner: string;
   private _authors: string[];
@@ -13,6 +26,23 @@ export class Post {
   private _status: PostStatus;
   private _visibility: PostVisibility;
   private _publishedAt: Date | null;
+
+  private constructor(post: IPost) {
+    this.id = post.id;
+
+    this._owner = post.owner;
+    this._slug = post.slug;
+    this._status = post.status;
+    this._visibility = post.visibility;
+
+    this._publishedAt = post.publishedAt;
+    this.updatedAt = post.updatedAt;
+    this.createdAt = post.createdAt;
+  }
+
+  get approved(): boolean {
+    return this._approved;
+  }
 
   get content(): Readonly<PostContent> {
     return this._content;
@@ -40,6 +70,10 @@ export class Post {
 
   get publishedAt(): Date | null {
     return this._publishedAt;
+  }
+
+  setApproved(approved: boolean) {
+    this._approved = approved;
   }
 
   changeVisibility(visibility: PostVisibility) {
@@ -74,23 +108,26 @@ export class Post {
   }
 }
 
-export class PostContent {
+export class PostContent implements IPostContent {
   private readonly _coverImage: string | null = null;
   private readonly _title: string;
   private readonly _description: string;
   private readonly _content: string;
   private readonly _editedAt: Date | null;
+  public readonly createdAt: Date;
 
   private constructor(
     title: string,
     description: string,
     content: string,
     editedAt: Date | null = new Date(),
+    createdAt: Date = new Date(),
   ) {
     this._title = title;
     this._description = description;
     this._content = content;
     this._editedAt = editedAt;
+    this.createdAt = createdAt;
   }
 
   get title(): string {

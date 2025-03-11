@@ -1,7 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { HydratedDocument } from 'mongoose';
 import { Schemas } from '../common/schema';
-import { ModerationStatus } from '@/domain/enums/moderation';
+import { ModerationStatus } from '@/domain/moderation';
 
 export type AuthorDocument = HydratedDocument<Moderation>;
 

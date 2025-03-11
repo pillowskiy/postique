@@ -1,4 +1,4 @@
-import { PostStatus, PostVisibility } from '@/domain/enums/post';
+import { PostStatus, PostVisibility } from '@/domain/post';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { HydratedDocument } from 'mongoose';
 import { Schemas } from '../common/schema';
