@@ -33,6 +33,6 @@ import * as schemas from './schemas';
       useClass: MongoTransactional,
     },
   ],
-  exports: [Transactional],
+  exports: [NestMongooseModule, Transactional],
 })
 export class MongoModule {}

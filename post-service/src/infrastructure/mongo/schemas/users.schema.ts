@@ -1,18 +1,21 @@
-import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { Prop, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument } from 'mongoose';
+import { MongoSchema } from '../common/schema';
 
 export type UserDocument = HydratedDocument<User>;
 
-@Schema({ id: true, optimisticConcurrency: true, timestamps: true })
+@MongoSchema()
 export class User {
+  id: string;
+
   @Prop({ type: String, required: true, unique: true, index: true })
   refId: string;
 
   @Prop({ type: String, required: true, unique: true, index: true })
   username: string;
 
-  @Prop({ type: String, default: null })
-  bio: string | null;
+  @Prop({ type: String, required: true })
+  avatarPath: string;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

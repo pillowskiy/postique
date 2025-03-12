@@ -1,12 +1,14 @@
 import { PostStatus, PostVisibility } from '@/domain/post';
-import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { Prop, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { HydratedDocument } from 'mongoose';
-import { Schemas } from '../common/schema';
+import { MongoSchema, Schemas } from '../common/schema';
 
 export type PostDocument = HydratedDocument<Post>;
 
-@Schema({ id: true, optimisticConcurrency: true, timestamps: true })
+@MongoSchema()
 export class Post {
+  id: mongoose.Types.ObjectId;
+
   @Prop({ type: String, default: null })
   coverImage: string | null;
 
@@ -39,6 +41,12 @@ export class Post {
 
   @Prop({ type: Date, default: null })
   publishedAt: Date | null;
+
+  @Prop({ type: Date, default: Date.now })
+  createdAt: Date;
+
+  @Prop({ type: Date, default: Date.now })
+  updatedAt: Date;
 }
 
 export const PostSchema = SchemaFactory.createForClass(Post);

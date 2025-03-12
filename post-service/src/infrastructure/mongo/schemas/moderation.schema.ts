@@ -1,11 +1,11 @@
-import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { Prop, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { HydratedDocument } from 'mongoose';
-import { Schemas } from '../common/schema';
+import { MongoSchema, Schemas } from '../common/schema';
 import { ModerationStatus } from '@/domain/moderation';
 
 export type AuthorDocument = HydratedDocument<Moderation>;
 
-@Schema({ id: true, optimisticConcurrency: true, timestamps: true })
+@MongoSchema()
 export class Moderation {
   @Prop({ type: mongoose.Types.ObjectId, ref: Schemas.Posts, required: true })
   userId: string;

@@ -1,10 +1,10 @@
-import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { Prop, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { HydratedDocument } from 'mongoose';
-import { Schemas } from '../common/schema';
+import { MongoSchema, Schemas } from '../common/schema';
 
 export type PostPreferencesDocument = HydratedDocument<PostPreferences>;
 
-@Schema({ id: true, optimisticConcurrency: true, timestamps: true })
+@MongoSchema()
 export class PostPreferences {
   @Prop({ type: mongoose.Types.ObjectId, ref: Schemas.Users, required: true })
   userId: string;
@@ -13,17 +13,17 @@ export class PostPreferences {
     type: [mongoose.Types.ObjectId],
     ref: Schemas.Posts,
     required: true,
-    default: new Set(),
+    default: [],
   })
-  postsBlacklist: Set<string>;
+  postsBlacklist: string[];
 
   @Prop({
     type: [mongoose.Types.ObjectId],
     ref: Schemas.Users,
     required: true,
-    default: new Set(),
+    default: [],
   })
-  authorBlacklist: Set<string>;
+  authorBlacklist: string[];
 }
 
 export const PostPreferencesSchema =

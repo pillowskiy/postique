@@ -1,10 +1,10 @@
-import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { Prop, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { HydratedDocument } from 'mongoose';
-import { Schemas } from '../common/schema';
+import { MongoSchema, Schemas } from '../common/schema';
 
 export type PostSeriesDocument = HydratedDocument<PostSeries>;
 
-@Schema({ id: true, optimisticConcurrency: true, timestamps: true })
+@MongoSchema()
 export class PostSeries {
   @Prop({ type: String, required: true })
   title: string;
