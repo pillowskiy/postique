@@ -1,0 +1,72 @@
+import { PostRepository } from '@/app/boundaries/repository';
+import { PostAggregate } from '@/domain/post';
+import { InjectModel, models } from '@/infrastructure/mongo';
+import { Schemas } from '@/infrastructure/mongo/common/schema';
+import { Post } from '@/infrastructure/mongo/schemas';
+import { Injectable } from '@nestjs/common';
+import mongoose from 'mongoose';
+
+@Injectable()
+export class MongoPostRepository extends PostRepository {
+  constructor(
+    @InjectModel(Schemas.Posts) private readonly _postModel: models.PostModel,
+  ) {
+    super();
+  }
+
+  async save(post: PostAggregate): Promise<void> {
+    await this._postModel
+      .updateOne(
+        { _id: new mongoose.Types.ObjectId(post.id) },
+        {
+          $set: {
+            title: post.content.title,
+            description: post.content.description,
+            content: post.content,
+            editedAt: post.content.editedAt,
+            owner: post.owner,
+            authors: post.authors,
+            slug: post.slug,
+            status: post.status,
+            visibility: post.visibility,
+            publishedAt: post.publishedAt,
+            createdAt: post.createdAt,
+          },
+        },
+        {
+          upsert: true,
+        },
+      )
+      .lean();
+  }
+
+  async getBySlug(slug: string): Promise<PostAggregate | null> {
+    const post = await this._postModel.findOne({ slug }).lean();
+    if (!post) {
+      return null;
+    }
+    return this.#getPostAggregate(post);
+  }
+
+  #getPostAggregate(post: Post): PostAggregate {
+    const postAggregate = PostAggregate.create({
+      id: post.id.toString(),
+      content: {
+        title: post.title,
+        description: post.description,
+        content: post.content,
+        editedAt: post.editedAt,
+      },
+      owner: post.owner,
+      slug: post.slug,
+      authors: post.authors,
+      status: post.status,
+      visibility: post.visibility,
+      publishedAt: post.publishedAt,
+      createdAt: post.createdAt,
+      updatedAt: post.updatedAt,
+    });
+
+    return postAggregate;
+  }
+}
