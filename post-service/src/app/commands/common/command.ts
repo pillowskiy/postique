@@ -1,12 +1,18 @@
-import { EventDispatcher, Transactional } from '@/app/boundaries/common';
+import { Transactional } from '@/app/boundaries/common';
+import { Inject } from '@nestjs/common';
+import { ICommand } from '@nestjs/cqrs';
 
-export abstract class Command<I = void, O = void> {
-  constructor(
-    protected readonly _dispatcher: EventDispatcher,
-    protected readonly _transactional: Transactional,
-  ) {}
+interface ICommandHandler<I extends ICommand = any, O = void> {
+  execute(input: I): Promise<O>;
+}
 
-  protected abstract invoke(input: I): Promise<O>;
+export abstract class Command<I extends ICommand = any, O = any>
+  implements ICommandHandler<I, O>
+{
+  @Inject(Transactional)
+  protected readonly _transactional: Transactional;
+
+  protected abstract invoke(input: I): O;
 
   public async execute(input: I): Promise<O> {
     await this._transactional.start();
@@ -14,7 +20,7 @@ export abstract class Command<I = void, O = void> {
     try {
       const result = await this.invoke(input);
       await this._transactional.commit();
-      this._dispatcher.dispatch();
+      //this._dispatcher.dispatch();
       return result;
     } catch (error) {
       await this._transactional.rollback();
