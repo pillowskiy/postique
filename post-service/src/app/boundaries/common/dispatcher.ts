@@ -1,6 +1,6 @@
 import { BaseEvent } from '@/domain/common/events';
 
-export interface IEventDispatcher {
-  register(event: BaseEvent<any>): void;
-  dispatch(): void;
+export abstract class EventDispatcher {
+  abstract register(event: BaseEvent<any>): void;
+  abstract dispatch(): void;
 }

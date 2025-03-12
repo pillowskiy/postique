@@ -1,16 +1,10 @@
-import { Inject } from '@nestjs/common';
-import {
-  IEventDispatcher,
-  ITransactional,
-  BaseToken,
-} from '@/app/boundaries/common';
+import { EventDispatcher, Transactional } from '@/app/boundaries/common';
 
 export abstract class Command<I = void, O = void> {
-  @Inject(BaseToken.EventDispatcher)
-  protected _dispatcher: IEventDispatcher;
-
-  @Inject(BaseToken.Transactional)
-  protected _transactional: ITransactional;
+  constructor(
+    protected readonly _dispatcher: EventDispatcher,
+    protected readonly _transactional: Transactional,
+  ) {}
 
   protected abstract invoke(input: I): Promise<O>;
 

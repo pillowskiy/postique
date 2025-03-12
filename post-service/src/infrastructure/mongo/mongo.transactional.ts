@@ -1,25 +1,53 @@
-import { Injectable, Scope } from '@nestjs/common';
+import { Transactional } from '@/app/boundaries/common';
+import { Injectable } from '@nestjs/common';
 import { InjectConnection } from '@nestjs/mongoose';
 import { ClientSession, Connection } from 'mongoose';
+import { RequestScope } from 'nj-request-scope';
 
-@Injectable({ scope: Scope.REQUEST })
-export class DbContext {
-  private session: ClientSession;
+@Injectable()
+@RequestScope()
+export class MongoTransactional extends Transactional {
+  private session: ClientSession | null;
 
-  constructor(@InjectConnection() private readonly connection: Connection) {}
+  constructor(@InjectConnection() private readonly connection: Connection) {
+    super();
+  }
 
-  async start() {
+  public async start() {
+    if (this.session) {
+      if (this.session.inTransaction()) {
+        await this.session.abortTransaction();
+        await this.session.endSession();
+        throw new Error('Session already in transaction');
+      }
+      await this.session.endSession();
+    }
+
     this.session = await this.connection.startSession();
-    this.session.startTransaction();
+    this.session.startTransaction({
+      readConcern: { level: 'majority' },
+      writeConcern: { w: 'majority' },
+      readPreference: 'primary',
+      retryWrites: true,
+    });
   }
 
-  async commit() {
-    await this.session.commitTransaction();
-    this.session.endSession();
+  public async commit() {
+    const session = this.getSession();
+    await session.commitTransaction();
+    return void session.endSession();
   }
 
-  async rollback() {
-    await this.session.abortTransaction();
-    this.session.endSession();
+  public async rollback() {
+    const session = this.getSession();
+    await session.abortTransaction();
+    return void session.endSession();
+  }
+
+  private getSession(): ClientSession {
+    if (!this.session) {
+      throw new Error('Session not started');
+    }
+    return this.session;
   }
 }

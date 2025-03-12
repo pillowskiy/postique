@@ -1,5 +1,5 @@
-export interface ITransactional {
-  start(): Promise<void>;
-  commit(): Promise<void>;
-  rollback(): Promise<void>;
+export abstract class Transactional {
+  abstract start(): Promise<void>;
+  abstract commit(): Promise<void>;
+  abstract rollback(): Promise<void>;
 }

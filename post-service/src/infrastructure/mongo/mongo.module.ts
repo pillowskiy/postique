@@ -1,8 +1,11 @@
+import { Transactional } from '@/app/boundaries/common';
 import { Module } from '@nestjs/common';
+import { MongooseModule as NestMongooseModule } from '@nestjs/mongoose';
+import { RequestScopeModule } from 'nj-request-scope';
 import { AppConfigModule } from '../config/config.module';
 import { AppConfigService } from '../config/config.service';
-import { MongooseModule as NestMongooseModule } from '@nestjs/mongoose';
 import { Schemas } from './common/schema';
+import { MongoTransactional } from './mongo.transactional';
 import * as schemas from './schemas';
 
 @Module({
@@ -16,11 +19,20 @@ import * as schemas from './schemas';
     ]),
     NestMongooseModule.forRootAsync({
       imports: [AppConfigModule],
-      useFactory: async (configService: AppConfigService) => ({
+      useFactory: (configService: AppConfigService) => ({
         uri: configService.get('MONGO_URI'),
+        replicaSet: configService.get('MONGO_REPLICA_SET'),
       }),
       inject: [AppConfigService],
     }),
+    RequestScopeModule,
   ],
+  providers: [
+    {
+      provide: Transactional,
+      useClass: MongoTransactional,
+    },
+  ],
+  exports: [Transactional],
 })
 export class MongoModule {}

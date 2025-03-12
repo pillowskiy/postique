@@ -1,4 +1,4 @@
-import { ValidationError } from '@nestjs/common';
+import { plainToInstance } from 'class-transformer';
 import {
   IsNotEmpty,
   IsString,
@@ -6,7 +6,6 @@ import {
   Matches,
   validateSync,
 } from 'class-validator';
-import { plainToInstance } from 'class-transformer';
 
 export class Config {
   static validate(config: Record<string, unknown>): Config {
@@ -51,4 +50,8 @@ export class Config {
       'Must be a valid MongoDB URI (e.g., mongodb://username:password@host:port)',
   })
   MONGO_URI: string;
+
+  @IsNotEmpty({ message: 'Cannot be empty' })
+  @IsString({ message: 'Must be a string' })
+  MONGO_REPLICA_SET: string;
 }
