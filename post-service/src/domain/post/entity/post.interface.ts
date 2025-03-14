@@ -22,8 +22,9 @@ export type IncomingPost = IncomingEntity<
 export interface IPost {
   id: string;
 
-  content: IPostContent;
+  content: Readonly<IPostContent>;
   owner: string;
+  authors: Readonly<string[]>;
   slug: string;
   status: PostStatus;
   visibility: PostVisibility;
@@ -32,6 +33,8 @@ export interface IPost {
   createdAt: Date;
   updatedAt: Date;
 }
+
+export type IncomingPostContent = Partial<IPostContent>;
 
 export interface IPostContent {
   coverImage: string | null;

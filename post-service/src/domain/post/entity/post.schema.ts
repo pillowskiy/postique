@@ -4,10 +4,11 @@ import {
   IsOptional,
   IsEnum,
   IsDate,
-  ValidateNested,
   MinLength,
   MaxLength,
   IsUUID,
+  IsArray,
+  ArrayNotEmpty,
 } from 'class-validator';
 import {
   type IPost,
@@ -15,8 +16,9 @@ import {
   PostStatus,
   PostVisibility,
 } from './post.interface';
-import { Type } from 'class-transformer';
+import { Transform, Type } from 'class-transformer';
 import { randomUUID } from 'crypto';
+import slugify from 'slugify';
 
 export class PostContentSchema implements IPostContent {
   @IsOptional()
@@ -56,7 +58,6 @@ export class PostSchema implements IPost {
   @IsUUID(4, { message: 'ID has incorrect format' })
   id: string = randomUUID();
 
-  @ValidateNested()
   @Type(() => PostContentSchema)
   content: PostContentSchema;
 
@@ -64,6 +65,10 @@ export class PostSchema implements IPost {
   @IsNotEmpty({ message: 'Owner cannot be empty' })
   owner: string;
 
+  @Transform(
+    ({ value, obj }) =>
+      value || slugify(obj.title, { lower: true, strict: true }),
+  )
   @IsString({ message: 'Slug must be a string' })
   @IsNotEmpty({ message: 'Slug cannot be empty' })
   @MinLength(3, { message: 'Slug must be at least 3 characters' })
@@ -75,6 +80,14 @@ export class PostSchema implements IPost {
 
   @IsEnum(PostVisibility, { message: 'Invalid post visibility' })
   visibility: PostVisibility;
+
+  @IsArray({ message: 'Post authors must be a list of references' })
+  @ArrayNotEmpty({ message: 'Post must have at least one author' })
+  @IsUUID('4', {
+    each: true,
+    message: 'Post author reference has incorrect format',
+  })
+  authors: Readonly<string[]>;
 
   @IsOptional()
   @IsDate({ message: 'PublishedAt must be a valid date or null' })

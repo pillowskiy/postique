@@ -1,12 +1,13 @@
 import { EntityFactory } from '../../common/entity';
 import {
   IncomingPost,
+  IncomingPostContent,
   IPost,
   IPostContent,
   PostStatus,
   PostVisibility,
 } from './post.interface';
-import { PostSchema } from './post.schema';
+import { PostContentSchema, PostSchema } from './post.schema';
 
 export class PostAggregate implements IPost {
   static create(post: IncomingPost): PostAggregate {
@@ -34,6 +35,7 @@ export class PostAggregate implements IPost {
     this._slug = post.slug;
     this._status = post.status;
     this._visibility = post.visibility;
+    this._content = PostContent.create(post.content);
 
     this._publishedAt = post.publishedAt;
     this.updatedAt = post.updatedAt;
@@ -77,6 +79,14 @@ export class PostAggregate implements IPost {
   }
 
   changeVisibility(visibility: PostVisibility) {
+    if (this.status === PostStatus.Archived) {
+      throw new Error('You cannot change visibility of an archived post');
+    }
+
+    if (this.visibility === visibility) {
+      throw new Error('Post visibility is already set to this value');
+    }
+
     this._visibility = visibility;
   }
 
@@ -103,12 +113,17 @@ export class PostAggregate implements IPost {
     this._content = content;
   }
 
-  setOwner(userId: string) {
+  transferOwnership(userId: string) {
     this._owner = userId;
   }
 }
 
 export class PostContent implements IPostContent {
+  static create(content: IncomingPostContent) {
+    const validContent = EntityFactory.create(PostContentSchema, content);
+    return new PostContent(validContent);
+  }
+
   private readonly _coverImage: string | null = null;
   private readonly _title: string;
   private readonly _description: string;
@@ -116,13 +131,13 @@ export class PostContent implements IPostContent {
   private readonly _editedAt: Date | null;
   public readonly createdAt: Date;
 
-  private constructor(
-    title: string,
-    description: string,
-    content: string,
-    editedAt: Date | null = new Date(),
-    createdAt: Date = new Date(),
-  ) {
+  private constructor({
+    title,
+    description,
+    content,
+    editedAt,
+    createdAt,
+  }: IPostContent) {
     this._title = title;
     this._description = description;
     this._content = content;
