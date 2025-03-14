@@ -12,7 +12,7 @@ export abstract class Command<I extends ICommand = any, O = any>
   @Inject(Transactional)
   protected readonly _transactional: Transactional;
 
-  protected abstract invoke(input: I): O;
+  protected abstract invoke(input: I): O | Promise<O>;
 
   public async execute(input: I): Promise<O> {
     await this._transactional.start();

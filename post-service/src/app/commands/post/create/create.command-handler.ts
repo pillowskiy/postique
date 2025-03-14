@@ -1,11 +1,11 @@
-import { CreatePostOutput } from '@/app/boundaries/dto';
+import { CreatePostOutput } from '@/app/boundaries/dto/output';
 import { PostRepository } from '@/app/boundaries/repository';
 import { UserRepository } from '@/app/boundaries/repository/user.repository';
 import { Command } from '@/app/commands/common';
 import { PostAggregate } from '@/domain/post';
 import { Inject } from '@nestjs/common';
 import { CommandHandler } from '@nestjs/cqrs';
-import { CreatePostCommand } from './create-post.command';
+import { CreatePostCommand } from './create.command';
 
 @CommandHandler(CreatePostCommand)
 export class CreatePostCommandHandler extends Command<
@@ -18,21 +18,21 @@ export class CreatePostCommandHandler extends Command<
   @Inject(UserRepository)
   private readonly _userRepository: UserRepository;
 
-  async invoke({
+  protected async invoke({
     visibility,
-    owner,
+    initiatedBy,
     ...content
   }: CreatePostCommand): Promise<CreatePostOutput> {
-    const user = await this._userRepository.getById(owner);
-    if (!user) {
-      throw new Error('Provided post owner does not exist');
-    }
-
     const post = PostAggregate.create({
       visibility,
       content,
-      owner,
+      owner: initiatedBy,
     });
+
+    const user = await this._userRepository.getById(initiatedBy);
+    if (!user) {
+      throw new Error('Provided post owner does not exist');
+    }
 
     const storedPost = await this._postRepository.getBySlug(post.slug);
     if (storedPost) {
@@ -40,6 +40,6 @@ export class CreatePostCommandHandler extends Command<
     }
 
     await this._postRepository.save(post);
-    return new CreatePostOutput();
+    return new CreatePostOutput(post.id);
   }
 }

@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common';
 import { RabbitMQModule } from '@/infrastructure/rabbitmq';
 import { AppConfigModule } from '@/infrastructure/config';
-import { MongoModule } from '@/infrastructure/mongo';
+import { PostsModule } from '@/infrastructure/delivery/posts';
 
 @Module({
-  imports: [AppConfigModule, RabbitMQModule, MongoModule],
+  imports: [AppConfigModule, RabbitMQModule, PostsModule],
 })
 export default class AppModule {}

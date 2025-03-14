@@ -48,6 +48,22 @@ export class MongoPostRepository extends PostRepository {
     return this.#getPostAggregate(post);
   }
 
+  async getById(id: string): Promise<PostAggregate | null> {
+    const post = await this._postModel.findOne({ _id: id }).lean();
+    if (!post) {
+      return null;
+    }
+    return this.#getPostAggregate(post);
+  }
+
+  async delete(postId: string): Promise<boolean> {
+    const query = await this._postModel.deleteOne({ _id: postId });
+    if (!query.acknowledged) {
+      throw new Error('Could not delete post');
+    }
+    return query.deletedCount === 1;
+  }
+
   #getPostAggregate(post: Post): PostAggregate {
     const postAggregate = PostAggregate.create({
       id: post.id.toString(),
