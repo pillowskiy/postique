@@ -1,9 +1,12 @@
-import { plainToInstance } from 'class-transformer';
+import { plainToInstance, Transform } from 'class-transformer';
 import {
   IsNotEmpty,
+  IsNumber,
   IsString,
   Length,
   Matches,
+  Max,
+  Min,
   validateSync,
 } from 'class-validator';
 
@@ -27,6 +30,17 @@ export class Config {
 
     return configInstance;
   }
+
+  @Transform(({ value }) => parseInt(value as string, 10), {
+    toClassOnly: true,
+  })
+  @IsNumber(
+    { allowInfinity: false, allowNaN: false },
+    { message: 'Must be a number' },
+  )
+  @Max(65535, { message: 'Must be less than 65535' })
+  @Min(0, { message: 'Must be greater than 0' })
+  PORT: number;
 
   @IsNotEmpty({ message: 'Cannot be empty' })
   @IsString({ message: 'Must be a string' })

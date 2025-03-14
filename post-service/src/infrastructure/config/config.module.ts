@@ -8,6 +8,7 @@ import { AppConfigService } from './config.service';
     NestConfigModule.forRoot<Config>({
       isGlobal: true,
       envFilePath: AppConfigModule.envPath(),
+      // eslint-disable-next-line @typescript-eslint/unbound-method
       validate: Config.validate,
     }),
   ],
