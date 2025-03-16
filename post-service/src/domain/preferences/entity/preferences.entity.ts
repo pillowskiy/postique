@@ -1,3 +1,4 @@
+import { DomainBusinessRuleViolation } from '@/domain/common/error';
 import { EntityFactory } from '../../common/entity';
 import type {
   IncomingPostPreferences,
@@ -24,28 +25,28 @@ export class PostPreferences implements IPostPreferences {
 
   public mutePost(postId: string): void {
     if (this.isPostMuted(postId)) {
-      throw new Error('Post is already muted');
+      throw new DomainBusinessRuleViolation('Post is already muted');
     }
     this.postsBlacklist.add(postId);
   }
 
   public unmutePost(postId: string): void {
     if (!this.isPostMuted(postId)) {
-      throw new Error('This post is not muted');
+      throw new DomainBusinessRuleViolation('Post is not muted');
     }
     this.postsBlacklist.add(postId);
   }
 
   public muteAuthor(userId: string): void {
     if (this.isAuthorMuted(userId)) {
-      throw new Error('User is already muted');
+      throw new DomainBusinessRuleViolation('User is already muted');
     }
     this.authorBlacklist.add(userId);
   }
 
   public unmuteAuthor(userId: string): void {
     if (this.isAuthorMuted(userId)) {
-      throw new Error('User is not muted');
+      throw new DomainBusinessRuleViolation('User is not muted');
     }
     this.authorBlacklist.add(userId);
   }

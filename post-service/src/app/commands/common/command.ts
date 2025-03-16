@@ -1,4 +1,5 @@
 import { Transactional } from '@/app/boundaries/common';
+import { ApplicationException } from '@/app/boundaries/errors';
 import { Inject } from '@nestjs/common';
 import { ICommand } from '@nestjs/cqrs';
 
@@ -24,7 +25,7 @@ export abstract class Command<I extends ICommand = any, O = any>
       return result;
     } catch (error) {
       await this._transactional.rollback();
-      throw error;
+      throw ApplicationException.parse(error);
     }
   }
 }

@@ -1,4 +1,5 @@
 import { validateSync } from 'class-validator';
+import { DomainInvariantViolation } from './error';
 
 export type IncomingEntity<
   E extends Record<string, any>,
@@ -18,13 +19,17 @@ export class EntityFactory {
     });
 
     if (errors?.length > 0) {
-      const formatted = errors.map((e) => {
-        const constraint = Object.values(e.constraints ?? []).at(0);
-        const message = constraint ?? 'Unknown constraint';
-        return message;
-      });
+      const formatted = errors.reduce(
+        (prev, curr) => {
+          const constraint = Object.values(curr.constraints ?? []).at(0);
+          const message = constraint ?? 'Unknown constraint';
+          prev[curr.property] = message;
+          return prev;
+        },
+        {} as Record<string, string>,
+      );
 
-      throw new Error(formatted.join('. '));
+      throw new DomainInvariantViolation('Failed to create entity', formatted);
     }
 
     return _schema;

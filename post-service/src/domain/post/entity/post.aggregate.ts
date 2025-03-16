@@ -1,3 +1,4 @@
+import { DomainBusinessRuleViolation } from '@/domain/common/error';
 import { EntityFactory } from '../../common/entity';
 import {
   IncomingPost,
@@ -80,11 +81,15 @@ export class PostAggregate implements IPost {
 
   changeVisibility(visibility: PostVisibility) {
     if (this.status === PostStatus.Archived) {
-      throw new Error('You cannot change visibility of an archived post');
+      throw new DomainBusinessRuleViolation(
+        'You cannot change visibility of an archived post',
+      );
     }
 
     if (this.visibility === visibility) {
-      throw new Error('Post visibility is already set to this value');
+      throw new DomainBusinessRuleViolation(
+        'Post visibility is already set to this value',
+      );
     }
 
     this._visibility = visibility;
@@ -92,7 +97,7 @@ export class PostAggregate implements IPost {
 
   publish() {
     if (this.status !== PostStatus.Draft) {
-      throw new Error('Post is not in draft state');
+      throw new DomainBusinessRuleViolation('Post is not in draft state');
     }
 
     this._status = PostStatus.Published;
@@ -101,7 +106,7 @@ export class PostAggregate implements IPost {
 
   archive() {
     if (this.status === PostStatus.Archived) {
-      throw new Error('Post is already archived');
+      throw new DomainBusinessRuleViolation('Post is already archived');
     }
 
     this._status = PostStatus.Archived;

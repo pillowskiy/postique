@@ -1,9 +1,10 @@
-import { CommandHandler } from '@nestjs/cqrs';
-import { ArchivePostCommand } from './archive.command';
-import { Command } from '../../common';
 import { ArchivePostOutput } from '@/app/boundaries/dto/output';
-import { Inject } from '@nestjs/common';
+import { NotFoundException } from '@/app/boundaries/errors';
 import { PostRepository } from '@/app/boundaries/repository';
+import { Inject } from '@nestjs/common';
+import { CommandHandler } from '@nestjs/cqrs';
+import { Command } from '../../common';
+import { ArchivePostCommand } from './archive.command';
 
 @CommandHandler(ArchivePostCommand)
 export class ArchivePostCommandHandler extends Command<
@@ -18,7 +19,7 @@ export class ArchivePostCommandHandler extends Command<
   ): Promise<ArchivePostOutput> {
     const post = await this._postRepository.getById(input.postId);
     if (!post) {
-      throw new Error('Post does not exist');
+      throw new NotFoundException('Post does not exist');
     }
 
     post.archive();

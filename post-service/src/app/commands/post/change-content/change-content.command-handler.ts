@@ -1,11 +1,12 @@
-import { CommandHandler } from '@nestjs/cqrs';
-import { ChangePostContentCommand } from './change-content.command';
-import { Command } from '../../common';
 import { Post } from '@/app/boundaries/dto/output';
-import { Inject } from '@nestjs/common';
+import { NotFoundException } from '@/app/boundaries/errors';
+import { PostMapper } from '@/app/boundaries/mapper';
 import { PostRepository } from '@/app/boundaries/repository';
 import { PostContent } from '@/domain/post';
-import { PostMapper } from '@/app/boundaries/mapper';
+import { Inject } from '@nestjs/common';
+import { CommandHandler } from '@nestjs/cqrs';
+import { Command } from '../../common';
+import { ChangePostContentCommand } from './change-content.command';
 
 @CommandHandler(ChangePostContentCommand)
 export class ChangePostContentCommandHandler extends Command<
@@ -22,7 +23,7 @@ export class ChangePostContentCommandHandler extends Command<
   }: ChangePostContentCommand): Promise<Post> {
     const post = await this._postRepository.getById(postId);
     if (!post) {
-      throw new Error('Post does not exist');
+      throw new NotFoundException('Post does not exist');
     }
 
     const postContent = PostContent.create(content);

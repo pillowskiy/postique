@@ -6,6 +6,7 @@ import {
   FastifyAdapter,
   NestFastifyApplication,
 } from '@nestjs/platform-fastify';
+import { ApplicationExceptionFilter } from '@/infrastructure/common/filters';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestFastifyApplication>(
@@ -17,6 +18,7 @@ async function bootstrap() {
   const appLogger = await app.resolve(Logger);
   app.useLogger(appLogger);
   app.setGlobalPrefix('/api/v1');
+  app.useGlobalFilters(app.get(ApplicationExceptionFilter));
 
   const config = app.get(AppConfigService);
   await app.listen(config.get('PORT'), '0.0.0.0');

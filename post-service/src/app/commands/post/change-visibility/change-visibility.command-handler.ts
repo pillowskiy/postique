@@ -1,11 +1,15 @@
+import { Post } from '@/app/boundaries/dto/output';
+import {
+  NotFoundException,
+  ValidationException,
+} from '@/app/boundaries/errors';
+import { PostMapper } from '@/app/boundaries/mapper';
+import { PostRepository } from '@/app/boundaries/repository';
+import { PostVisibility } from '@/domain/post';
+import { Inject } from '@nestjs/common';
 import { CommandHandler } from '@nestjs/cqrs';
 import { Command } from '../../common';
-import { Post } from '@/app/boundaries/dto/output';
-import { Inject } from '@nestjs/common';
-import { PostRepository } from '@/app/boundaries/repository';
-import { PostMapper } from '@/app/boundaries/mapper';
 import { ChangePostVisibilityCommand } from './change-visibility.command';
-import { PostVisibility } from '@/domain/post';
 
 @CommandHandler(ChangePostVisibilityCommand)
 export class ChangePostVisibilityCommandHandler extends Command<
@@ -18,11 +22,11 @@ export class ChangePostVisibilityCommandHandler extends Command<
   protected async invoke(input: ChangePostVisibilityCommand): Promise<Post> {
     const post = await this._postRepository.getById(input.postId);
     if (!post) {
-      throw new Error('Post does not exist');
+      throw new NotFoundException('Post does not exist');
     }
 
     if (!this.#isValidPostVisibility(input.visibility)) {
-      throw new Error('Invalid post visibility');
+      throw new ValidationException('Invalid post visibility');
     }
 
     post.changeVisibility(input.visibility);

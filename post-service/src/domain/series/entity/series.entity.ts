@@ -1,3 +1,4 @@
+import { DomainBusinessRuleViolation } from '@/domain/common/error';
 import { EntityFactory } from '../../common/entity';
 import type { IncomingPostSeries, IPostSeries } from './series.interface';
 import { PostSeriesSchema } from './series.schema';
@@ -40,7 +41,7 @@ export class PostSeries implements IPostSeries {
 
   addPost(postId: string): void {
     if (this._hasPost(postId)) {
-      throw new Error('Series already has this post');
+      throw new DomainBusinessRuleViolation('Series already has this post');
     }
     this._posts.push(postId);
   }

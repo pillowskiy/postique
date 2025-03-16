@@ -1,3 +1,4 @@
+import { DomainBusinessRuleViolation } from '@/domain/common/error';
 import { EntityFactory } from '../../common/entity';
 import {
   IModeration,
@@ -39,14 +40,18 @@ export class PostModeration implements IModeration {
 
   approve(): void {
     if (this._status !== ModerationStatus.Pending) {
-      throw new Error('Moderation is not pending');
+      throw new DomainBusinessRuleViolation(
+        'Moderation is not pending for approval',
+      );
     }
     this._status = ModerationStatus.Approved;
   }
 
   reject(reason: string = ''): void {
     if (this._status !== ModerationStatus.Pending) {
-      throw new Error('Moderation is not pending');
+      throw new DomainBusinessRuleViolation(
+        'Moderation is not pending for rejection',
+      );
     }
 
     this._status = ModerationStatus.Rejected;

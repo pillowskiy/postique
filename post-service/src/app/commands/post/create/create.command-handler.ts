@@ -1,6 +1,7 @@
+import { Logger } from '@/app/boundaries/common';
 import { CreatePostOutput } from '@/app/boundaries/dto/output';
-import { PostRepository } from '@/app/boundaries/repository';
-import { UserRepository } from '@/app/boundaries/repository/user.repository';
+import { ConflictException, NotFoundException } from '@/app/boundaries/errors';
+import { PostRepository, UserRepository } from '@/app/boundaries/repository';
 import { Command } from '@/app/commands/common';
 import { PostAggregate } from '@/domain/post';
 import { Inject } from '@nestjs/common';
@@ -18,28 +19,37 @@ export class CreatePostCommandHandler extends Command<
   @Inject(UserRepository)
   private readonly _userRepository: UserRepository;
 
+  @Inject(Logger)
+  private readonly _logger: Logger;
+
   protected async invoke({
     visibility,
     initiatedBy,
     ...content
   }: CreatePostCommand): Promise<CreatePostOutput> {
+    this._logger.assign({ input: { content, visibility, initiatedBy } });
+    this._logger.debug?.('Creating post');
+
     const post = PostAggregate.create({
       visibility,
       content,
       owner: initiatedBy,
     });
 
-    const user = await this._userRepository.getById(initiatedBy);
-    if (!user) {
-      throw new Error('Provided post owner does not exist');
-    }
-
     const storedPost = await this._postRepository.getBySlug(post.slug);
     if (storedPost) {
-      throw new Error('Post with this slug already exists');
+      throw new ConflictException('Post with this slug already exists');
     }
 
+    const user = await this._userRepository.getById(initiatedBy);
+    if (!user) {
+      throw new NotFoundException('Post owner does not exist');
+    }
+    this._logger.assign({ owner: { username: user.username, id: user.id } });
+    this._logger.debug?.('Post owner exists');
+
     await this._postRepository.save(post);
+    this._logger.debug?.('Post saved', { post });
     return new CreatePostOutput(post.id);
   }
 }
