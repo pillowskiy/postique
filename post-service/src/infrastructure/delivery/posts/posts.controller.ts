@@ -21,7 +21,6 @@ export class PostsController {
   async createPost(
     @Body() data: input.CreatePostInput,
   ): Promise<output.CreatePostOutput> {
-    console.log('Creating post from incoming', data);
     return this._postsService.createPost(randomUUID(), data);
   }
 
@@ -30,7 +29,6 @@ export class PostsController {
     @Param('id') id: string,
     @Body() data: input.ChangePostContentInput,
   ): Promise<output.Post> {
-    console.log('Changing post content from incoming', data);
     return this._postsService.changePostContent(id, data);
   }
 
@@ -39,7 +37,6 @@ export class PostsController {
     @Param('id') id: string,
     @Body('visibility') visibility: string,
   ): Promise<output.Post> {
-    console.log('Changing post visibility from incoming', visibility);
     return this._postsService.changePostVisibility(id, visibility);
   }
 
@@ -47,19 +44,16 @@ export class PostsController {
   async archivePost(
     @Param('id') id: string,
   ): Promise<output.ArchivePostOutput> {
-    console.log('Archiving post from incoming');
     return this._postsService.archivePost(id);
   }
 
   @Patch(':id/publish')
   async publishPost(@Param('id') id: string): Promise<output.Post> {
-    console.log('Publishing post from incoming');
     return this._postsService.publishPost(id);
   }
 
   @Delete(':id')
   async deletePost(@Param('id') id: string): Promise<output.DeletePostOutput> {
-    console.log('Deleting post from incoming');
     return this._postsService.deletePost(id);
   }
 
@@ -68,7 +62,6 @@ export class PostsController {
     @Param('id') id: string,
     @Body('newOwner') newOwner: string,
   ): Promise<output.TransferPostOwnershipOutput> {
-    console.log('Transferring post ownership from incoming', newOwner);
     return this._postsService.transferPostOwnership(id, newOwner);
   }
 }
