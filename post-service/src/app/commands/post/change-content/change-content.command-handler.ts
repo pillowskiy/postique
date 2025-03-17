@@ -7,6 +7,7 @@ import { Inject } from '@nestjs/common';
 import { CommandHandler } from '@nestjs/cqrs';
 import { Command } from '../../common';
 import { ChangePostContentCommand } from './change-content.command';
+import { Sanitizer } from '@/infrastructure/sanitizer';
 
 @CommandHandler(ChangePostContentCommand)
 export class ChangePostContentCommandHandler extends Command<
@@ -16,17 +17,25 @@ export class ChangePostContentCommandHandler extends Command<
   @Inject(PostRepository)
   private readonly _postRepository: PostRepository;
 
+  @Inject(Sanitizer)
+  private readonly _sanitizer: Sanitizer;
+
   protected async invoke({
     postId,
-    iniatedBy,
-    ...content
+    title,
+    description,
+    content,
   }: ChangePostContentCommand): Promise<Post> {
     const post = await this._postRepository.getById(postId);
     if (!post) {
       throw new NotFoundException('Post does not exist');
     }
 
-    const postContent = PostContent.create(content);
+    const postContent = PostContent.create({
+      title,
+      description,
+      content: this._sanitizer.sanitize(content),
+    });
     post.changeContent(postContent);
     await this._postRepository.save(post);
 

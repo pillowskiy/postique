@@ -113,7 +113,7 @@ export class PostAggregate implements IPost {
     this._publishedAt = null;
   }
 
-  changeContent(content: PostContent) {
+  changeContent(content: PostContent): void {
     this._slug = content.title;
     this._content = content;
   }
@@ -140,13 +140,11 @@ export class PostContent implements IPostContent {
     title,
     description,
     content,
-    editedAt,
     createdAt,
   }: IPostContent) {
     this._title = title;
     this._description = description;
     this._content = content;
-    this._editedAt = editedAt;
     this.createdAt = createdAt;
   }
 
@@ -162,7 +160,7 @@ export class PostContent implements IPostContent {
     return this._content;
   }
 
-  get coverImage() {
+  get coverImage(): string | null {
     return this._coverImage;
   }
 

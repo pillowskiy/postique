@@ -41,6 +41,5 @@ export interface IPostContent {
   title: string;
   description: string;
   content: string;
-  editedAt: Date | null;
   createdAt: Date;
 }

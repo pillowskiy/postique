@@ -42,11 +42,6 @@ export class PostContentSchema implements IPostContent {
   })
   content: string;
 
-  @IsOptional()
-  @IsDate({ message: 'EditedAt must be a valid date or null' })
-  @Type(() => Date)
-  editedAt: Date | null = null;
-
   @IsDate({ message: 'CreatedAt must be a valid date' })
   @Type(() => Date)
   createdAt: Date = new Date();

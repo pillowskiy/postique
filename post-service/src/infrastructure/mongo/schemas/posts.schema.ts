@@ -21,9 +21,6 @@ export class Post {
   @Prop({ type: String, required: true })
   content: string;
 
-  @Prop({ type: Date, default: null })
-  editedAt: Date | null;
-
   @Prop({ type: String, required: true })
   owner: string;
 

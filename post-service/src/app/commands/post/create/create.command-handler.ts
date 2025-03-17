@@ -7,6 +7,7 @@ import { PostAggregate } from '@/domain/post';
 import { Inject } from '@nestjs/common';
 import { CommandHandler } from '@nestjs/cqrs';
 import { CreatePostCommand } from './create.command';
+import { Sanitizer } from '@/infrastructure/sanitizer';
 
 @CommandHandler(CreatePostCommand)
 export class CreatePostCommandHandler extends Command<
@@ -22,17 +23,26 @@ export class CreatePostCommandHandler extends Command<
   @Inject(Logger)
   private readonly _logger: Logger;
 
+  @Inject(Sanitizer)
+  private readonly _sanitizer: Sanitizer;
+
   protected async invoke({
     visibility,
     initiatedBy,
-    ...content
+    content,
+    description,
+    title,
   }: CreatePostCommand): Promise<CreatePostOutput> {
-    this._logger.assign({ input: { content, visibility, initiatedBy } });
+    this._logger.assign({ input: { title, visibility, initiatedBy } });
     this._logger.debug?.('Creating post');
 
     const post = PostAggregate.create({
       visibility,
-      content,
+      content: {
+        title,
+        description,
+        content: this._sanitizer.sanitize(content),
+      },
       owner: initiatedBy,
     });
 
