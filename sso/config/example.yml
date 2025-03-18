@@ -5,7 +5,8 @@ server:
 session:
   token_ttl: 720h
   encryption_secret: 1234567890123456
-  access_token_secret: secret
+  token_ed25519_private_key_path: .keys/private/access_token.pem
+  token_ed25519_public_key_path: .keys/public/access_token.pem
 
 postgres:
   host: postgres

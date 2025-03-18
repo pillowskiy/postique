@@ -21,9 +21,10 @@ type Server struct {
 }
 
 type Session struct {
-	TokenTTL          time.Duration `yaml:"token_ttl" env-default:"48h"`
-	EncryptionSecret  string        `yaml:"encryption_secret" env-required:"true"`
-	AccessTokenSecret string        `yaml:"access_token_secret" env-required:"true"`
+	TokenTTL                   time.Duration `yaml:"token_ttl" env-default:"48h"`
+	EncryptionSecret           string        `yaml:"encryption_secret" env-required:"true"`
+	TokenED25519PrivatePEMPath string        `yaml:"token_ed25519_private_key_path" env-required:"true"`
+	TokenED25519PublicPEMPath  string        `yaml:"token_ed25519_public_key_path" env-required:"true"`
 }
 
 type Postgres struct {

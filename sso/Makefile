@@ -1,3 +1,9 @@
+.PHONY: init
+
+keygen:
+	@echo "Generating app keys"
+	@go run cmd/keygen/main.go -privout=../.keys/private/access_token.pem -pubout=../.keys/public/access_token.pem
+
 .PHONY: app
 
 env_dev:

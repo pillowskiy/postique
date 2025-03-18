@@ -9,19 +9,31 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
-type MapClaims = jwt.MapClaims
+type (
+	MapClaims = jwt.MapClaims
+)
 
-func New(payload interface{}, secret string, duration time.Duration) (string, error) {
+var methods = map[SigningMethod]jwt.SigningMethod{
+	SigningMethodEdDSA: jwt.SigningMethodEdDSA,
+	SigningMethodHS256: jwt.SigningMethodHS256,
+}
+
+func New(payload any, s Secret, dur time.Duration) (string, error) {
+	method, ok := methods[s.Method()]
+	if !ok {
+		return "", errors.New("unknown signing method provided")
+	}
+
 	claims := &MapClaims{
-		"exp": time.Now().Add(duration).Unix(),
+		"exp": time.Now().Add(dur).Unix(),
 	}
 
 	if err := decode(payload, claims); err != nil {
 		return "", err
 	}
 
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	tokenStr, err := token.SignedString([]byte(secret))
+	token := jwt.NewWithClaims(method, claims)
+	tokenStr, err := token.SignedString(s.SignKey())
 	if err != nil {
 		return "", err
 	}
@@ -29,12 +41,18 @@ func New(payload interface{}, secret string, duration time.Duration) (string, er
 	return tokenStr, nil
 }
 
-func Verify(token, secret string) (interface{}, error) {
-	jwtToken, err := jwt.Parse(token, func(token *jwt.Token) (interface{}, error) {
-		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
+func Verify(token string, s Secret) (any, error) {
+	method, ok := methods[s.Method()]
+	if !ok {
+		return "", errors.New("unknown signing method provided")
+	}
+
+	jwtToken, err := jwt.Parse(token, func(token *jwt.Token) (any, error) {
+		if token.Method.Alg() != method.Alg() {
+			return nil, fmt.Errorf("unexpected signing method algorithm: %v", token.Header["alg"])
 		}
-		return []byte(secret), nil
+
+		return s.VerifyKey(), nil
 	})
 	if err != nil {
 		return "", err
@@ -47,8 +65,8 @@ func Verify(token, secret string) (interface{}, error) {
 	return jwtToken.Claims, nil
 }
 
-func VerifyAndScan(token, secret string, dest interface{}) error {
-	payload, err := Verify(token, secret)
+func VerifyAndScan(token string, s Secret, dest any) error {
+	payload, err := Verify(token, s)
 	if err != nil {
 		return err
 	}
@@ -65,7 +83,7 @@ func VerifyAndScan(token, secret string, dest interface{}) error {
 	return nil
 }
 
-func decode(src interface{}, dest interface{}) error {
+func decode(src any, dest any) error {
 	tmp, err := json.Marshal(src)
 	if err != nil {
 		return fmt.Errorf("failed to marshal src: %w", err)

@@ -10,6 +10,7 @@ import (
 	"github.com/pillowskiy/postique/sso/internal/config"
 	"github.com/pillowskiy/postique/sso/internal/domain"
 	"github.com/pillowskiy/postique/sso/internal/dto"
+	"github.com/pillowskiy/postique/sso/internal/lib/ioutil"
 	"github.com/pillowskiy/postique/sso/internal/lib/jwt"
 	"github.com/pillowskiy/postique/sso/internal/storage"
 )
@@ -39,13 +40,18 @@ type SessionCache interface {
 }
 
 type sessionUseCase struct {
-	sessionRepo SessionRepository
-	cfg         config.Session
-	log         *slog.Logger
+	sessionRepo  SessionRepository
+	accessSecret jwt.Secret
+	cfg          config.Session
+	log          *slog.Logger
 }
 
 func NewSessionUseCase(sessionRepo SessionRepository, cfg config.Session, log *slog.Logger) *sessionUseCase {
-	return &sessionUseCase{sessionRepo: sessionRepo, cfg: cfg, log: log}
+	publicKey := ioutil.MustDecodePem(cfg.TokenED25519PublicPEMPath, ioutil.PemTypePublic)
+	privateKey := ioutil.MustDecodePem(cfg.TokenED25519PrivatePEMPath, ioutil.PemTypePrivate)
+	secret := jwt.EdDSASecret(publicKey, privateKey)
+
+	return &sessionUseCase{sessionRepo: sessionRepo, accessSecret: secret, cfg: cfg, log: log}
 }
 
 func (uc *sessionUseCase) Refresh(ctx context.Context, input *dto.AppSession, secret string) (*dto.Session, error) {
@@ -65,7 +71,8 @@ func (uc *sessionUseCase) Refresh(ctx context.Context, input *dto.AppSession, se
 
 	var session *dto.Session
 	err = uc.sessionRepo.DoInTransaction(ctx, func(ctx context.Context) error {
-		payload, err := uc.getUserPayload(input.Token, secret)
+		refreshSecret := jwt.HS256Secret([]byte(secret))
+		payload, err := uc.getUserPayload(input.Token, refreshSecret)
 		if err != nil {
 			return fmt.Errorf("%s: %w", op, err)
 		}
@@ -97,7 +104,7 @@ func (uc *sessionUseCase) Create(ctx context.Context, payload *dto.UserPayload, 
 		slog.Any("payload", payload),
 	)
 
-	accessToken, err := jwt.New(payload, uc.cfg.AccessTokenSecret, accessTokenTTL)
+	accessToken, err := jwt.New(payload, uc.accessSecret, accessTokenTTL)
 	if err != nil {
 		log.Error("Failed to generate access token", slog.String("error", err.Error()))
 		return nil, fmt.Errorf("%s: %w", op, err)
@@ -118,21 +125,22 @@ func (uc *sessionUseCase) Create(ctx context.Context, payload *dto.UserPayload, 
 }
 
 func (uc *sessionUseCase) VerifyAccess(ctx context.Context, token string) (*dto.UserPayload, error) {
-	return uc.getUserPayload(token, uc.cfg.AccessTokenSecret)
+	return uc.getUserPayload(token, uc.accessSecret)
 }
 
 func (uc *sessionUseCase) createAppSession(ctx context.Context, payload *dto.UserPayload, meta *dto.AppSessionMeta, secret string) (*domain.Session, error) {
 	const op = "usecase.sessionUseCase.CreateAppSession"
-    log := uc.log.With(slog.Any("payload", payload), slog.Any("meta", meta))
+	log := uc.log.With(slog.Any("payload", payload), slog.Any("meta", meta))
 
-	token, err := jwt.New(payload, secret, uc.cfg.TokenTTL)
+	appSecret := jwt.HS256Secret([]byte(secret))
+	token, err := jwt.New(payload, appSecret, uc.cfg.TokenTTL)
 	if err != nil {
 		return nil, fmt.Errorf("%s: %w", op, err)
 	}
 
 	session, err := domain.NewSession(token, meta.Fingerprint, meta.AppID)
 	if err != nil {
-        log.Warn("Failed to generate session", slog.String("error", err.Error()))
+		log.Warn("Failed to generate session", slog.String("error", err.Error()))
 		return nil, parseDomainErr(err)
 	}
 
@@ -162,7 +170,7 @@ func (uc *sessionUseCase) appSession(ctx context.Context, token string, appID do
 	return session, nil
 }
 
-func (uc *sessionUseCase) getUserPayload(token string, secret string) (*dto.UserPayload, error) {
+func (uc *sessionUseCase) getUserPayload(token string, secret jwt.Secret) (*dto.UserPayload, error) {
 	const op = "usecase.sessionUseCase.verify"
 	log := uc.log.With(slog.String("op", op))
 

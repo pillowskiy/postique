@@ -29,7 +29,7 @@ docker_build_with_restart(
   '.',
   entrypoint=['/app/build/sso'],
   dockerfile='./infrastructure/dev/docker/sso.Dockerfile',
-  only=['./sso/build', './sso/config', './contracts'],
+  only=['./sso/build', './sso/config', './contracts', './.keys/'],
   live_update=[
     sync('./build', '/app/build'),
     sync('./contracts', '/app/contracts'),

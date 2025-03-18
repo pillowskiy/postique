@@ -3,11 +3,13 @@ package tests
 import (
 	"context"
 	"fmt"
+	"path"
 	"testing"
 	"time"
 
 	"github.com/brianvoe/gofakeit/v7"
 	pb "github.com/pillowskiy/postique/pb/v1/sso"
+	"github.com/pillowskiy/postique/sso/internal/lib/ioutil"
 	"github.com/pillowskiy/postique/sso/internal/lib/jwt"
 	"github.com/pillowskiy/postique/sso/tests/suites"
 	"github.com/stretchr/testify/assert"
@@ -39,7 +41,9 @@ func assertValidSession(st *suites.AuthSuite, approxCreatedAt time.Time, userID 
 	assert.Equal(st.T, session.GetTokenType(), "Bearer")
 
 	var payload map[string]any
-	err := jwt.VerifyAndScan(session.GetAccessToken(), st.Cfg.Session.AccessTokenSecret, &payload)
+	publicKey := ioutil.MustDecodePem(path.Join("..", st.Cfg.Session.TokenED25519PublicPEMPath), ioutil.PemTypePublic)
+	jwtSecret := jwt.EdDSASecret(publicKey, []byte{})
+	err := jwt.VerifyAndScan(session.GetAccessToken(), jwtSecret, &payload)
 	require.NoError(st.T, err)
 	assert.Equal(st.T, payload["UserID"].(string), userID)
 	assert.InDelta(st.T, approxCreatedAt.Add(time.Duration(session.ExpiresIn)*time.Second).Unix(), payload["exp"].(float64), 5)
