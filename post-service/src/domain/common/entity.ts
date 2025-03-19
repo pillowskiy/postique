@@ -3,7 +3,7 @@ import { DomainInvariantViolation } from './error';
 
 export type IncomingEntity<
   E extends Record<string, any>,
-  P extends Partial<Record<keyof E | string, any>>,
+  P extends Partial<Record<keyof E | string, any>> = object,
 > = Partial<Omit<E, keyof P> & P>;
 
 export class EntityFactory {
