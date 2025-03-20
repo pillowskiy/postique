@@ -9,6 +9,7 @@ import {
   Min,
   validateSync,
 } from 'class-validator';
+import { resolve } from 'path';
 
 export class Config {
   static validate(config: Record<string, unknown>): Config {
@@ -68,4 +69,18 @@ export class Config {
   @IsNotEmpty({ message: 'Cannot be empty' })
   @IsString({ message: 'Must be a string' })
   MONGO_REPLICA_SET: string;
+
+  @IsNotEmpty({ message: 'Cannot be empty' })
+  @IsString({ message: 'Must be a string' })
+  SSO_URL: string;
+
+  @IsNotEmpty({ message: 'Cannot be empty' })
+  @IsString({ message: 'Must be a string' })
+  @Transform(
+    ({ value }) => resolve(__dirname, '../../../../', (value as string) ?? ''),
+    {
+      toClassOnly: true,
+    },
+  )
+  PROTO_PATH: string;
 }

@@ -1,12 +1,12 @@
-import { Module } from '@nestjs/common';
+import { Global, Module } from '@nestjs/common';
 import { ConfigModule as NestConfigModule } from '@nestjs/config';
 import { Config } from './config.schema';
 import { AppConfigService } from './config.service';
 
+@Global()
 @Module({
   imports: [
     NestConfigModule.forRoot<Config>({
-      isGlobal: true,
       envFilePath: AppConfigModule.envPath(),
       // eslint-disable-next-line @typescript-eslint/unbound-method
       validate: Config.validate,
