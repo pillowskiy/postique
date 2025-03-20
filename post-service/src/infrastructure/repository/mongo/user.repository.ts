@@ -1,9 +1,7 @@
-import { UserRepository } from '@/app/boundaries/repository/user.repository';
+import { UserRepository } from '@/app/boundaries/repository';
 import { UserEntity } from '@/domain/user';
-import { InjectModel, models } from '@/infrastructure/mongo';
-import { Schemas } from '@/infrastructure/mongo/common/schema';
-import { User } from '@/infrastructure/mongo/schemas';
-import mongoose from 'mongoose';
+import { InjectModel, Schemas, models } from '@/infrastructure/database/mongo';
+import { User } from '@/infrastructure/database/mongo/schemas';
 
 export class MongoUserRepository extends UserRepository {
   constructor(
@@ -18,7 +16,7 @@ export class MongoUserRepository extends UserRepository {
       return null;
     }
 
-    return this.#getUserEntity(user);
+    return this._getUserEntity(user);
   }
 
   async getById(id: string): Promise<UserEntity | null> {
@@ -27,10 +25,10 @@ export class MongoUserRepository extends UserRepository {
       return null;
     }
 
-    return this.#getUserEntity(user);
+    return this._getUserEntity(user);
   }
 
-  #getUserEntity(user: User): UserEntity {
+  private _getUserEntity(user: User): UserEntity {
     const userEntity = UserEntity.create({
       id: user.id.toString(),
       username: user.username,

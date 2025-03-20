@@ -1,10 +1,8 @@
 import { PostRepository } from '@/app/boundaries/repository';
 import { PostAggregate } from '@/domain/post';
-import { InjectModel, models } from '@/infrastructure/mongo';
-import { Schemas } from '@/infrastructure/mongo/common/schema';
-import { Post } from '@/infrastructure/mongo/schemas';
+import { InjectModel, Schemas, models } from '@/infrastructure/database/mongo';
+import { Post } from '@/infrastructure/database/mongo/schemas';
 import { Injectable } from '@nestjs/common';
-import mongoose from 'mongoose';
 
 @Injectable()
 export class MongoPostRepository extends PostRepository {
@@ -17,7 +15,7 @@ export class MongoPostRepository extends PostRepository {
   async save(post: PostAggregate): Promise<void> {
     await this._postModel
       .updateOne(
-        { _id: new mongoose.Types.ObjectId(post.id) },
+        { _id: post.id },
         {
           $set: {
             title: post.content.title,
@@ -71,7 +69,6 @@ export class MongoPostRepository extends PostRepository {
         title: post.title,
         description: post.description,
         content: post.content,
-        editedAt: post.editedAt,
       },
       owner: post.owner,
       slug: post.slug,

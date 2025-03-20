@@ -1,8 +1,9 @@
 import { InjectModel as NestInjectModel } from '@nestjs/mongoose';
-import { Schemas } from './common/schema';
+import { Schemas } from './shared';
 import * as schemas from './schemas';
 import { Model } from 'mongoose';
 
+// eslint-disable-next-line @typescript-eslint/no-namespace
 export namespace models {
   export type PostModel = Model<schemas.Post>;
   export type UserModel = Model<schemas.User>;

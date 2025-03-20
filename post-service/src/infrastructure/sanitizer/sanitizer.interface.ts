@@ -1,5 +1,3 @@
-import { ISanitizer } from '@/domain/common/sanititizer';
-
-export abstract class Sanitizer implements ISanitizer {
+export abstract class Sanitizer {
   abstract sanitize(text: string): string;
 }

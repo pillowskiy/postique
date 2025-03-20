@@ -1,6 +1,6 @@
 import { PostRepository, UserRepository } from '@/app/boundaries/repository';
 import PostCommandHandlers from '@/app/commands/post';
-import { MongoModule } from '@/infrastructure/mongo';
+import { MongoModule } from '@/infrastructure/database/mongo';
 import {
   MongoPostRepository,
   MongoUserRepository,
