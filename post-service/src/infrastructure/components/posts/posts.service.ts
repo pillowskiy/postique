@@ -25,7 +25,7 @@ export class PostsService {
     { title, content, visibility, description }: CreatePostInput,
   ): Promise<CreatePostOutput> {
     return this._commandBus.execute<CreatePostCommand, CreatePostOutput>(
-      new CreatePostCommand(title, description, content, owner, visibility),
+      new CreatePostCommand(title, description, content, visibility, owner),
     );
   }
 

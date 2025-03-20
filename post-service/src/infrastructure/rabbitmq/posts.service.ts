@@ -13,6 +13,9 @@ export class PostsRMQService {
         noAck,
         urls: [this._configService.get('RABBIT_MQ_URI')],
         persistent: true,
+        queueOptions: {
+          durable: true,
+        },
         queue: this._configService.get('RABBIT_MQ_POSTS_QUEUE'),
       },
     };

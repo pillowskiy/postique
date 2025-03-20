@@ -1,5 +1,5 @@
 import { PostRepository } from '@/app/boundaries/repository';
-import { PostAggregate, PostEntity } from '@/domain/post';
+import { PostEntity } from '@/domain/post';
 import { InjectModel, Schemas, models } from '@/infrastructure/database/mongo';
 import { Post } from '@/infrastructure/database/mongo/schemas';
 import { Injectable } from '@nestjs/common';
@@ -21,6 +21,7 @@ export class MongoPostRepository extends PostRepository {
             owner: post.owner,
             authors: post.authors,
             slug: post.slug,
+            content: post.contentId,
             status: post.status,
             visibility: post.visibility,
             publishedAt: post.publishedAt,
@@ -62,6 +63,7 @@ export class MongoPostRepository extends PostRepository {
     const postAggregate = PostEntity.create({
       id: post.id.toString(),
       owner: post.owner,
+      contentId: post.content,
       slug: post.slug,
       authors: post.authors,
       status: post.status,
@@ -74,3 +76,4 @@ export class MongoPostRepository extends PostRepository {
     return postAggregate;
   }
 }
+

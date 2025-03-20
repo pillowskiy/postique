@@ -8,7 +8,7 @@ export type ModerationDocument = HydratedDocument<Moderation>;
 @MongoSchema()
 export class Moderation {
   @Prop({ type: mongoose.Types.ObjectId, ref: Schemas.Posts, required: true })
-  userId: string;
+  postId: string;
 
   @Prop({ type: mongoose.Types.ObjectId, ref: Schemas.Users, required: true })
   moderatorId: string;

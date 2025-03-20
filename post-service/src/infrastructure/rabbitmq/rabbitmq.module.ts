@@ -1,5 +1,5 @@
-import { Module } from '@nestjs/common';
 import { AppConfigModule } from '@/infrastructure/globals/config';
+import { Module } from '@nestjs/common';
 import { PostsRMQService } from './posts.service';
 
 @Module({
