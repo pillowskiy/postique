@@ -1,12 +1,4 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Param,
-  Patch,
-  Post,
-  Put,
-} from '@nestjs/common';
+import { Body, Controller, Delete, Param, Patch, Post } from '@nestjs/common';
 import { randomUUID } from 'crypto';
 
 import * as input from '@/app/boundaries/dto/input';
@@ -22,14 +14,6 @@ export class PostsController {
     @Body() data: input.CreatePostInput,
   ): Promise<output.CreatePostOutput> {
     return this._postsService.createPost(randomUUID(), data);
-  }
-
-  @Put(':id/content')
-  async changePostContent(
-    @Param('id') id: string,
-    @Body() data: input.ChangePostContentInput,
-  ): Promise<output.Post> {
-    return this._postsService.changePostContent(id, data);
   }
 
   @Patch(':id/visibility')

@@ -1,9 +1,9 @@
 import { Prop, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { HydratedDocument } from 'mongoose';
-import { MongoSchema, Schemas } from '../common/schema';
+import { MongoSchema, Schemas } from '../shared/schema';
 import { ModerationStatus } from '@/domain/moderation';
 
-export type AuthorDocument = HydratedDocument<Moderation>;
+export type ModerationDocument = HydratedDocument<Moderation>;
 
 @MongoSchema()
 export class Moderation {

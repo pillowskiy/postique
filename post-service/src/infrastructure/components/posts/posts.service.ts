@@ -7,13 +7,9 @@ import {
   DeletePostOutput,
   CreatePostOutput,
 } from '@/app/boundaries/dto/output';
-import {
-  ChangePostContentInput,
-  CreatePostInput,
-} from '@/app/boundaries/dto/input';
+import { CreatePostInput } from '@/app/boundaries/dto/input';
 
 import { CreatePostCommand } from '@/app/commands/post/create';
-import { ChangePostContentCommand } from '@/app/commands/post/change-content';
 import { ChangePostVisibilityCommand } from '@/app/commands/post/change-visibility';
 import { ArchivePostCommand } from '@/app/commands/post/archive';
 import { PublishPostCommand } from '@/app/commands/post/publish';
@@ -30,15 +26,6 @@ export class PostsService {
   ): Promise<CreatePostOutput> {
     return this._commandBus.execute<CreatePostCommand, CreatePostOutput>(
       new CreatePostCommand(title, description, content, owner, visibility),
-    );
-  }
-
-  public async changePostContent(
-    postId: string,
-    { title, content, description }: ChangePostContentInput,
-  ): Promise<Post> {
-    return this._commandBus.execute<ChangePostContentCommand, Post>(
-      new ChangePostContentCommand(postId, title, description, content, ''),
     );
   }
 

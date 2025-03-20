@@ -7,11 +7,14 @@ import { Markup } from '../markup';
 import { CodeMetadata, ImageMetadata } from '../metadata';
 import { ParagraphSchema } from './content-paragraph.schema';
 import { EntityFactory } from '@/domain/common/entity';
+import { DomainBusinessRuleViolation } from '@/domain/common/error';
 
-export class Paragraph<T extends ParagraphType> implements IParagraph<T> {
-  static create(data: IncomingParagraph): Paragraph<any> {
+export class ParagraphAggregate<T extends ParagraphType = any>
+  implements IParagraph<T>
+{
+  static create(data: IncomingParagraph): ParagraphAggregate<any> {
     const validParagraph = EntityFactory.create(ParagraphSchema, data);
-    return new Paragraph(validParagraph);
+    return new ParagraphAggregate(validParagraph);
   }
 
   public readonly name: string;
@@ -28,22 +31,23 @@ export class Paragraph<T extends ParagraphType> implements IParagraph<T> {
     this.markups = data.markups.map((m) => Markup.create(m));
 
     if (data.metadata) {
-      (this as Paragraph<ParagraphType.Figure>).metadata = ImageMetadata.create(
-        data.metadata,
-      );
+      (this as ParagraphAggregate<ParagraphType.Figure>).metadata =
+        ImageMetadata.create(data.metadata);
     }
 
     if (data.codeMetadata) {
-      (this as Paragraph<ParagraphType.Code>).codeMetadata =
+      (this as ParagraphAggregate<ParagraphType.Code>).codeMetadata =
         CodeMetadata.create(data.codeMetadata);
     }
   }
 
-  appendMarkup(markup: Markup, index: number): void {
-    if (index < 0 || index > this.markups.length) {
-      throw new Error('Index out of range');
+  appendMarkup(markup: Markup): void {
+    if (this.markups.length > 50) {
+      throw new DomainBusinessRuleViolation(
+        `The max size of the paragraph markups exceed, max size is 50 markups per paragraph`,
+      );
     }
 
-    this.markups.splice(index, 0, markup);
+    this.markups.push(markup);
   }
 }

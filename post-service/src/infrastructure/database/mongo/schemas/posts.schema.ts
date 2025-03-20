@@ -1,7 +1,7 @@
 import { PostStatus, PostVisibility } from '@/domain/post';
 import { Prop, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { HydratedDocument } from 'mongoose';
-import { MongoSchema, Schemas } from '../common/schema';
+import { MongoSchema, Schemas } from '../shared/schema';
 
 export type PostDocument = HydratedDocument<Post>;
 
@@ -12,13 +12,7 @@ export class Post {
   @Prop({ type: String, default: null })
   coverImage: string | null;
 
-  @Prop({ type: String, required: true })
-  title: string;
-
-  @Prop({ type: String, required: true, default: '' })
-  description: string;
-
-  @Prop({ type: String, required: true })
+  @Prop({ type: mongoose.Types.ObjectId, ref: Schemas.Content, required: true })
   content: string;
 
   @Prop({ type: String, required: true })

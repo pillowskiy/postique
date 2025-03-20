@@ -1,13 +1,10 @@
-import { PostAggregate } from '@/domain/post';
 import { Post } from '@/app/boundaries/dto/output';
+import { PostEntity } from '@/domain/post';
 
 export class PostMapper {
-  static toDto(post: PostAggregate): Post {
-    return new Post(
+  static toDto(post: PostEntity): Post {
+    const postDto = new Post(
       post.id,
-      post.content.title,
-      post.content.description,
-      post.content.content,
       post.visibility,
       post.owner,
       [...post.authors],
@@ -17,5 +14,7 @@ export class PostMapper {
       post.createdAt,
       post.updatedAt,
     );
+
+    return postDto;
   }
 }

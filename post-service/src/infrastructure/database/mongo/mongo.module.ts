@@ -2,9 +2,11 @@ import { Transactional } from '@/app/boundaries/common';
 import { Module } from '@nestjs/common';
 import { MongooseModule as NestMongooseModule } from '@nestjs/mongoose';
 import { RequestScopeModule } from 'nj-request-scope';
-import { AppConfigModule } from '../config/config.module';
-import { AppConfigService } from '../config/config.service';
-import { Schemas } from './common/schema';
+import {
+  AppConfigModule,
+  AppConfigService,
+} from '@/infrastructure/globals/config';
+import { Schemas } from './shared/schema';
 import { MongoTransactional } from './mongo.transactional';
 import * as schemas from './schemas';
 

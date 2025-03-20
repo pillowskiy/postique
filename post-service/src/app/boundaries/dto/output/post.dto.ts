@@ -1,10 +1,8 @@
 export class Post {
-  public readonly content: PostContent;
+  private _content: PostContent;
+
   constructor(
     public readonly id: string,
-    title: string,
-    description: string,
-    content: string,
     public readonly visibility: string,
     public readonly owner: string,
     public readonly authors: string[],
@@ -13,16 +11,65 @@ export class Post {
     public readonly publishedAt: Date | null,
     public readonly createdAt: Date,
     public readonly updatedAt: Date,
-  ) {
-    this.content = new PostContent(title, description, content);
+  ) {}
+
+  get content(): PostContent {
+    return this._content;
+  }
+
+  setContent(content: PostContent) {
+    this._content = content;
   }
 }
 
 export class PostContent {
+  private _paragraphs: PostParagraph[];
+
   constructor(
     public readonly title: string,
     public readonly description: string,
-    public readonly content: string,
+  ) {}
+
+  get paragraphs(): PostParagraph[] {
+    return this._paragraphs;
+  }
+
+  appendParagraph(paragraph: PostParagraph) {
+    this._paragraphs.push(paragraph);
+  }
+}
+
+export class PostParagraph {
+  constructor(
+    public readonly name: string,
+    public readonly type: number,
+    public readonly text: string,
+    public readonly markups: PostMarkup[],
+    public readonly metadata?: ImageMetadata,
+    public readonly codeMetadata?: CodeMetadata,
+  ) {}
+}
+
+export class PostMarkup {
+  constructor(
+    public readonly type: number,
+    public readonly start: number,
+    public readonly end: number,
+  ) {}
+}
+
+export class ImageMetadata {
+  constructor(
+    public readonly id: string,
+    public readonly originalWidth: number,
+    public readonly originalHeight: number,
+  ) {}
+}
+
+export class CodeMetadata {
+  constructor(
+    public readonly language: string,
+    public readonly spellcheck: boolean,
   ) {}
 }
 

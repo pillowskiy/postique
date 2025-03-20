@@ -6,6 +6,11 @@ export enum Schemas {
   Series = 'series',
   Preferences = 'preferences',
   Moderation = 'moderation',
+  Paragraph = 'paragraphs',
+  Content = 'contents',
+  Markup = 'markups',
+  ImageMetadata = 'images_metadata',
+  CodeMetadata = 'codes_metadata',
 }
 
 export function MongoSchema(options: SchemaOptions = {}) {

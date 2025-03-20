@@ -4,7 +4,6 @@ import {
   IsString,
   IsArray,
   IsObject,
-  ValidateNested,
   IsOptional,
 } from 'class-validator';
 import { ParagraphType, IParagraph } from './content-paragraph.interface';
@@ -25,7 +24,6 @@ export class ParagraphSchema<T extends ParagraphType> implements IParagraph<T> {
   public readonly text: string;
 
   @IsArray({ message: 'Markups must be a list of references' })
-  @ValidateNested({ each: true })
   @Type(() => MarkupSchema)
   public readonly markups: MarkupSchema[];
 

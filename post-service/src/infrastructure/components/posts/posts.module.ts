@@ -9,10 +9,9 @@ import { Module } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
 import { PostsController } from './posts.controller';
 import { PostsService } from './posts.service';
-import { SanitizerModule } from '@/infrastructure/sanitizer';
 
 @Module({
-  imports: [MongoModule, CqrsModule.forRoot(), SanitizerModule],
+  imports: [MongoModule, CqrsModule.forRoot()],
   controllers: [PostsController],
   providers: [
     ...PostCommandHandlers,

@@ -34,6 +34,7 @@ export class CodeMetadata implements ICodeMetadata {
     const correctMetadata = EntityFactory.create(CodeMetadataSchema, metadata);
     return new CodeMetadata(correctMetadata);
   }
+
   public readonly lang: string;
   public readonly spellcheck: boolean;
 

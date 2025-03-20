@@ -1,5 +1,5 @@
 import { PostRepository } from '@/app/boundaries/repository';
-import { PostAggregate } from '@/domain/post';
+import { PostAggregate, PostEntity } from '@/domain/post';
 import { InjectModel, Schemas, models } from '@/infrastructure/database/mongo';
 import { Post } from '@/infrastructure/database/mongo/schemas';
 import { Injectable } from '@nestjs/common';
@@ -12,16 +12,12 @@ export class MongoPostRepository extends PostRepository {
     super();
   }
 
-  async save(post: PostAggregate): Promise<void> {
+  async save(post: PostEntity): Promise<void> {
     await this._postModel
       .updateOne(
         { _id: post.id },
         {
           $set: {
-            title: post.content.title,
-            description: post.content.description,
-            content: post.content,
-            editedAt: post.content.editedAt,
             owner: post.owner,
             authors: post.authors,
             slug: post.slug,
@@ -38,20 +34,20 @@ export class MongoPostRepository extends PostRepository {
       .lean();
   }
 
-  async getBySlug(slug: string): Promise<PostAggregate | null> {
+  async getBySlug(slug: string): Promise<PostEntity | null> {
     const post = await this._postModel.findOne({ slug }).lean();
     if (!post) {
       return null;
     }
-    return this.#getPostAggregate(post);
+    return this.#getPostEntity(post);
   }
 
-  async getById(id: string): Promise<PostAggregate | null> {
+  async getById(id: string): Promise<PostEntity | null> {
     const post = await this._postModel.findOne({ _id: id }).lean();
     if (!post) {
       return null;
     }
-    return this.#getPostAggregate(post);
+    return this.#getPostEntity(post);
   }
 
   async delete(postId: string): Promise<boolean> {
@@ -62,14 +58,9 @@ export class MongoPostRepository extends PostRepository {
     return query.deletedCount === 1;
   }
 
-  #getPostAggregate(post: Post): PostAggregate {
-    const postAggregate = PostAggregate.create({
+  #getPostEntity(post: Post): PostEntity {
+    const postAggregate = PostEntity.create({
       id: post.id.toString(),
-      content: {
-        title: post.title,
-        description: post.description,
-        content: post.content,
-      },
       owner: post.owner,
       slug: post.slug,
       authors: post.authors,
