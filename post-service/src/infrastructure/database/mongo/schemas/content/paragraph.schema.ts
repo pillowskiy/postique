@@ -6,18 +6,19 @@ export type ParagraphDocument = HydratedDocument<Paragraph>;
 
 @MongoSchema()
 export class Paragraph {
-  @Prop({ type: String, required: true, index: true })
-  name: string;
+  _id: string;
 
   @Prop({ type: String, required: true })
   text: string;
 
-  @Prop({
-    type: [mongoose.Types.ObjectId],
-    ref: Schemas.Markup,
-    required: true,
-    default: [],
-  })
+  @Prop([
+    {
+      type: mongoose.Types.ObjectId,
+      ref: Schemas.Markup,
+      required: true,
+      default: [],
+    },
+  ])
   markups: string[];
 
   @Prop({

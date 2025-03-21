@@ -1,8 +1,5 @@
-import {
-  DomainBusinessRuleViolation,
-  DomainInvariantViolation,
-} from '@/domain/common/error';
-import { PostContentAggregate } from '@/domain/content';
+import { DomainBusinessRuleViolation } from '@/domain/common/error';
+import { ParagraphAggregate } from '@/domain/content';
 import { EntityFactory } from '../../common/entity';
 import {
   IDetailedPost,
@@ -13,39 +10,20 @@ import {
 import { PostSchema } from './post.schema';
 import { PostEntity } from './post.entity';
 
-export class PostAggregate<HasContent extends boolean = false>
-  extends PostEntity
-  implements IDetailedPost
-{
+export class PostAggregate extends PostEntity implements IDetailedPost {
   static create(post: IncomingPost): PostAggregate {
     const validPost = EntityFactory.create(PostSchema, post);
     return new PostAggregate(validPost);
   }
 
-  private _content: HasContent extends true ? PostContentAggregate : null;
+  private _paragraphs: ParagraphAggregate<any>[] = [];
 
   private constructor(post: IPost) {
     super(post);
   }
 
-  get content(): PostContentAggregate {
-    if (!this.hasContent()) {
-      throw new DomainInvariantViolation(
-        "You trying to access content of a post that doesn't have any content",
-      );
-    }
-
-    return this._content;
-  }
-
-  hasContent(): this is PostAggregate<true> {
-    return !!this._content;
-  }
-
-  withContent(content: PostContentAggregate): PostAggregate<true> {
-    const current = this as PostAggregate<true>;
-    current._content = content;
-    return current;
+  get paragraphs(): ParagraphAggregate<any>[] {
+    return this._paragraphs;
   }
 
   publish() {
@@ -64,5 +42,9 @@ export class PostAggregate<HasContent extends boolean = false>
 
     this._status = PostStatus.Archived;
     this._publishedAt = null;
+  }
+
+  changeContent(_: string[]): never {
+    throw new Error('Method is not available in aggregate.');
   }
 }

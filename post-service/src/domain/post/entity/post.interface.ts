@@ -1,5 +1,5 @@
-import { IPostContent } from '@/domain/content/content.interface';
 import type { IncomingEntity } from '../../common/entity';
+import { IParagraph } from '@/domain/content/paragraph/content-paragraph.interface';
 
 export enum PostStatus {
   Draft = 'draft',
@@ -17,24 +17,26 @@ export enum PostVisibility {
 
 export type IncomigDetailedPost = IncomingEntity<
   IDetailedPost,
-  { status: string; visibility: string; content: Partial<IPostContent> }
+  { status: string; visibility: string }
 >;
 
 export interface IDetailedPost extends IPost {
-  content: Readonly<IPostContent>;
+  paragraphs: Readonly<IParagraph[]>;
 }
 
 export type IncomingPost = IncomingEntity<
   IPost,
-  { status: string; visibility: string; content: Partial<IPostContent> }
+  { status: string; visibility: string }
 >;
 
 export interface IPost {
   id: string;
+  title: string;
+  description: string;
   owner: string;
   authors: Readonly<string[]>;
   slug: string;
-  contentId: string;
+  paragraphIds: Readonly<string[]>;
   status: PostStatus;
   visibility: PostVisibility;
   publishedAt: Date | null;

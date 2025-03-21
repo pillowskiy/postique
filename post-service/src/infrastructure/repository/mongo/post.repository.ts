@@ -18,10 +18,12 @@ export class MongoPostRepository extends PostRepository {
         { _id: post.id },
         {
           $set: {
+            title: post.title,
+            description: post.description,
             owner: post.owner,
             authors: post.authors,
             slug: post.slug,
-            content: post.contentId,
+            paragraphs: post.paragraphIds,
             status: post.status,
             visibility: post.visibility,
             publishedAt: post.publishedAt,
@@ -30,6 +32,7 @@ export class MongoPostRepository extends PostRepository {
         },
         {
           upsert: true,
+          strict: false,
         },
       )
       .lean();
@@ -61,9 +64,11 @@ export class MongoPostRepository extends PostRepository {
 
   #getPostEntity(post: Post): PostEntity {
     const postAggregate = PostEntity.create({
-      id: post.id.toString(),
+      id: post._id.toString(),
+      title: post.title,
+      description: post.description,
       owner: post.owner,
-      contentId: post.content,
+      paragraphIds: post.paragraphs,
       slug: post.slug,
       authors: post.authors,
       status: post.status,
@@ -76,4 +81,3 @@ export class MongoPostRepository extends PostRepository {
     return postAggregate;
   }
 }
-

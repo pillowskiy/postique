@@ -1,5 +1,6 @@
 import { validateSync } from 'class-validator';
 import { DomainInvariantViolation } from './error';
+import { plainToInstance } from 'class-transformer';
 
 export type IncomingEntity<
   E extends Record<string, any>,
@@ -11,9 +12,8 @@ export class EntityFactory {
     I extends IncomingEntity<object, any>,
     E = I extends IncomingEntity<infer T, any> ? T : never,
   >(schema: new () => E extends object ? E : never, input: I): E {
-    const _schema = new schema();
-    Object.assign(_schema, input);
-    const errors = validateSync(_schema, {
+    const instance = plainToInstance(schema, input);
+    const errors = validateSync(instance, {
       whitelist: true,
       stopAtFirstError: true,
     });
@@ -32,6 +32,6 @@ export class EntityFactory {
       throw new DomainInvariantViolation('Failed to create entity', formatted);
     }
 
-    return _schema;
+    return instance;
   }
 }

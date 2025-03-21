@@ -18,6 +18,10 @@ import * as schemas from './schemas';
       { name: Schemas.Series, schema: schemas.PostSeriesSchema },
       { name: Schemas.Moderation, schema: schemas.ModerationSchema },
       { name: Schemas.Preferences, schema: schemas.PostPreferencesSchema },
+      { name: Schemas.Markup, schema: schemas.MarkupSchema },
+      { name: Schemas.Paragraph, schema: schemas.ParagraphSchema },
+      { name: Schemas.ImageMetadata, schema: schemas.ImageMetadataSchema },
+      { name: Schemas.CodeMetadata, schema: schemas.CodeMetadataSchema },
     ]),
     NestMongooseModule.forRootAsync({
       imports: [AppConfigModule],

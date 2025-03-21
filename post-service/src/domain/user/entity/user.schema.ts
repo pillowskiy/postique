@@ -16,12 +16,11 @@ export class UserSchema implements IUser {
 
   @IsString({ message: 'Username must be a string' })
   @IsNotEmpty({ message: 'Username cannot be empty string' })
-  @MinLength(2, { message: 'Username must be greater than 2 characters' })
   @MaxLength(128, { message: 'Username must be at most 128 characters' })
+  @MinLength(2, { message: 'Username must be greater than 2 characters' })
   username: string;
 
   @IsString({ message: 'Avatar path must be a string' })
-  @IsNotEmpty({ message: 'Avatar path cannot be empty' })
   @MaxLength(256, { message: 'Avatar path must be at most 256 characters' })
   avatarPath: string;
 }

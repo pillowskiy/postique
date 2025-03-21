@@ -10,6 +10,10 @@ export namespace models {
   export type PostSeriesModel = Model<schemas.PostSeries>;
   export type ModerationModel = Model<schemas.Moderation>;
   export type PostPreferencesModel = Model<schemas.PostPreferences>;
+  export type MarkupModel = Model<schemas.Markup>;
+  export type ParagraphModel = Model<schemas.Paragraph>;
+  export type ImageMetadataModel = Model<schemas.ImageMetadata>;
+  export type CodeMetadataModel = Model<schemas.CodeMetadata>;
 }
 
 export function InjectModel<S extends Schemas>(schema: S) {

@@ -12,13 +12,13 @@ export enum ParagraphType {
   Heading,
 }
 
-export type IncomingParagraph = IncomingEntity<IParagraph<any>, {}>;
+export type IncomingParagraph = IncomingEntity<IParagraph, { type: number }>;
 
-export interface IParagraph<T extends ParagraphType> {
+export interface IParagraph {
   name: string;
-  type: T;
+  type: ParagraphType;
   text: string;
   markups: IMarkup[];
-  metadata: T extends ParagraphType.Figure ? IImageMetadata : never;
-  codeMetadata: T extends ParagraphType.Code ? ICodeMetadata : never;
+  metadata: IImageMetadata | undefined;
+  codeMetadata: ICodeMetadata | undefined;
 }

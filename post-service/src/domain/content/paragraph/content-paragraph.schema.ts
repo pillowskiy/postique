@@ -13,7 +13,7 @@ import {
 } from '../metadata/content-metadata.schema';
 import { MarkupSchema } from '../markup/content-markup.schema';
 
-export class ParagraphSchema<T extends ParagraphType> implements IParagraph<T> {
+export class ParagraphSchema<T extends ParagraphType> implements IParagraph {
   @IsString({ message: 'Name must be a string' })
   public readonly name: string;
 

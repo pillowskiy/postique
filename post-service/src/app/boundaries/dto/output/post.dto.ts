@@ -1,5 +1,5 @@
 export class Post {
-  private _content: PostContent;
+  _paragraphs: PostParagraph[];
 
   constructor(
     public readonly id: string,
@@ -13,24 +13,7 @@ export class Post {
     public readonly updatedAt: Date,
   ) {}
 
-  get content(): PostContent {
-    return this._content;
-  }
-
-  setContent(content: PostContent) {
-    this._content = content;
-  }
-}
-
-export class PostContent {
-  private _paragraphs: PostParagraph[];
-
-  constructor(
-    public readonly title: string,
-    public readonly description: string,
-  ) {}
-
-  get paragraphs(): PostParagraph[] {
+  public get paragraphs(): Readonly<PostParagraph[]> {
     return this._paragraphs;
   }
 

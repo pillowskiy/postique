@@ -8,25 +8,26 @@ import { CodeMetadata, ImageMetadata } from '../metadata';
 import { ParagraphSchema } from './content-paragraph.schema';
 import { EntityFactory } from '@/domain/common/entity';
 import { DomainBusinessRuleViolation } from '@/domain/common/error';
+import { nanoid } from 'nanoid';
 
 export class ParagraphAggregate<T extends ParagraphType = any>
-  implements IParagraph<T>
+  implements IParagraph
 {
   static create(data: IncomingParagraph): ParagraphAggregate<any> {
     const validParagraph = EntityFactory.create(ParagraphSchema, data);
     return new ParagraphAggregate(validParagraph);
   }
 
-  public readonly name: string;
+  public readonly name: string = nanoid(8);
   public readonly type: T;
   public readonly text: string;
   public markups: Markup[];
-  public metadata: T extends ParagraphType.Figure ? ImageMetadata : never;
-  public codeMetadata: T extends ParagraphType.Code ? CodeMetadata : never;
+  public metadata: T extends ParagraphType.Figure ? ImageMetadata : undefined;
+  public codeMetadata: T extends ParagraphType.Code ? CodeMetadata : undefined;
 
-  constructor(data: IParagraph<T>) {
+  private constructor(data: IParagraph) {
     this.name = data.name;
-    this.type = data.type;
+    this.type = data.type as T;
     this.text = data.text;
     this.markups = data.markups.map((m) => Markup.create(m));
 

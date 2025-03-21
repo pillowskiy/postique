@@ -8,6 +8,7 @@ import {
 } from './post.interface';
 
 import { PostSchema } from './post.schema';
+
 export class PostEntity implements IPost {
   static create(post: IncomingPost): PostEntity {
     const validPost = EntityFactory.create(PostSchema, post);
@@ -18,26 +19,41 @@ export class PostEntity implements IPost {
   public readonly createdAt: Date;
   public readonly updatedAt: Date;
 
-  protected _approved: boolean;
+  protected _title: string;
+  protected _description: string;
+
+  protected _approved: boolean = false;
   protected _owner: string;
   protected _authors: string[];
   protected _slug: string;
   protected _status: PostStatus;
   protected _visibility: PostVisibility;
   protected _publishedAt: Date | null;
-  protected _contentId: string;
+  protected _paragraphIds: string[];
 
   protected constructor(post: IPost) {
     this.id = post.id;
 
     this._owner = post.owner;
+    this._authors = [...post.authors];
     this._slug = post.slug;
     this._status = post.status;
+    this._paragraphIds = [...post.paragraphIds];
     this._visibility = post.visibility;
+    this._title = post.title;
+    this._description = post.description;
 
     this._publishedAt = post.publishedAt;
     this.updatedAt = post.updatedAt;
     this.createdAt = post.createdAt;
+  }
+
+  get title(): string {
+    return this._title;
+  }
+
+  get description(): string {
+    return this._description;
   }
 
   get approved(): boolean {
@@ -68,8 +84,8 @@ export class PostEntity implements IPost {
     return this._publishedAt;
   }
 
-  get contentId(): string {
-    return this._contentId;
+  get paragraphIds(): string[] {
+    return this._paragraphIds;
   }
 
   setApproved(approved: boolean) {
@@ -90,6 +106,10 @@ export class PostEntity implements IPost {
     }
 
     this._visibility = visibility;
+  }
+
+  changeContent(paragraphs: string[]) {
+    this._paragraphIds = paragraphs;
   }
 
   transferOwnership(userId: string) {

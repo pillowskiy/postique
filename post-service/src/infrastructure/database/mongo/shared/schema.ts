@@ -7,7 +7,6 @@ export enum Schemas {
   Preferences = 'preferences',
   Moderation = 'moderation',
   Paragraph = 'paragraphs',
-  Content = 'contents',
   Markup = 'markups',
   ImageMetadata = 'images_metadata',
   CodeMetadata = 'codes_metadata',

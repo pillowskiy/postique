@@ -7,13 +7,23 @@ export type PostDocument = HydratedDocument<Post>;
 
 @MongoSchema()
 export class Post {
-  id: mongoose.Types.ObjectId;
+  _id: string;
+
+  @Prop({ type: String, required: true, default: '' })
+  title: string;
+
+  @Prop({ type: String, required: true, default: '' })
+  description: string;
 
   @Prop({ type: String, default: null })
   coverImage: string | null;
 
-  @Prop({ type: mongoose.Types.ObjectId, ref: Schemas.Content, required: true })
-  content: string;
+  @Prop({
+    type: [mongoose.Types.ObjectId],
+    ref: Schemas.Paragraph,
+    required: true,
+  })
+  paragraphs: string[];
 
   @Prop({ type: String, required: true })
   owner: string;

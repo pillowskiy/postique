@@ -6,7 +6,7 @@ export type UserDocument = HydratedDocument<User>;
 
 @MongoSchema()
 export class User {
-  id: string;
+  _id: string;
 
   @Prop({ type: String, required: true, unique: true, index: true })
   refId: string;
