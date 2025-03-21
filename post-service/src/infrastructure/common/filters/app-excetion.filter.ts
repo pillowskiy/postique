@@ -18,13 +18,14 @@ export class ApplicationExceptionFilter implements ExceptionFilter {
 
   catch(exception: ApplicationException, host: ArgumentsHost) {
     if (exception.isCritical()) {
-      this._logger.error('Critical error occurred', {
+      this._logger.assign({
         message: exception.message,
         parent: {
           message: exception.parent.message,
           stack: exception.parent.stack,
         },
       });
+      this._logger.error('Critical error occurred');
     }
 
     const ctx = host.switchToHttp();

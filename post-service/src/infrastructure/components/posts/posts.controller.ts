@@ -48,4 +48,12 @@ export class PostsController {
   ): Promise<output.TransferPostOwnershipOutput> {
     return this._postsService.transferPostOwnership(id, newOwner);
   }
+
+  @Patch(':id/delta')
+  async deltaSave(
+    @Param('id') id: string,
+    @Body('deltas') deltas: input.Delta[],
+  ) {
+    return this._postsService.deltaSave(id, deltas);
+  }
 }

@@ -1,9 +1,14 @@
-import { PostRepository, UserRepository } from '@/app/boundaries/repository';
+import {
+  ParagraphRepository,
+  PostRepository,
+  UserRepository,
+} from '@/app/boundaries/repository';
 import PostCommandHandlers from '@/app/commands/post';
 import { MongoModule } from '@/infrastructure/database/mongo';
 import {
   MongoPostRepository,
   MongoUserRepository,
+  MongoParagraphRepository,
 } from '@/infrastructure/repository/mongo';
 import { Module } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
@@ -22,6 +27,10 @@ import { PostsService } from './posts.service';
     {
       provide: UserRepository,
       useClass: MongoUserRepository,
+    },
+    {
+      provide: ParagraphRepository,
+      useClass: MongoParagraphRepository,
     },
     PostsService,
   ],

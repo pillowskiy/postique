@@ -6,6 +6,7 @@ import { ChangePostVisibilityCommandHandler } from './change-visibility';
 import { ArchivePostCommandHandler } from './archive';
 import { PublishPostCommandHandler } from './publish';
 import { DeletePostCommandHandler } from './delete';
+import { DeltaSaveCommandHandler } from './delta';
 import { TransferPostOwnershipCommandHandler } from './transfer-ownership';
 
 const handlers: Type<ICommandHandler>[] = [
@@ -14,6 +15,7 @@ const handlers: Type<ICommandHandler>[] = [
   ArchivePostCommandHandler,
   PublishPostCommandHandler,
   DeletePostCommandHandler,
+  DeltaSaveCommandHandler,
   TransferPostOwnershipCommandHandler,
 ];
 export default handlers;

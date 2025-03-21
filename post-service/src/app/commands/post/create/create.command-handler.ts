@@ -3,11 +3,11 @@ import { CreatePostOutput } from '@/app/boundaries/dto/output';
 import { ConflictException, NotFoundException } from '@/app/boundaries/errors';
 import { PostRepository, UserRepository } from '@/app/boundaries/repository';
 import { Command } from '@/app/commands/common';
-import { PostAggregate } from '@/domain/post';
+import { PostAggregate, PostVisibility } from '@/domain/post';
 import { Inject } from '@nestjs/common';
 import { CommandHandler } from '@nestjs/cqrs';
 import { CreatePostCommand } from './create.command';
-import { Sanitizer } from '@/infrastructure/sanitizer';
+import slugify from 'slugify';
 
 @CommandHandler(CreatePostCommand)
 export class CreatePostCommandHandler extends Command<
@@ -23,27 +23,22 @@ export class CreatePostCommandHandler extends Command<
   @Inject(Logger)
   private readonly _logger: Logger;
 
-  @Inject(Sanitizer)
-  private readonly _sanitizer: Sanitizer;
-
   protected async invoke({
-    visibility,
     initiatedBy,
-    content,
-    description,
+    visibility,
     title,
+    ...restPost
   }: CreatePostCommand): Promise<CreatePostOutput> {
-    this._logger.assign({ input: { title, visibility, initiatedBy } });
+    this._logger.assign({ input: { ...restPost, initiatedBy } });
     this._logger.debug?.('Creating post');
 
     const post = PostAggregate.create({
-      visibility,
-      content: {
-        title,
-        description,
-        content: this._sanitizer.sanitize(content),
-      },
       owner: initiatedBy,
+      authors: [initiatedBy],
+      title,
+      slug: slugify(title, { lower: true, strict: true }),
+      visibility: visibility ?? PostVisibility.Public.toString(),
+      ...restPost,
     });
 
     const storedPost = await this._postRepository.getBySlug(post.slug);
