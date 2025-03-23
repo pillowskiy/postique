@@ -15,10 +15,10 @@ export enum ParagraphType {
 export type IncomingParagraph = IncomingEntity<IParagraph, { type: number }>;
 
 export interface IParagraph {
-  name: string;
+  id: string;
   type: ParagraphType;
   text: string;
   markups: IMarkup[];
-  metadata: IImageMetadata | undefined;
-  codeMetadata: ICodeMetadata | undefined;
+  metadata?: IImageMetadata;
+  codeMetadata?: ICodeMetadata;
 }

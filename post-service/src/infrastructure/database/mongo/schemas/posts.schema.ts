@@ -1,12 +1,13 @@
 import { PostStatus, PostVisibility } from '@/domain/post';
 import { Prop, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { HydratedDocument } from 'mongoose';
-import { MongoSchema, Schemas } from '../shared/schema';
+import { MongoSchema, PropOptimizedUUID, Schemas } from '../shared/schema';
 
 export type PostDocument = HydratedDocument<Post>;
 
 @MongoSchema()
 export class Post {
+  @PropOptimizedUUID()
   _id: string;
 
   @Prop({ type: String, required: true, default: '' })
@@ -19,17 +20,17 @@ export class Post {
   coverImage: string | null;
 
   @Prop({
-    type: [mongoose.Types.ObjectId],
+    type: [mongoose.Types.UUID],
     ref: Schemas.Paragraph,
     required: true,
   })
-  paragraphs: string[];
+  paragraphs: Readonly<string[]>;
 
   @Prop({ type: String, required: true })
   owner: string;
 
-  @Prop({ type: [mongoose.Types.ObjectId], ref: Schemas.Users, required: true })
-  authors: string[];
+  @Prop({ type: [mongoose.Types.UUID], ref: Schemas.Users, required: true })
+  authors: Readonly<string[]>;
 
   @Prop({ type: String, required: true, unique: true, index: true })
   slug: string;
@@ -47,7 +48,7 @@ export class Post {
   createdAt: Date;
 
   @Prop({ type: Date, default: Date.now })
-  updatedAt: Date;
+  updatedAt?: Date;
 }
 
 export const PostSchema = SchemaFactory.createForClass(Post);

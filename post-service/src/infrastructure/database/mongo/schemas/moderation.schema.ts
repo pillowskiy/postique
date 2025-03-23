@@ -1,16 +1,19 @@
 import { Prop, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { HydratedDocument } from 'mongoose';
-import { MongoSchema, Schemas } from '../shared/schema';
+import { MongoSchema, PropOptimizedUUID, Schemas } from '../shared/schema';
 import { ModerationStatus } from '@/domain/moderation';
 
 export type ModerationDocument = HydratedDocument<Moderation>;
 
 @MongoSchema()
 export class Moderation {
-  @Prop({ type: mongoose.Types.ObjectId, ref: Schemas.Posts, required: true })
+  @PropOptimizedUUID()
+  _id: string;
+
+  @Prop({ type: mongoose.Types.UUID, ref: Schemas.Posts, required: true })
   postId: string;
 
-  @Prop({ type: mongoose.Types.ObjectId, ref: Schemas.Users, required: true })
+  @Prop({ type: mongoose.Types.UUID, ref: Schemas.Users, required: true })
   moderatorId: string;
 
   @Prop({ type: String, enum: ModerationStatus, required: true })

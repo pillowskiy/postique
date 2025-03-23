@@ -1,36 +1,17 @@
+import { BulkOperation, BulkOperationType } from '@/domain/common/bulk';
 import { DomainBusinessRuleViolation } from '@/domain/common/error';
 import { DeltaEntity, DeltaGroup } from '../delta/delta.entity';
-import { ParagraphAggregate } from '../paragraph';
 import { DeltaType } from '../delta/delta.interface';
-
-export class ParagraphUpdateNode<T extends 'keep' | 'delete' | 'save'> {
-  constructor(
-    public readonly strategy: T,
-    public readonly target: string,
-    public readonly content: T extends 'save' ? ParagraphAggregate<any> : null,
-  ) {}
-
-  isSave(): this is ParagraphUpdateNode<'save'> {
-    return this.strategy === 'save';
-  }
-
-  isDelete(): this is ParagraphUpdateNode<'delete'> {
-    return this.strategy === 'delete';
-  }
-
-  isKeep(): this is ParagraphUpdateNode<'keep'> {
-    return this.strategy === 'keep';
-  }
-}
+import { ParagraphAggregate } from '../paragraph';
 
 export class ContentChangeStrategy {
-  private _changeList: ParagraphUpdateNode<any>[];
+  private _changeList: BulkOperation<BulkOperationType, ParagraphAggregate>[];
   private _paragraphs: string[];
 
   constructor(paragraphs: string[]) {
     this._paragraphs = paragraphs;
     this._changeList = paragraphs.map(
-      (p) => new ParagraphUpdateNode('keep', p, null),
+      (p) => new BulkOperation(BulkOperationType.Keep, p),
     );
   }
 
@@ -53,22 +34,32 @@ export class ContentChangeStrategy {
   }
 
   public insertDelta(delta: DeltaEntity) {
-    this._paragraphs.splice(delta.index, 0, delta.paragraph.name);
+    this._paragraphs.splice(delta.index, 0, delta.paragraph.id);
     this._changeList.push(
-      new ParagraphUpdateNode('save', delta.paragraph.name, delta.paragraph),
+      new BulkOperation(
+        BulkOperationType.Insert,
+        delta.paragraph.id,
+        delta.paragraph,
+      ),
     );
   }
 
   public deleteDelta(delta: DeltaEntity) {
     const paragraph = this._getParagraph(delta.index);
     this._paragraphs.splice(delta.index, 1);
-    this._changeList.push(new ParagraphUpdateNode('delete', paragraph, null));
+    this._changeList.push(
+      new BulkOperation(BulkOperationType.Delete, paragraph),
+    );
   }
 
   public updateDelta(delta: DeltaEntity) {
     const _ = this._getParagraph(delta.index);
     this._changeList.push(
-      new ParagraphUpdateNode('save', delta.paragraph.name, delta.paragraph),
+      new BulkOperation(
+        BulkOperationType.Save,
+        delta.paragraph.id,
+        delta.paragraph,
+      ),
     );
   }
 
@@ -76,7 +67,7 @@ export class ContentChangeStrategy {
     return this._paragraphs;
   }
 
-  public changes(): ParagraphUpdateNode<any>[] {
+  public changes(): BulkOperation<any, ParagraphAggregate>[] {
     return this._changeList;
   }
 

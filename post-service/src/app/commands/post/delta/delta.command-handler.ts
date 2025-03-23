@@ -65,27 +65,7 @@ export class DeltaSaveCommandHandler extends Command<
   private async applyChanges(
     strategy: ContentChangeStrategy,
   ): Promise<string[]> {
-    await this.storeChanges(strategy);
+    await this._paragraphRepository.applyBulk(strategy.changes());
     return strategy.paragraphs();
-  }
-
-  private async storeChanges(strategy: ContentChangeStrategy): Promise<void> {
-    const promises: Promise<any>[] = [];
-    for (const change of strategy.changes()) {
-      this._logger.assign({
-        change: {
-          target: change.target,
-          type: change.strategy,
-        },
-      });
-
-      if (change.isDelete()) {
-        promises.push(this._paragraphRepository.delete(change.target));
-      } else if (change.isSave()) {
-        promises.push(this._paragraphRepository.save(change.content));
-      }
-    }
-
-    await Promise.all(promises);
   }
 }

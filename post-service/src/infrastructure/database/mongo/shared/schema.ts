@@ -1,4 +1,5 @@
-import { Schema, SchemaOptions } from '@nestjs/mongoose';
+import { Prop, PropOptions, Schema, SchemaOptions } from '@nestjs/mongoose';
+import mongoose from 'mongoose';
 
 export enum Schemas {
   Posts = 'posts',
@@ -7,18 +8,30 @@ export enum Schemas {
   Preferences = 'preferences',
   Moderation = 'moderation',
   Paragraph = 'paragraphs',
-  Markup = 'markups',
-  ImageMetadata = 'images_metadata',
-  CodeMetadata = 'codes_metadata',
+}
+
+export function PropOptimizedUUID(options: PropOptions = {}) {
+  return Prop(
+    Object.assign(
+      {
+        type: mongoose.Types.UUID,
+        required: true,
+      },
+      options,
+    ),
+  );
 }
 
 export function MongoSchema(options: SchemaOptions = {}) {
   return Schema(
-    Object.assign(options, {
-      _id: false,
-      id: true,
-      optimisticConcurrency: true,
-      timestamps: true,
-    }),
+    Object.assign(
+      {
+        _id: false,
+        id: true,
+        optimisticConcurrency: true,
+        timestamps: true,
+      },
+      options,
+    ),
   );
 }

@@ -1,5 +1,5 @@
 import { PostRepository } from '@/app/boundaries/repository';
-import { PostEntity } from '@/domain/post';
+import { IPost, PostEntity } from '@/domain/post';
 import { InjectModel, Schemas, models } from '@/infrastructure/database/mongo';
 import { Post } from '@/infrastructure/database/mongo/schemas';
 import { Injectable } from '@nestjs/common';
@@ -18,6 +18,7 @@ export class MongoPostRepository extends PostRepository {
         { _id: post.id },
         {
           $set: {
+            _id: post.id,
             title: post.title,
             description: post.description,
             owner: post.owner,
@@ -28,7 +29,8 @@ export class MongoPostRepository extends PostRepository {
             visibility: post.visibility,
             publishedAt: post.publishedAt,
             createdAt: post.createdAt,
-          },
+            coverImage: null,
+          } satisfies Post,
         },
         {
           upsert: true,
@@ -75,8 +77,8 @@ export class MongoPostRepository extends PostRepository {
       visibility: post.visibility,
       publishedAt: post.publishedAt,
       createdAt: post.createdAt,
-      updatedAt: post.updatedAt,
-    });
+      updatedAt: post.updatedAt ?? new Date(),
+    } satisfies IPost);
 
     return postAggregate;
   }

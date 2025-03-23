@@ -1,6 +1,7 @@
 import { DomainBusinessRuleViolation } from '@/domain/common/error';
 import { ParagraphAggregate } from '@/domain/content';
 import { EntityFactory } from '../../common/entity';
+import { PostEntity } from './post.entity';
 import {
   IDetailedPost,
   IncomingPost,
@@ -8,7 +9,6 @@ import {
   PostStatus,
 } from './post.interface';
 import { PostSchema } from './post.schema';
-import { PostEntity } from './post.entity';
 
 export class PostAggregate extends PostEntity implements IDetailedPost {
   static create(post: IncomingPost): PostAggregate {
@@ -16,13 +16,13 @@ export class PostAggregate extends PostEntity implements IDetailedPost {
     return new PostAggregate(validPost);
   }
 
-  private _paragraphs: ParagraphAggregate<any>[] = [];
+  private _paragraphs: ParagraphAggregate[] = [];
 
   private constructor(post: IPost) {
     super(post);
   }
 
-  get paragraphs(): ParagraphAggregate<any>[] {
+  get paragraphs(): ParagraphAggregate[] {
     return this._paragraphs;
   }
 

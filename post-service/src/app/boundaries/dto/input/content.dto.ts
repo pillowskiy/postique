@@ -8,12 +8,12 @@ export class Delta {
 
 export class Paragraph {
   constructor(
-    public readonly name: string,
+    public readonly id: string,
     public readonly type: number,
     public readonly text: string,
     public readonly markups: Markup[],
-    public readonly metadata: ImageMetadata | undefined,
-    public readonly codeMetadata: CodeMetadata | undefined,
+    public readonly metadata?: ImageMetadata,
+    public readonly codeMetadata?: CodeMetadata,
   ) {}
 }
 

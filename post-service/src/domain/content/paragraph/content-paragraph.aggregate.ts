@@ -1,24 +1,23 @@
+import { EntityFactory } from '@/domain/common/entity';
+import { DomainBusinessRuleViolation } from '@/domain/common/error';
+import { Markup } from '../markup';
+import { CodeMetadata, ImageMetadata } from '../metadata';
 import {
   type IncomingParagraph,
   type IParagraph,
   ParagraphType,
 } from './content-paragraph.interface';
-import { Markup } from '../markup';
-import { CodeMetadata, ImageMetadata } from '../metadata';
 import { ParagraphSchema } from './content-paragraph.schema';
-import { EntityFactory } from '@/domain/common/entity';
-import { DomainBusinessRuleViolation } from '@/domain/common/error';
-import { nanoid } from 'nanoid';
 
-export class ParagraphAggregate<T extends ParagraphType = any>
+export class ParagraphAggregate<T extends ParagraphType = ParagraphType>
   implements IParagraph
 {
-  static create(data: IncomingParagraph): ParagraphAggregate<any> {
+  static create(data: IncomingParagraph): ParagraphAggregate {
     const validParagraph = EntityFactory.create(ParagraphSchema, data);
     return new ParagraphAggregate(validParagraph);
   }
 
-  public readonly name: string = nanoid(8);
+  public readonly id: string;
   public readonly type: T;
   public readonly text: string;
   public markups: Markup[];
@@ -26,7 +25,7 @@ export class ParagraphAggregate<T extends ParagraphType = any>
   public codeMetadata: T extends ParagraphType.Code ? CodeMetadata : undefined;
 
   private constructor(data: IParagraph) {
-    this.name = data.name;
+    this.id = data.id;
     this.type = data.type as T;
     this.text = data.text;
     this.markups = data.markups.map((m) => Markup.create(m));

@@ -11,7 +11,7 @@ export class MongoUserRepository extends UserRepository {
   }
 
   async getByUsername(username: string): Promise<UserEntity | null> {
-    const user = await this._userModel.findOne({ username });
+    const user = await this._userModel.findOne({ username }).lean();
     if (!user) {
       return null;
     }
@@ -20,7 +20,7 @@ export class MongoUserRepository extends UserRepository {
   }
 
   async getById(id: string): Promise<UserEntity | null> {
-    const user = await this._userModel.findById(id);
+    const user = await this._userModel.findById(id).lean();
     if (!user) {
       return null;
     }
@@ -30,7 +30,7 @@ export class MongoUserRepository extends UserRepository {
 
   private _getUserEntity(user: User): UserEntity {
     const userEntity = UserEntity.create({
-      id: user.id.toString(),
+      id: user._id.toString(),
       username: user.username,
       avatarPath: user.avatarPath,
     });
