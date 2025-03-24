@@ -1,8 +1,8 @@
-import { Prop, SchemaFactory } from '@nestjs/mongoose';
-import mongoose, { HydratedDocument } from 'mongoose';
-import { MongoSchema, PropOptimizedUUID, Schemas } from '../shared/schema';
 import { MarkupType } from '@/domain/content';
 import { ParagraphType } from '@/domain/content/paragraph/content-paragraph.interface';
+import { Prop, SchemaFactory } from '@nestjs/mongoose';
+import { HydratedDocument } from 'mongoose';
+import { MongoSchema, PropOptimizedUUID } from '../shared/schema';
 
 export type ParagraphDocument = HydratedDocument<Paragraph>;
 
@@ -14,7 +14,7 @@ export type Markup = {
 };
 
 export type ImageMetadata = {
-  id: string;
+  src: string;
   originalWidth: number;
   originalHeight: number;
   alt?: string;
@@ -30,31 +30,29 @@ export class Paragraph {
   @PropOptimizedUUID()
   _id: string;
 
-  @Prop({ type: String, required: true })
+  @Prop({ type: String, default: '' })
   text: string;
 
   @Prop({ enum: ParagraphType, required: true })
   type: ParagraphType;
 
-  @Prop([
-    {
-      type: [
-        {
-          type: { type: String, enum: MarkupType, required: true },
-          href: { type: String, required: false },
-          start: { type: Number, required: true },
-          end: { type: Number, required: true },
-        },
-      ],
-      required: true,
-      default: [],
-    },
-  ])
+  @Prop({
+    type: [
+      {
+        type: { type: Number, enum: MarkupType, required: true },
+        href: { type: String, required: false },
+        start: { type: Number, required: true },
+        end: { type: Number, required: true },
+      },
+    ],
+    required: true,
+    default: [],
+  })
   markups: Markup[];
 
   @Prop({
     type: {
-      id: { type: String, required: true },
+      src: { type: String, required: true },
       originalWidth: { type: Number, required: true },
       originalHeight: { type: Number, required: true },
       alt: { type: String, required: false },
