@@ -61,9 +61,9 @@ export class PostSchema implements IPost {
   @Type(() => Date)
   createdAt: Date = new Date();
 
-  @IsString({ message: 'ID must be a string' })
-  @IsNotEmpty({ message: 'ID cannot be empty' })
-  @IsUUID(4, { message: 'ID has incorrect format' })
+  @IsString({ message: 'Content must be a reference' })
+  @IsNotEmpty({ message: 'Content cannot be empty' })
+  @IsUUID(4, { message: 'Content has incorrect format' })
   content: string = randomUUID();
 
   @IsDate({ message: 'UpdatedAt must be a valid date' })

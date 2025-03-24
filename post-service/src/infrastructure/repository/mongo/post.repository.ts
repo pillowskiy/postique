@@ -120,7 +120,17 @@ export class MongoPostRepository extends PostRepository {
     cursor: string | Date,
   ): AsyncGenerator<PostEntity> {
     const dataCursor = this._postModel
-      .find({ [field]: { $gt: cursor } })
+      .find({
+        [field]: { $lt: cursor },
+        $or: [
+          { visibility: PostVisibility.Public },
+          {
+            visibility: PostVisibility.Premium,
+          },
+        ],
+        status: PostStatus.Published,
+        publishedAt: { $exists: true },
+      })
       .sort({ [sortBy]: 1 })
       .limit(200)
       .cursor();

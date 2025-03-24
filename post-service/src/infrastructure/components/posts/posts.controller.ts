@@ -1,4 +1,14 @@
-import { Body, Controller, Delete, Param, Patch, Post } from '@nestjs/common';
+import {
+  BadRequestException,
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Query,
+} from '@nestjs/common';
 import { randomUUID } from 'crypto';
 
 import * as input from '@/app/boundaries/dto/input';
@@ -55,5 +65,36 @@ export class PostsController {
     @Body('deltas') deltas: input.Delta[],
   ) {
     return this._postsService.deltaSave(id, deltas);
+  }
+
+  @Get('/cursor')
+  async getPosts(
+    @Query('cursor') cursor: string,
+    @Query('take') take: number,
+  ): Promise<output.Cursor<output.Post>> {
+    return this._postsService.getPosts(randomUUID(), take, cursor);
+  }
+
+  @Get('/:slug')
+  async getPost(@Param('slug') slug: string): Promise<output.Post> {
+    return this._postsService.getPost(slug);
+  }
+
+  @Get('/status/:status')
+  async getPostsByStatus(
+    @Param('status') status: string,
+    @Query('take') take: number,
+    @Query('skip') skip: number,
+  ): Promise<output.Post[]> {
+    switch (status) {
+      case 'draft':
+        return this._postsService.getDrafts(randomUUID(), take, skip);
+      case 'published':
+        return this._postsService.getPublished(randomUUID(), take, skip);
+      case 'archived':
+        return this._postsService.getArchived(randomUUID(), take, skip);
+      default:
+        throw new BadRequestException('Invalid post status');
+    }
   }
 }

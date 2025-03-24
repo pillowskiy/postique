@@ -3,7 +3,7 @@ import type { IncomingEntity } from '@/domain/common/entity';
 export type IncomingImageMetadata = IncomingEntity<IImageMetadata>;
 
 export interface IImageMetadata {
-  id: string;
+  src: string;
   originalWidth: number;
   originalHeight: number;
   alt?: string;

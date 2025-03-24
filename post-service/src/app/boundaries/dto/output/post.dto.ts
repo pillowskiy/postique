@@ -1,5 +1,5 @@
 export class Post {
-  _paragraphs: PostParagraph[];
+  _paragraphs: PostParagraph[] = [];
 
   constructor(
     public readonly id: string,
@@ -44,7 +44,7 @@ export class PostMarkup {
 
 export class ImageMetadata {
   constructor(
-    public readonly id: string,
+    public readonly src: string,
     public readonly originalWidth: number,
     public readonly originalHeight: number,
   ) {}

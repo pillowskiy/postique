@@ -16,13 +16,13 @@ export class ImageMetadata implements IImageMetadata {
     return new ImageMetadata(correctMetadata);
   }
 
-  public readonly id: string;
+  public readonly src: string;
   public readonly originalWidth: number;
   public readonly originalHeight: number;
   public readonly alt?: string;
 
   constructor(data: IImageMetadata) {
-    this.id = data.id;
+    this.src = data.src;
     this.originalWidth = data.originalWidth;
     this.originalHeight = data.originalHeight;
     this.alt = data.alt;

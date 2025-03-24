@@ -4,6 +4,7 @@ import {
   IsNumber,
   IsObject,
   IsPositive,
+  Min,
 } from 'class-validator';
 import { DeltaType, IDelta } from './delta.interface';
 import { IParagraph } from '../paragraph/content-paragraph.interface';
@@ -15,7 +16,7 @@ export class DeltaSchema implements IDelta {
 
   @IsNotEmpty({ message: 'Index must be a number' })
   @IsNumber({ allowNaN: false }, { message: 'Index must be a number' })
-  @IsPositive({ message: 'Index must be a positive number' })
+  @Min(0, { message: 'Index must be a positive number' })
   index: number;
 
   @IsNotEmpty({ message: 'Paragraph must be a reference' })

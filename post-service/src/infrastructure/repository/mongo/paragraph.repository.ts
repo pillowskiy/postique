@@ -43,7 +43,6 @@ export class MongoParagraphRepository extends ParagraphRepository {
             updateOne: {
               filter: { _id: op.target },
               update: this._paragraphFields(op.content),
-              upsert: true,
             },
           };
         }
@@ -68,7 +67,9 @@ export class MongoParagraphRepository extends ParagraphRepository {
       })
       .filter((op) => op !== null);
 
-    const res = await this._paragraphModel.bulkWrite(mongoseOperations, {});
+    const res = await this._paragraphModel.bulkWrite(mongoseOperations, {
+      retryWrites: true,
+    });
     if (!res.isOk) {
       throw new Error(
         `Could not apply bulk operations: ${res

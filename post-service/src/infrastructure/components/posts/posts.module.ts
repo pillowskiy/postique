@@ -5,23 +5,28 @@ import {
   UserRepository,
 } from '@/app/boundaries/repository';
 import PostCommandHandlers from '@/app/commands/post';
+import PostQueryHandlers from '@/app/queries/post';
 import { MongoModule } from '@/infrastructure/database/mongo';
 import {
   MongoPostRepository,
   MongoUserRepository,
   MongoParagraphRepository,
   MongoContentRepository,
+  MongoPreferencesRepository,
 } from '@/infrastructure/repository/mongo';
 import { Module } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
 import { PostsController } from './posts.controller';
 import { PostsService } from './posts.service';
+import { PreferencesRepository } from '@/app/boundaries/repository/preferences.repository';
 
 @Module({
   imports: [MongoModule, CqrsModule.forRoot()],
   controllers: [PostsController],
   providers: [
     ...PostCommandHandlers,
+    ...PostQueryHandlers,
+    // TEMP: SRP, remove most of this repository
     {
       provide: PostRepository,
       useClass: MongoPostRepository,
@@ -37,6 +42,10 @@ import { PostsService } from './posts.service';
     {
       provide: ParagraphRepository,
       useClass: MongoParagraphRepository,
+    },
+    {
+      provide: PreferencesRepository,
+      useClass: MongoPreferencesRepository,
     },
     PostsService,
   ],

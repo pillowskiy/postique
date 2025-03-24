@@ -6,13 +6,20 @@ import type {
 } from './preferences.interface';
 import { PostPreferencesSchema } from './preferences.schema';
 
-export class PostPreferences implements IPostPreferences {
-  static create(preferences: IncomingPostPreferences): PostPreferences {
+export class PostPreferencesEntity implements IPostPreferences {
+  static empty(): PostPreferencesEntity {
+    return new PostPreferencesEntity({
+      postsBlacklist: new Set(),
+      authorBlacklist: new Set(),
+    });
+  }
+
+  static create(preferences: IncomingPostPreferences): PostPreferencesEntity {
     const validPreferences = EntityFactory.create(
       PostPreferencesSchema,
       preferences,
     );
-    return new PostPreferences(validPreferences);
+    return new PostPreferencesEntity(validPreferences);
   }
 
   private constructor(preferences: IPostPreferences) {

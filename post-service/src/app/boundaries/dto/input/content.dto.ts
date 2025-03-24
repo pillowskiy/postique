@@ -27,7 +27,7 @@ export class Markup {
 
 export class ImageMetadata {
   constructor(
-    public readonly id: string,
+    public readonly src: string,
     public readonly originalWidth: number,
     public readonly originalHeight: number,
   ) {}
