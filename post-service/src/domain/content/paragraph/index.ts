@@ -1,2 +1,2 @@
-export * from './content-paragraph.schema';
 export * from './content-paragraph.aggregate';
+export * from './content-paragraph.interface';

@@ -1,5 +1,6 @@
 import { DeltaSaveOutput } from '@/app/boundaries/dto/output';
 import {
+  ContentRepository,
   ParagraphRepository,
   PostRepository,
 } from '@/app/boundaries/repository';
@@ -23,6 +24,9 @@ export class DeltaSaveCommandHandler extends Command<
   @Inject(ParagraphRepository)
   private readonly _paragraphRepository: ParagraphRepository;
 
+  @Inject(ContentRepository)
+  private readonly _contentRepository: ContentRepository;
+
   @Inject(Logger)
   private readonly _logger: Logger;
 
@@ -34,11 +38,16 @@ export class DeltaSaveCommandHandler extends Command<
     if (!post) {
       throw new NotFoundException('Post does not exist');
     }
+
+    const paragraphIds = await this._contentRepository.getPlainParagraphs(
+      post.content,
+    );
+
     this._logger.assign({
       post: {
         id: post.id,
         slug: post.slug,
-        paragraphLength: post.paragraphIds.length,
+        paragraphLength: paragraphIds.length,
       },
     });
     this._logger.debug?.('Post found');
@@ -47,7 +56,7 @@ export class DeltaSaveCommandHandler extends Command<
     this._logger.assign({ deltaGroup: { length: deltaGroup.deltas.length } });
     this._logger.debug?.('Delta group created');
 
-    const changeStrategy = new ContentChangeStrategy(post.paragraphIds);
+    const changeStrategy = new ContentChangeStrategy(paragraphIds);
     changeStrategy.applyDeltaGroup(deltaGroup);
     this._logger.assign({
       changeStrategy: { length: changeStrategy.changes().length },
@@ -56,8 +65,7 @@ export class DeltaSaveCommandHandler extends Command<
     const paragraphs = await this.applyChanges(changeStrategy);
     this._logger.debug?.('Paragraphs applied');
 
-    post.changeContent(paragraphs);
-    await this._postRepository.save(post);
+    await this._contentRepository.save(post.content, paragraphs);
 
     return new DeltaSaveOutput();
   }

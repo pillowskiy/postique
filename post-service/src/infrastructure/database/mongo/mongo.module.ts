@@ -19,6 +19,7 @@ import * as schemas from './schemas';
       { name: Schemas.Moderation, schema: schemas.ModerationSchema },
       { name: Schemas.Preferences, schema: schemas.PostPreferencesSchema },
       { name: Schemas.Paragraph, schema: schemas.ParagraphSchema },
+      { name: Schemas.Content, schema: schemas.ContentSchema },
     ]),
     NestMongooseModule.forRootAsync({
       imports: [AppConfigModule],

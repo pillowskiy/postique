@@ -38,6 +38,7 @@ export class PostMarkup {
     public readonly type: number,
     public readonly start: number,
     public readonly end: number,
+    public readonly href?: string,
   ) {}
 }
 

@@ -15,7 +15,7 @@ export class Markup implements IMarkup {
   public readonly type: MarkupType;
   public readonly start: number;
   public readonly end: number;
-  public readonly href: string | undefined;
+  public readonly href?: string;
 
   constructor(data: IMarkup) {
     this.type = data.type;

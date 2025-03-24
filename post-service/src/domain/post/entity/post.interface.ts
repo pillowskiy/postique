@@ -36,7 +36,7 @@ export interface IPost {
   owner: string;
   authors: Readonly<string[]>;
   slug: string;
-  paragraphIds: Readonly<string[]>;
+  content: string;
   status: PostStatus;
   visibility: PostVisibility;
   publishedAt: Date | null;

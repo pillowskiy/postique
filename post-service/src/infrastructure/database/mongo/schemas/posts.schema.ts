@@ -19,12 +19,8 @@ export class Post {
   @Prop({ type: String, default: null })
   coverImage: string | null;
 
-  @Prop({
-    type: [mongoose.Types.UUID],
-    ref: Schemas.Paragraph,
-    required: true,
-  })
-  paragraphs: Readonly<string[]>;
+  @Prop({ type: mongoose.Types.UUID, ref: Schemas.Content, required: true })
+  content: string;
 
   @Prop({ type: String, required: true })
   owner: string;

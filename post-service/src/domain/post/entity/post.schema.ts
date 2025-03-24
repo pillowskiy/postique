@@ -61,12 +61,10 @@ export class PostSchema implements IPost {
   @Type(() => Date)
   createdAt: Date = new Date();
 
-  @IsArray({ message: 'Paragraph IDs must be a list of references' })
-  @IsString({
-    each: true,
-    message: 'Paragraph ID has incorrect format',
-  })
-  paragraphIds: Readonly<string[]> = [];
+  @IsString({ message: 'ID must be a string' })
+  @IsNotEmpty({ message: 'ID cannot be empty' })
+  @IsUUID(4, { message: 'ID has incorrect format' })
+  content: string = randomUUID();
 
   @IsDate({ message: 'UpdatedAt must be a valid date' })
   @Type(() => Date)

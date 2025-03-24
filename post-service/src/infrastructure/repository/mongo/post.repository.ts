@@ -1,5 +1,9 @@
-import { PostRepository } from '@/app/boundaries/repository';
-import { IPost, PostEntity } from '@/domain/post';
+import {
+  CursorField,
+  PostRepository,
+  SortField,
+} from '@/app/boundaries/repository';
+import { IPost, PostEntity, PostStatus, PostVisibility } from '@/domain/post';
 import { InjectModel, Schemas, models } from '@/infrastructure/database/mongo';
 import { Post } from '@/infrastructure/database/mongo/schemas';
 import { Injectable } from '@nestjs/common';
@@ -24,7 +28,7 @@ export class MongoPostRepository extends PostRepository {
             owner: post.owner,
             authors: post.authors,
             slug: post.slug,
-            paragraphs: post.paragraphIds,
+            content: post.content,
             status: post.status,
             visibility: post.visibility,
             publishedAt: post.publishedAt,
@@ -64,13 +68,75 @@ export class MongoPostRepository extends PostRepository {
     return query.deletedCount === 1;
   }
 
+  async getAllUserPosts(
+    userId: string,
+    status: PostStatus,
+    sortField: SortField,
+    take: number,
+    skip: number,
+  ): Promise<PostEntity[]> {
+    const posts = await this._postModel
+      .find({
+        authors: userId,
+        status,
+      })
+      .sort({ [sortField]: 1 })
+      .limit(take)
+      .skip(skip)
+      .lean();
+
+    return posts.map((post) => this.#getPostEntity(post));
+  }
+
+  async getUserPosts(
+    userId: string,
+    sortField: SortField,
+    take: number,
+    skip: number,
+  ): Promise<PostEntity[]> {
+    const posts = await this._postModel
+      .find({
+        status: PostStatus.Published,
+        authors: { $in: [userId] },
+        $or: [
+          { visibility: PostVisibility.Public },
+          {
+            visibility: PostVisibility.Premium,
+          },
+        ],
+        publishedAt: { $exists: true },
+      })
+      .sort({ [sortField]: 1 })
+      .limit(take)
+      .skip(skip)
+      .lean();
+
+    return posts.map((post) => this.#getPostEntity(post));
+  }
+
+  async *cursor(
+    field: CursorField,
+    sortBy: SortField,
+    cursor: string | Date,
+  ): AsyncGenerator<PostEntity> {
+    const dataCursor = this._postModel
+      .find({ [field]: { $gt: cursor } })
+      .sort({ [sortBy]: 1 })
+      .limit(200)
+      .cursor();
+
+    for await (const doc of dataCursor) {
+      yield this.#getPostEntity(doc);
+    }
+  }
+
   #getPostEntity(post: Post): PostEntity {
     const postAggregate = PostEntity.create({
       id: post._id.toString(),
       title: post.title,
       description: post.description,
       owner: post.owner,
-      paragraphIds: post.paragraphs,
+      content: post.content,
       slug: post.slug,
       authors: post.authors,
       status: post.status,

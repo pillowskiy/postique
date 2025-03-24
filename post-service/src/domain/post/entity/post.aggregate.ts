@@ -43,8 +43,4 @@ export class PostAggregate extends PostEntity implements IDetailedPost {
     this._status = PostStatus.Archived;
     this._publishedAt = null;
   }
-
-  changeContent(_: string[]): never {
-    throw new Error('Method is not available in aggregate.');
-  }
 }

@@ -8,6 +8,7 @@ export enum Schemas {
   Preferences = 'preferences',
   Moderation = 'moderation',
   Paragraph = 'paragraphs',
+  Content = 'content',
 }
 
 export function PropOptimizedUUID(options: PropOptions = {}) {

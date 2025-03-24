@@ -29,7 +29,7 @@ export class PostEntity implements IPost {
   protected _status: PostStatus;
   protected _visibility: PostVisibility;
   protected _publishedAt: Date | null;
-  protected _paragraphIds: string[];
+  protected _content: string;
 
   protected constructor(post: IPost) {
     this.id = post.id;
@@ -38,7 +38,7 @@ export class PostEntity implements IPost {
     this._authors = [...post.authors];
     this._slug = post.slug;
     this._status = post.status;
-    this._paragraphIds = [...post.paragraphIds];
+    this._content = post.content;
     this._visibility = post.visibility;
     this._title = post.title;
     this._description = post.description;
@@ -84,8 +84,8 @@ export class PostEntity implements IPost {
     return this._publishedAt;
   }
 
-  get paragraphIds(): string[] {
-    return this._paragraphIds;
+  get content(): string {
+    return this._content;
   }
 
   setApproved(approved: boolean) {
@@ -108,8 +108,8 @@ export class PostEntity implements IPost {
     this._visibility = visibility;
   }
 
-  changeContent(paragraphs: string[]) {
-    this._paragraphIds = paragraphs;
+  changeContent(content: string) {
+    this._content = content;
   }
 
   transferOwnership(userId: string) {

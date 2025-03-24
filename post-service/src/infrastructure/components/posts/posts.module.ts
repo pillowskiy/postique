@@ -1,4 +1,5 @@
 import {
+  ContentRepository,
   ParagraphRepository,
   PostRepository,
   UserRepository,
@@ -9,6 +10,7 @@ import {
   MongoPostRepository,
   MongoUserRepository,
   MongoParagraphRepository,
+  MongoContentRepository,
 } from '@/infrastructure/repository/mongo';
 import { Module } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
@@ -27,6 +29,10 @@ import { PostsService } from './posts.service';
     {
       provide: UserRepository,
       useClass: MongoUserRepository,
+    },
+    {
+      provide: ContentRepository,
+      useClass: MongoContentRepository,
     },
     {
       provide: ParagraphRepository,

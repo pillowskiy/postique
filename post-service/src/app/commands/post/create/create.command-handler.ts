@@ -1,13 +1,17 @@
 import { Logger } from '@/app/boundaries/common';
 import { CreatePostOutput } from '@/app/boundaries/dto/output';
 import { ConflictException, NotFoundException } from '@/app/boundaries/errors';
-import { PostRepository, UserRepository } from '@/app/boundaries/repository';
+import {
+  ContentRepository,
+  PostRepository,
+  UserRepository,
+} from '@/app/boundaries/repository';
 import { Command } from '@/app/commands/common';
-import { PostAggregate, PostVisibility } from '@/domain/post';
+import { PostEntity, PostVisibility } from '@/domain/post';
 import { Inject } from '@nestjs/common';
 import { CommandHandler } from '@nestjs/cqrs';
-import { CreatePostCommand } from './create.command';
 import slugify from 'slugify';
+import { CreatePostCommand } from './create.command';
 
 @CommandHandler(CreatePostCommand)
 export class CreatePostCommandHandler extends Command<
@@ -19,6 +23,9 @@ export class CreatePostCommandHandler extends Command<
 
   @Inject(UserRepository)
   private readonly _userRepository: UserRepository;
+
+  @Inject(ContentRepository)
+  private readonly _contentRepository: ContentRepository;
 
   @Inject(Logger)
   private readonly _logger: Logger;
@@ -32,7 +39,7 @@ export class CreatePostCommandHandler extends Command<
     this._logger.assign({ input: { ...restPost, initiatedBy } });
     this._logger.debug?.('Creating post');
 
-    const post = PostAggregate.create({
+    const post = PostEntity.create({
       owner: initiatedBy,
       authors: [initiatedBy],
       title,
@@ -53,7 +60,11 @@ export class CreatePostCommandHandler extends Command<
     this._logger.assign({ owner: { username: user.username, id: user.id } });
     this._logger.debug?.('Post owner exists');
 
-    await this._postRepository.save(post);
+    await Promise.all([
+      this._contentRepository.save(post.content, []),
+      this._postRepository.save(post),
+    ]);
+
     this._logger.debug?.('Post saved', { post });
     return new CreatePostOutput(post.id);
   }
