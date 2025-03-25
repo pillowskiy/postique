@@ -1,15 +1,17 @@
 import { Prop, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { HydratedDocument } from 'mongoose';
-import { MongoSchema, PropOptimizedUUID, Schemas } from '../shared/schema';
+import { MongoSchema, Schemas } from '../shared/schema';
 
 export type PostPreferencesDocument = HydratedDocument<PostPreferences>;
 
 @MongoSchema()
 export class PostPreferences {
-  @PropOptimizedUUID()
-  _id: string;
-
-  @Prop({ type: mongoose.Types.UUID, ref: Schemas.Users, required: true })
+  @Prop({
+    type: mongoose.Types.UUID,
+    ref: Schemas.Users,
+    required: true,
+    unique: true,
+  })
   userId: string;
 
   @Prop({
