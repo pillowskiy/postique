@@ -3,10 +3,10 @@ import { EntityFactory } from '../../common/entity';
 import type { IncomingPostSeries, IPostSeries } from './series.interface';
 import { PostSeriesSchema } from './series.schema';
 
-export class PostSeries implements IPostSeries {
-  static create(series: IncomingPostSeries): PostSeries {
+export class PostSeriesEntity implements IPostSeries {
+  static create(series: IncomingPostSeries): PostSeriesEntity {
     const validSeries = EntityFactory.create(PostSeriesSchema, series);
-    return new PostSeries(validSeries);
+    return new PostSeriesEntity(validSeries);
   }
 
   public readonly id: string;
@@ -44,6 +44,22 @@ export class PostSeries implements IPostSeries {
       throw new DomainBusinessRuleViolation('Series already has this post');
     }
     this._posts.push(postId);
+  }
+
+  removePost(postId: string): void {
+    if (!this._hasPost(postId)) {
+      throw new DomainBusinessRuleViolation('Series does not have this post');
+    }
+    this._posts.splice(this._posts.indexOf(postId), 1);
+  }
+
+  updateTitle(title: string, slug: string): void {
+    this._title = title;
+    this._slug = slug;
+  }
+
+  updateDescription(description: string): void {
+    this._description = description;
   }
 
   private _hasPost(postId: string): boolean {

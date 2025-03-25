@@ -12,11 +12,14 @@ export class PostSeries {
   @Prop({ type: String, required: true })
   title: string;
 
+  @Prop({ type: String, unique: true, required: true })
+  slug: string;
+
   @Prop({ type: String, required: true, default: '' })
   description: string;
 
   @Prop({ type: [mongoose.Types.UUID], ref: Schemas.Posts, required: true })
-  posts: string[];
+  posts: Readonly<string[]>;
 }
 
 export const PostSeriesSchema = SchemaFactory.createForClass(PostSeries);
