@@ -13,6 +13,7 @@ type Config struct {
 	Session  Session  `yaml:"session"`
 	Postgres Postgres `yaml:"postgres"`
 	Logger   Logger   `yaml:"logger"`
+	RabbitMQ RabbitMQ `yaml:"rmq"`
 }
 
 type Server struct {
@@ -25,6 +26,11 @@ type Session struct {
 	EncryptionSecret           string        `yaml:"encryption_secret" env-required:"true"`
 	TokenED25519PrivatePEMPath string        `yaml:"token_ed25519_private_key_path" env-required:"true"`
 	TokenED25519PublicPEMPath  string        `yaml:"token_ed25519_public_key_path" env-required:"true"`
+}
+
+type RabbitMQ struct {
+	URL       string `yaml:"url" env-required:"true"`
+	UserQueue string `yaml:"user_queue" env-required:"true"`
 }
 
 type Postgres struct {

@@ -5,16 +5,23 @@ import (
 
 	"github.com/pillowskiy/postique/sso/internal/app/grpc"
 	"github.com/pillowskiy/postique/sso/internal/config"
+	"github.com/pillowskiy/postique/sso/internal/infrastructure/rmq"
 	"github.com/pillowskiy/postique/sso/internal/storage/pg"
 	"github.com/pillowskiy/postique/sso/internal/usecase"
 )
 
 type App struct {
 	grpcApp *grpc.App
+	userPub *rmq.RabbitMQProducer
 }
 
 func New(log *slog.Logger, cfg *config.Config) *App {
 	pgStorage := pg.MustConnect(cfg.Postgres)
+	userPub := rmq.MustRabbitMQProducer(
+		cfg.RabbitMQ.URL,
+		"",
+		cfg.RabbitMQ.UserQueue,
+	)
 
 	roleRepo := pg.NewRoleStorage(pgStorage)
 	roleUC := usecase.NewRoleUseCase(roleRepo, log)
@@ -29,14 +36,14 @@ func New(log *slog.Logger, cfg *config.Config) *App {
 	appUC := usecase.NewAppUseCase(appRepo, sessionUC, cfg.Session, log)
 
 	profileRepo := pg.NewProfileStorage(pgStorage)
-	profileUC := usecase.NewProfileUseCase(profileRepo, log)
+	profileUC := usecase.NewProfileUseCase(profileRepo, userPub, log)
 
 	authRepo := pg.NewUserStorage(pgStorage)
-	authUC := usecase.NewAuthUseCase(authRepo, appUC, profileUC, log)
+	authUC := usecase.NewAuthUseCase(authRepo, appUC, userPub, profileUC, log)
 
 	grpcApp := grpc.NewApp(log, cfg.Server, appUC, authUC, permUC, profileUC)
 
-	return &App{grpcApp: grpcApp}
+	return &App{grpcApp: grpcApp, userPub: userPub}
 }
 
 func (a *App) MustRun() {
@@ -47,4 +54,5 @@ func (a *App) MustRun() {
 
 func (a *App) GracefulStop() {
 	a.grpcApp.Stop()
+	a.userPub.Close()
 }

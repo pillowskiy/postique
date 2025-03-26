@@ -16,6 +16,10 @@ postgres:
   database: sso
   ssl: disable
 
+rmq:
+  url: amqp://guest:guest@rabbitmq:5672
+  user_queue: user_queue
+
 logger:
   mode: development
   disable_caller: false

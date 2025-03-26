@@ -7,6 +7,7 @@ import (
 	"log/slog"
 
 	"github.com/pillowskiy/postique/sso/internal/domain"
+	"github.com/pillowskiy/postique/sso/internal/domain/event"
 	"github.com/pillowskiy/postique/sso/internal/dto"
 	"github.com/pillowskiy/postique/sso/internal/storage"
 )
@@ -30,7 +31,7 @@ type AuthAppUseCase interface {
 }
 
 type AuthProfileUseCase interface {
-	CreateProfile(ctx context.Context, profile *dto.CreateProfileInput) (string, error)
+	CreateProfile(ctx context.Context, profile *dto.CreateProfileInput) (*dto.Profile, error)
 	Profile(ctx context.Context, userID domain.PID) (*dto.Profile, error)
 }
 
@@ -39,12 +40,14 @@ type authUseCase struct {
 	appUC     AuthAppUseCase
 	profileUC AuthProfileUseCase
 	log       *slog.Logger
+	userPub   event.EventPublisher
 }
 
-func NewAuthUseCase(authRepo AuthRepository, appUC AuthAppUseCase, profileUC AuthProfileUseCase, log *slog.Logger) *authUseCase {
+func NewAuthUseCase(authRepo AuthRepository, appUC AuthAppUseCase, userPub event.EventPublisher, profileUC AuthProfileUseCase, log *slog.Logger) *authUseCase {
 	return &authUseCase{
 		authRepo:  authRepo,
 		appUC:     appUC,
+		userPub:   userPub,
 		profileUC: profileUC,
 		log:       log,
 	}
@@ -140,9 +143,18 @@ func (uc *authUseCase) Register(ctx context.Context, input *dto.RegisterUserInpu
 		profileInput := &dto.CreateProfileInput{
 			UserID:   domain.PID(userID),
 			Username: user.Email.AsUsername(),
+			Email:    string(user.Email),
 			Bio:      "",
 		}
-		if _, err := uc.profileUC.CreateProfile(ctx, profileInput); err != nil {
+		profile, err := uc.profileUC.CreateProfile(ctx, profileInput)
+		if err != nil {
+			log.Error("Failed to create profile", slog.String("error", err.Error()))
+			return fmt.Errorf("%s: %w", op, err)
+		}
+
+		err = uc.userPub.Publish(event.NewUserRegisteredEvent(user, profile.AvatarPath, profile.Username))
+		if err != nil {
+			log.Error("Failed to publish user registered event", slog.String("error", err.Error()))
 			return fmt.Errorf("%s: %w", op, err)
 		}
 
