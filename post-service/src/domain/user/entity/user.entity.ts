@@ -9,12 +9,14 @@ export class UserEntity implements IUser {
   }
 
   public readonly id: string;
+  public readonly email: string;
   public readonly username: string;
   public readonly avatarPath: string;
 
-  private constructor({ id, username, avatarPath }: IUser) {
+  private constructor({ id, username, email, avatarPath }: IUser) {
     this.id = id;
     this.username = username;
+    this.email = email;
     this.avatarPath = avatarPath;
   }
 }

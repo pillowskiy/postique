@@ -10,7 +10,7 @@ export class User {
   _id: string;
 
   @Prop({ type: String, required: true, unique: true, index: true })
-  refId: string;
+  email: string;
 
   @Prop({ type: String, required: true, unique: true, index: true })
   username: string;

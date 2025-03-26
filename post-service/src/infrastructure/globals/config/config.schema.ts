@@ -48,7 +48,7 @@ export class Config {
   @Length(3, 50, {
     message: 'Must be between 3 and 50 characters long',
   })
-  RABBIT_MQ_POSTS_QUEUE: string;
+  RABBIT_MQ_USERS_QUEUE: string;
 
   @IsNotEmpty({ message: 'Cannot be empty' })
   @IsString({ message: 'Must be a string' })

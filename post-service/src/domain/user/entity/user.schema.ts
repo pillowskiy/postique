@@ -4,6 +4,7 @@ import {
   MinLength,
   MaxLength,
   IsUUID,
+  IsEmail,
 } from 'class-validator';
 import { randomUUID } from 'crypto';
 import type { IUser } from './user.interface';
@@ -13,6 +14,12 @@ export class UserSchema implements IUser {
   @IsNotEmpty({ message: 'ID cannot be empty' })
   @IsUUID(4, { message: 'ID has incorrect format' })
   id: string = randomUUID();
+
+  @MaxLength(512, { message: 'Email must be at most 512 characters' })
+  @IsEmail({}, { message: 'Email is not valid' })
+  @IsString({ message: 'Email must be a string' })
+  @IsNotEmpty({ message: 'Email cannot be empty' })
+  email: string;
 
   @IsString({ message: 'Username must be a string' })
   @IsNotEmpty({ message: 'Username cannot be empty string' })

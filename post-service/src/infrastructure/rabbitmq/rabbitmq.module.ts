@@ -1,10 +1,10 @@
 import { AppConfigModule } from '@/infrastructure/globals/config';
 import { Module } from '@nestjs/common';
-import { PostsRMQService } from './posts.service';
+import { UsersRMQService } from './users.service';
 
 @Module({
   imports: [AppConfigModule],
-  providers: [PostsRMQService],
-  exports: [PostsRMQService],
+  providers: [UsersRMQService],
+  exports: [UsersRMQService],
 })
 export class RabbitMQModule {}

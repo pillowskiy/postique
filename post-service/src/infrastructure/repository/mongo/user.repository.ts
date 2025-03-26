@@ -10,6 +10,23 @@ export class MongoUserRepository extends UserRepository {
     super();
   }
 
+  async save(user: UserEntity): Promise<void> {
+    await this._userModel.updateOne(
+      { _id: user.id },
+      { $set: this._getUserFields(user) },
+      { upsert: true },
+    );
+  }
+
+  async getUnique(username: string, email: string): Promise<UserEntity | null> {
+    const user = await this._userModel.findOne({ username, email }).lean();
+    if (!user) {
+      return null;
+    }
+
+    return this._getUserEntity(user);
+  }
+
   async getByUsername(username: string): Promise<UserEntity | null> {
     const user = await this._userModel.findOne({ username }).lean();
     if (!user) {
@@ -26,6 +43,15 @@ export class MongoUserRepository extends UserRepository {
     }
 
     return this._getUserEntity(user);
+  }
+
+  private _getUserFields(user: UserEntity): User {
+    return {
+      _id: user.id,
+      email: user.email,
+      username: user.username,
+      avatarPath: user.avatarPath,
+    };
   }
 
   private _getUserEntity(user: User): UserEntity {

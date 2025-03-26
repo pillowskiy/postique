@@ -3,7 +3,7 @@ import { RmqOptions, Transport } from '@nestjs/microservices';
 import { AppConfigService } from '@/infrastructure/globals/config';
 
 @Injectable()
-export class PostsRMQService {
+export class UsersRMQService {
   constructor(private readonly _configService: AppConfigService) {}
 
   getOptions(noAck = false): RmqOptions {
@@ -16,7 +16,7 @@ export class PostsRMQService {
         queueOptions: {
           durable: true,
         },
-        queue: this._configService.get('RABBIT_MQ_POSTS_QUEUE'),
+        queue: this._configService.get('RABBIT_MQ_USERS_QUEUE'),
       },
     };
   }

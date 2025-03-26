@@ -7,6 +7,7 @@ import {
   NestFastifyApplication,
 } from '@nestjs/platform-fastify';
 import { ApplicationExceptionFilter } from '@/infrastructure/common/filters';
+import { UsersRMQService } from './infrastructure/rabbitmq';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestFastifyApplication>(
@@ -21,8 +22,12 @@ async function bootstrap() {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
   app.useGlobalFilters(app.get(ApplicationExceptionFilter));
 
+  await app.init();
+  app.connectMicroservice(app.get(UsersRMQService).getOptions());
+
   const config = app.get(AppConfigService);
   await app.listen(config.get('PORT'), '0.0.0.0');
+  await app.startAllMicroservices();
 }
 
 void bootstrap();
