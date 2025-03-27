@@ -1,5 +1,5 @@
 import { PermissionProvider } from '@/app/boundaries/providers';
-import { AppConfigService } from '@/infrastructure/config';
+import { AppConfigService } from '@/infrastructure/globals/config';
 import { Module } from '@nestjs/common';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { SSOPermissionProvider } from './permission.service';
