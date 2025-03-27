@@ -19,6 +19,7 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
+	Permission_SyncPermissions_FullMethodName   = "/sso.permission.Permission/SyncPermissions"
 	Permission_HasPermission_FullMethodName     = "/sso.permission.Permission/HasPermission"
 	Permission_HasUserPermission_FullMethodName = "/sso.permission.Permission/HasUserPermission"
 )
@@ -27,6 +28,7 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type PermissionClient interface {
+	SyncPermissions(ctx context.Context, in *SyncPermissionsRequest, opts ...grpc.CallOption) (*SyncPermissionsResponse, error)
 	HasPermission(ctx context.Context, in *HasPermissionRequest, opts ...grpc.CallOption) (*HasPermissionResponse, error)
 	HasUserPermission(ctx context.Context, in *HasUserPermissionRequest, opts ...grpc.CallOption) (*HasUserPermissionResponse, error)
 }
@@ -37,6 +39,16 @@ type permissionClient struct {
 
 func NewPermissionClient(cc grpc.ClientConnInterface) PermissionClient {
 	return &permissionClient{cc}
+}
+
+func (c *permissionClient) SyncPermissions(ctx context.Context, in *SyncPermissionsRequest, opts ...grpc.CallOption) (*SyncPermissionsResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(SyncPermissionsResponse)
+	err := c.cc.Invoke(ctx, Permission_SyncPermissions_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
 }
 
 func (c *permissionClient) HasPermission(ctx context.Context, in *HasPermissionRequest, opts ...grpc.CallOption) (*HasPermissionResponse, error) {
@@ -63,6 +75,7 @@ func (c *permissionClient) HasUserPermission(ctx context.Context, in *HasUserPer
 // All implementations must embed UnimplementedPermissionServer
 // for forward compatibility.
 type PermissionServer interface {
+	SyncPermissions(context.Context, *SyncPermissionsRequest) (*SyncPermissionsResponse, error)
 	HasPermission(context.Context, *HasPermissionRequest) (*HasPermissionResponse, error)
 	HasUserPermission(context.Context, *HasUserPermissionRequest) (*HasUserPermissionResponse, error)
 	mustEmbedUnimplementedPermissionServer()
@@ -75,6 +88,9 @@ type PermissionServer interface {
 // pointer dereference when methods are called.
 type UnimplementedPermissionServer struct{}
 
+func (UnimplementedPermissionServer) SyncPermissions(context.Context, *SyncPermissionsRequest) (*SyncPermissionsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SyncPermissions not implemented")
+}
 func (UnimplementedPermissionServer) HasPermission(context.Context, *HasPermissionRequest) (*HasPermissionResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method HasPermission not implemented")
 }
@@ -100,6 +116,24 @@ func RegisterPermissionServer(s grpc.ServiceRegistrar, srv PermissionServer) {
 		t.testEmbeddedByValue()
 	}
 	s.RegisterService(&Permission_ServiceDesc, srv)
+}
+
+func _Permission_SyncPermissions_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SyncPermissionsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(PermissionServer).SyncPermissions(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Permission_SyncPermissions_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PermissionServer).SyncPermissions(ctx, req.(*SyncPermissionsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
 }
 
 func _Permission_HasPermission_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -145,6 +179,10 @@ var Permission_ServiceDesc = grpc.ServiceDesc{
 	ServiceName: "sso.permission.Permission",
 	HandlerType: (*PermissionServer)(nil),
 	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "SyncPermissions",
+			Handler:    _Permission_SyncPermissions_Handler,
+		},
 		{
 			MethodName: "HasPermission",
 			Handler:    _Permission_HasPermission_Handler,

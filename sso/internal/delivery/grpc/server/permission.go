@@ -12,6 +12,7 @@ import (
 
 type PermissionUseCase interface {
 	HasPermission(ctx context.Context, userID string, permissionName string) (bool, error)
+	SyncPermissions(ctx context.Context, permissionNames []string) error
 }
 
 type permissionServer struct {
@@ -21,6 +22,15 @@ type permissionServer struct {
 
 func RegisterPermissionServer(server *grpc.Server, permUC PermissionUseCase) {
 	pb.RegisterPermissionServer(server, &permissionServer{permUC: permUC})
+}
+
+func (s *permissionServer) SyncPermissions(ctx context.Context, req *pb.SyncPermissionsRequest) (*pb.SyncPermissionsResponse, error) {
+	err := s.permUC.SyncPermissions(ctx, req.GetNames())
+	if err != nil {
+		return nil, parseUseCaseException(err)
+	}
+
+	return &pb.SyncPermissionsResponse{}, nil
 }
 
 func (s *permissionServer) HasPermission(ctx context.Context, req *pb.HasPermissionRequest) (*pb.HasPermissionResponse, error) {

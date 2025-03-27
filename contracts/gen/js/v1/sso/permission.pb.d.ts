@@ -1,6 +1,11 @@
 import { BinaryReader, BinaryWriter } from "@bufbuild/protobuf/wire";
 import { type CallOptions, ChannelCredentials, Client, type ClientOptions, type ClientUnaryCall, type handleUnaryCall, Metadata, type ServiceError, type UntypedServiceImplementation } from "@grpc/grpc-js";
 export declare const protobufPackage = "sso.permission";
+export interface SyncPermissionsRequest {
+    names: string[];
+}
+export interface SyncPermissionsResponse {
+}
 export interface HasPermissionRequest {
     name: string;
 }
@@ -14,12 +19,23 @@ export interface HasUserPermissionRequest {
 export interface HasUserPermissionResponse {
     hasPermission: boolean;
 }
+export declare const SyncPermissionsRequest: MessageFns<SyncPermissionsRequest>;
+export declare const SyncPermissionsResponse: MessageFns<SyncPermissionsResponse>;
 export declare const HasPermissionRequest: MessageFns<HasPermissionRequest>;
 export declare const HasPermissionResponse: MessageFns<HasPermissionResponse>;
 export declare const HasUserPermissionRequest: MessageFns<HasUserPermissionRequest>;
 export declare const HasUserPermissionResponse: MessageFns<HasUserPermissionResponse>;
 export type PermissionService = typeof PermissionService;
 export declare const PermissionService: {
+    readonly syncPermissions: {
+        readonly path: "/sso.permission.Permission/SyncPermissions";
+        readonly requestStream: false;
+        readonly responseStream: false;
+        readonly requestSerialize: (value: SyncPermissionsRequest) => Buffer<ArrayBuffer>;
+        readonly requestDeserialize: (value: Buffer) => SyncPermissionsRequest;
+        readonly responseSerialize: (value: SyncPermissionsResponse) => Buffer<ArrayBuffer>;
+        readonly responseDeserialize: (value: Buffer) => SyncPermissionsResponse;
+    };
     readonly hasPermission: {
         readonly path: "/sso.permission.Permission/HasPermission";
         readonly requestStream: false;
@@ -40,10 +56,14 @@ export declare const PermissionService: {
     };
 };
 export interface PermissionServer extends UntypedServiceImplementation {
+    syncPermissions: handleUnaryCall<SyncPermissionsRequest, SyncPermissionsResponse>;
     hasPermission: handleUnaryCall<HasPermissionRequest, HasPermissionResponse>;
     hasUserPermission: handleUnaryCall<HasUserPermissionRequest, HasUserPermissionResponse>;
 }
 export interface PermissionClient extends Client {
+    syncPermissions(request: SyncPermissionsRequest, callback: (error: ServiceError | null, response: SyncPermissionsResponse) => void): ClientUnaryCall;
+    syncPermissions(request: SyncPermissionsRequest, metadata: Metadata, callback: (error: ServiceError | null, response: SyncPermissionsResponse) => void): ClientUnaryCall;
+    syncPermissions(request: SyncPermissionsRequest, metadata: Metadata, options: Partial<CallOptions>, callback: (error: ServiceError | null, response: SyncPermissionsResponse) => void): ClientUnaryCall;
     hasPermission(request: HasPermissionRequest, callback: (error: ServiceError | null, response: HasPermissionResponse) => void): ClientUnaryCall;
     hasPermission(request: HasPermissionRequest, metadata: Metadata, callback: (error: ServiceError | null, response: HasPermissionResponse) => void): ClientUnaryCall;
     hasPermission(request: HasPermissionRequest, metadata: Metadata, options: Partial<CallOptions>, callback: (error: ServiceError | null, response: HasPermissionResponse) => void): ClientUnaryCall;

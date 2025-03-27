@@ -14,7 +14,9 @@ import (
 var ErrPermissionNotFound = errors.New("permission not found")
 
 type PermissionRepository interface {
+	Save(ctx context.Context, perm *domain.Permission) error
 	GetPermission(ctx context.Context, name domain.PermName) (*domain.Permission, error)
+	storage.Transactional
 }
 
 type PermissionRoleUseCase interface {
@@ -29,6 +31,34 @@ type permissionUseCase struct {
 
 func NewPermissionUseCase(permRepo PermissionRepository, roleUC PermissionRoleUseCase, log *slog.Logger) *permissionUseCase {
 	return &permissionUseCase{permRepo: permRepo, roleUC: roleUC, log: log}
+}
+
+func (uc *permissionUseCase) SyncPermissions(ctx context.Context, perms []string) error {
+	const op = "usecase.permissionUseCase.SyncPermissions"
+	log := uc.log.With(slog.String("op", op), slog.Any("perms", perms))
+
+	log.Debug("Syncing permissions")
+	err := uc.permRepo.DoInTransaction(ctx, func(ctx context.Context) error {
+		for _, perm := range perms {
+			domainPerm, err := domain.NewPermission(perm)
+			if err != nil {
+				log.Warn("Failed to create domain permission", slog.String("error", err.Error()))
+				return parseDomainErr(err)
+			}
+
+			if err := uc.permRepo.Save(ctx, domainPerm); err != nil {
+				log.Error("Failed to save permission", slog.String("error", err.Error()))
+				return fmt.Errorf("%s: %w", op, err)
+			}
+		}
+		return nil
+	})
+	if err != nil {
+		return err
+	}
+	log.Debug("Permissions synced successfully")
+
+	return nil
 }
 
 func (uc *permissionUseCase) HasPermission(ctx context.Context, userID string, permName string) (bool, error) {

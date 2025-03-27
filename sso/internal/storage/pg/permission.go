@@ -18,6 +18,21 @@ func NewPermissionStorage(pg *Storage) *PermissionStorage {
 	return &PermissionStorage{Storage: pg}
 }
 
+func (s *PermissionStorage) Save(ctx context.Context, perm *domain.Permission) error {
+	const op = "pg.PermissionStorage.Save"
+	const query = `
+    INSERT INTO permissions (id, name) VALUES ($1, $2)
+    ON CONFLICT (name) DO NOTHING
+    `
+
+	_, err := s.ext(ctx).ExecContext(ctx, query, perm.ID, perm.Name)
+	if err != nil {
+		return fmt.Errorf("%s: %w", op, err)
+	}
+
+	return nil
+}
+
 func (s *PermissionStorage) GetPermission(ctx context.Context, name domain.PermName) (*domain.Permission, error) {
 	const op = "pg.PermissionStorage.GetPermission"
 	q, args, err := psql.Select("id", "name").From("permissions").Where("name = ?", name).ToSql()

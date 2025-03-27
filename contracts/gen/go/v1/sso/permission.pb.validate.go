@@ -35,6 +35,210 @@ var (
 	_ = sort.Sort
 )
 
+// Validate checks the field values on SyncPermissionsRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *SyncPermissionsRequest) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on SyncPermissionsRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// SyncPermissionsRequestMultiError, or nil if none found.
+func (m *SyncPermissionsRequest) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *SyncPermissionsRequest) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if len(errors) > 0 {
+		return SyncPermissionsRequestMultiError(errors)
+	}
+
+	return nil
+}
+
+// SyncPermissionsRequestMultiError is an error wrapping multiple validation
+// errors returned by SyncPermissionsRequest.ValidateAll() if the designated
+// constraints aren't met.
+type SyncPermissionsRequestMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m SyncPermissionsRequestMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m SyncPermissionsRequestMultiError) AllErrors() []error { return m }
+
+// SyncPermissionsRequestValidationError is the validation error returned by
+// SyncPermissionsRequest.Validate if the designated constraints aren't met.
+type SyncPermissionsRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e SyncPermissionsRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e SyncPermissionsRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e SyncPermissionsRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e SyncPermissionsRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e SyncPermissionsRequestValidationError) ErrorName() string {
+	return "SyncPermissionsRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e SyncPermissionsRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sSyncPermissionsRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = SyncPermissionsRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = SyncPermissionsRequestValidationError{}
+
+// Validate checks the field values on SyncPermissionsResponse with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *SyncPermissionsResponse) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on SyncPermissionsResponse with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// SyncPermissionsResponseMultiError, or nil if none found.
+func (m *SyncPermissionsResponse) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *SyncPermissionsResponse) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if len(errors) > 0 {
+		return SyncPermissionsResponseMultiError(errors)
+	}
+
+	return nil
+}
+
+// SyncPermissionsResponseMultiError is an error wrapping multiple validation
+// errors returned by SyncPermissionsResponse.ValidateAll() if the designated
+// constraints aren't met.
+type SyncPermissionsResponseMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m SyncPermissionsResponseMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m SyncPermissionsResponseMultiError) AllErrors() []error { return m }
+
+// SyncPermissionsResponseValidationError is the validation error returned by
+// SyncPermissionsResponse.Validate if the designated constraints aren't met.
+type SyncPermissionsResponseValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e SyncPermissionsResponseValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e SyncPermissionsResponseValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e SyncPermissionsResponseValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e SyncPermissionsResponseValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e SyncPermissionsResponseValidationError) ErrorName() string {
+	return "SyncPermissionsResponseValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e SyncPermissionsResponseValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sSyncPermissionsResponse.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = SyncPermissionsResponseValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = SyncPermissionsResponseValidationError{}
+
 // Validate checks the field values on HasPermissionRequest with the rules
 // defined in the proto definition for this message. If any rules are
 // violated, the first error encountered is returned, or nil if there are no violations.

@@ -5,9 +5,16 @@ package sso.permission;
 option go_package = "postique.sso.v1;pb";
 
 service Permission {
+    rpc SyncPermissions (SyncPermissionsRequest) returns (SyncPermissionsResponse);
     rpc HasPermission (HasPermissionRequest) returns (HasPermissionResponse);
     rpc HasUserPermission(HasUserPermissionRequest) returns (HasUserPermissionResponse);
 }
+
+message SyncPermissionsRequest {
+    repeated string names = 1;
+}
+
+message SyncPermissionsResponse {}
 
 message HasPermissionRequest {
     string name = 1; 
