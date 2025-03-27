@@ -8,18 +8,21 @@ import {
   Patch,
   Post,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { randomUUID } from 'crypto';
 
 import * as input from '@/app/boundaries/dto/input';
 import * as output from '@/app/boundaries/dto/output';
 import { PostsService } from './posts.service';
+import { AuthGuard } from '@/infrastructure/common/guards';
 
 @Controller('posts')
 export class PostsController {
   constructor(private readonly _postsService: PostsService) {}
 
   @Post()
+  @UseGuards(AuthGuard)
   async createPost(
     @Body() data: input.CreatePostInput,
   ): Promise<output.CreatePostOutput> {

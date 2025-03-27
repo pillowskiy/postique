@@ -77,10 +77,30 @@ export class Config {
   @IsNotEmpty({ message: 'Cannot be empty' })
   @IsString({ message: 'Must be a string' })
   @Transform(
-    ({ value }) => resolve(__dirname, '../../../../', (value as string) ?? ''),
+    ({ value }) =>
+      resolve(__dirname, '../../../../../', (value as string) ?? ''),
     {
       toClassOnly: true,
     },
   )
   PROTO_PATH: string;
+
+  @IsNotEmpty({ message: 'Cannot be empty' })
+  @IsString({ message: 'Must be a string' })
+  @Transform(
+    ({ value }) =>
+      resolve(__dirname, '../../../../../', (value as string) ?? ''),
+    {
+      toClassOnly: true,
+    },
+  )
+  JWT_KEY_PATH: string;
+
+  @IsNotEmpty({ message: 'Cannot be empty' })
+  @IsString({ message: 'Must be a string' })
+  JWT_ALG: string;
+
+  @IsNotEmpty({ message: 'Cannot be empty' })
+  @IsString({ message: 'Must be a string' })
+  JWT_CRV: string;
 }
