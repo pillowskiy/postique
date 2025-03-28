@@ -7,7 +7,7 @@ import type {
 import { PostPreferencesSchema } from './preferences.schema';
 
 export class PostPreferencesEntity implements IPostPreferences {
-  static empty(): PostPreferencesEntity {
+  static empty(userId?: string): PostPreferencesEntity {
     return new PostPreferencesEntity({
       postsBlacklist: new Set(),
       authorBlacklist: new Set(),
@@ -22,38 +22,40 @@ export class PostPreferencesEntity implements IPostPreferences {
     return new PostPreferencesEntity(validPreferences);
   }
 
+  public readonly userId?: string;
+  public readonly postsBlacklist: Set<string>;
+  public readonly authorBlacklist: Set<string>;
+
   private constructor(preferences: IPostPreferences) {
+    this.userId = preferences.userId;
     this.postsBlacklist = preferences.postsBlacklist;
     this.authorBlacklist = preferences.authorBlacklist;
   }
 
-  public readonly postsBlacklist: Set<string>;
-  public readonly authorBlacklist: Set<string>;
-
   public mutePost(postId: string): void {
-    if (this.isPostMuted(postId)) {
+    if (this.postsBlacklist.has(postId)) {
       throw new DomainBusinessRuleViolation('Post is already muted');
     }
     this.postsBlacklist.add(postId);
   }
 
   public unmutePost(postId: string): void {
-    if (!this.isPostMuted(postId)) {
+    if (!this.postsBlacklist.has(postId)) {
       throw new DomainBusinessRuleViolation('Post is not muted');
     }
     this.postsBlacklist.add(postId);
   }
 
   public muteAuthor(userId: string): void {
-    if (this.isAuthorMuted(userId)) {
-      throw new DomainBusinessRuleViolation('User is already muted');
+    if (this.authorBlacklist.has(userId)) {
+      throw new DomainBusinessRuleViolation('Author is already muted');
     }
     this.authorBlacklist.add(userId);
   }
 
   public unmuteAuthor(userId: string): void {
-    if (this.isAuthorMuted(userId)) {
-      throw new DomainBusinessRuleViolation('User is not muted');
+    if (!this.authorBlacklist.has(userId)) {
+      throw new DomainBusinessRuleViolation('Author is not muted');
     }
     this.authorBlacklist.add(userId);
   }

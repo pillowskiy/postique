@@ -6,9 +6,14 @@ import PreferencesCommandHandlers from '@/app/commands/preferences';
 import { PreferencesRepository } from '@/app/boundaries/repository';
 import { MongoPreferencesRepository } from '@/infrastructure/repository/mongo';
 import { PreferencesService } from './preferences.service';
+import { PreferencesAccessControlListModule } from '@/infrastructure/acl/preferences';
 
 @Module({
-  imports: [MongoModule, CqrsModule.forRoot()],
+  imports: [
+    MongoModule,
+    CqrsModule.forRoot(),
+    PreferencesAccessControlListModule,
+  ],
   controllers: [PreferencesController],
   providers: [
     ...PreferencesCommandHandlers,

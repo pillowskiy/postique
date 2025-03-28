@@ -48,6 +48,7 @@ export class MongoPreferencesRepository extends PreferencesRepository {
 
   #getPreferences(pref: PostPreferences): PostPreferencesEntity {
     return PostPreferencesEntity.create({
+      userId: pref.userId,
       authorBlacklist: new Set(...pref.authorBlacklist),
       postsBlacklist: new Set(...pref.postsBlacklist),
     } satisfies IPostPreferences);
