@@ -19,6 +19,8 @@ export class MongoSeriesRepository extends SeriesRepository {
           _id: series.id,
           title: series.title,
           slug: series.slug,
+          owner: series.owner,
+          visibility: series.visibility,
           description: series.description,
           posts: series.posts,
         } satisfies PostSeries,
@@ -59,6 +61,8 @@ export class MongoSeriesRepository extends SeriesRepository {
     const seriesEntity = PostSeriesEntity.create({
       id: series._id.toString(),
       title: series.title,
+      owner: series.owner,
+      visibility: series.visibility,
       slug: series.slug,
       description: series.description,
       posts: series.posts,

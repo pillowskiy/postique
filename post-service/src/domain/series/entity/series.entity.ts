@@ -1,6 +1,10 @@
 import { DomainBusinessRuleViolation } from '@/domain/common/error';
 import { EntityFactory } from '../../common/entity';
-import type { IncomingPostSeries, IPostSeries } from './series.interface';
+import type {
+  IncomingPostSeries,
+  IPostSeries,
+  PostSeriesVisibility,
+} from './series.interface';
 import { PostSeriesSchema } from './series.schema';
 
 export class PostSeriesEntity implements IPostSeries {
@@ -12,6 +16,8 @@ export class PostSeriesEntity implements IPostSeries {
   public readonly id: string;
   private _title: string;
   private _slug: string;
+  private _owner: string;
+  private _visibility: PostSeriesVisibility;
   private _description: string = '';
   private _posts: string[] = [];
 
@@ -19,6 +25,8 @@ export class PostSeriesEntity implements IPostSeries {
     this.id = series.id;
     this._title = series.title;
     this._slug = series.slug;
+    this._owner = series.owner;
+    this._visibility = series.visibility;
     this._description = series.description;
     this._posts = [...series.posts];
   }
@@ -29,6 +37,14 @@ export class PostSeriesEntity implements IPostSeries {
 
   get slug(): string {
     return this._slug;
+  }
+
+  get owner(): string {
+    return this._owner;
+  }
+
+  get visibility(): PostSeriesVisibility {
+    return this._visibility;
   }
 
   get description(): string {
@@ -60,6 +76,10 @@ export class PostSeriesEntity implements IPostSeries {
 
   updateDescription(description: string): void {
     this._description = description;
+  }
+
+  changeVisibility(visibility: PostSeriesVisibility): void {
+    this._visibility = visibility;
   }
 
   private _hasPost(postId: string): boolean {

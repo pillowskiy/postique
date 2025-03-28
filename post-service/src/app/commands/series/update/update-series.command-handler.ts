@@ -5,12 +5,17 @@ import { Inject } from '@nestjs/common';
 import { SeriesRepository } from '@/app/boundaries/repository';
 import { UpdateSeriesOutput } from '@/app/boundaries/dto/output';
 import slugify from 'slugify';
+import { SeriesAccessControlList } from '@/app/boundaries/acl';
+import { ForbiddenException } from '@/app/boundaries/errors';
 
 @CommandHandler(UpdateSeriesCommand)
 export class UpdateSeriesCommandHandler extends Command<
   UpdateSeriesCommand,
   UpdateSeriesOutput
 > {
+  @Inject(SeriesAccessControlList)
+  private readonly _seriesACL: SeriesAccessControlList;
+
   @Inject(SeriesRepository)
   private readonly _seriesRepository: SeriesRepository;
 
@@ -20,6 +25,16 @@ export class UpdateSeriesCommandHandler extends Command<
     const series = await this._seriesRepository.getById(input.seriesId);
     if (!series) {
       throw new Error('Series does not exist');
+    }
+
+    const hasPermission = await this._seriesACL.canModify(
+      input.initiatedBy,
+      series,
+    );
+    if (!hasPermission) {
+      throw new ForbiddenException(
+        'You do not have permission to modify this series',
+      );
     }
 
     if (input.series.title) {

@@ -6,18 +6,31 @@ import {
   MaxLength,
   IsArray,
   ArrayNotEmpty,
+  IsEnum,
+  IsNotEmpty,
 } from 'class-validator';
-import { IPostSeries } from './series.interface';
+import { IPostSeries, PostSeriesVisibility } from './series.interface';
+import { randomUUID } from 'crypto';
 
 export class PostSeriesSchema implements IPostSeries {
-  @IsUUID('4', { message: 'id must be a valid UUID v4' })
-  id: string;
+  @IsUUID('4', { message: 'Series id must be a valid UUID v4' })
+  id: string = randomUUID();
 
   @IsString({ message: 'Series title must be a string' })
   @Length(2, 256, {
     message: 'Series title must be between 2 and 256 characters',
   })
   title: string;
+
+  @IsUUID('4', { message: 'Series owner must be a valid reference' })
+  owner: string;
+
+  @IsNotEmpty({ message: 'Visibility cannot be empty' })
+  @IsString({ message: 'Visibility must be a string' })
+  @IsEnum(PostSeriesVisibility, {
+    message: 'Visibility must be one of the following values',
+  })
+  visibility: PostSeriesVisibility = PostSeriesVisibility.Public;
 
   @IsString({ message: 'Series slug must be a string' })
   @Length(2, 256, {

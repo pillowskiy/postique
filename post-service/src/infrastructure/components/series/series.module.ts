@@ -9,9 +9,10 @@ import {
 } from '@/infrastructure/repository/mongo';
 import { SeriesController } from './series.controller';
 import { SeriesService } from './series.service';
+import { SeriesAccessControlListModule } from '@/infrastructure/acl/series';
 
 @Module({
-  imports: [MongoModule, CqrsModule.forRoot()],
+  imports: [MongoModule, CqrsModule.forRoot(), SeriesAccessControlListModule],
   controllers: [SeriesController],
   providers: [
     ...SeriesCommandHandlers,
