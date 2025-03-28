@@ -5,6 +5,7 @@ import {
 import {
   CreateSeriesOutput,
   DeleteSeriesOutput,
+  Series,
   UpdateSeriesOutput,
 } from '@/app/boundaries/dto/output';
 import { AddSeriesPostCommand } from '@/app/commands/series/add-post';
@@ -12,12 +13,17 @@ import { CreateSeriesCommand } from '@/app/commands/series/create';
 import { DeleteSeriesCommand } from '@/app/commands/series/delete';
 import { RemoveSeriesPostCommand } from '@/app/commands/series/remove-post';
 import { UpdateSeriesCommand } from '@/app/commands/series/update';
+import { GetMySeriesesQuery } from '@/app/queries/series/get-my-serieses';
+import { GetPostSeriesesQuery } from '@/app/queries/series/get-post-serieses';
 import { Injectable } from '@nestjs/common';
-import { CommandBus } from '@nestjs/cqrs';
+import { CommandBus, QueryBus } from '@nestjs/cqrs';
 
 @Injectable()
 export class SeriesService {
-  constructor(private readonly _commandBus: CommandBus) {}
+  constructor(
+    private readonly _commandBus: CommandBus,
+    private readonly _queryBus: QueryBus,
+  ) {}
 
   async createSeries(
     series: CreateSeriesInput,
@@ -64,6 +70,22 @@ export class SeriesService {
   ): Promise<void> {
     return this._commandBus.execute<RemoveSeriesPostCommand, void>(
       new RemoveSeriesPostCommand(seriesId, postId, initiatedBy),
+    );
+  }
+
+  async getPostSerieses(postId: string, userId?: string): Promise<Series[]> {
+    return this._queryBus.execute<GetPostSeriesesQuery, Series[]>(
+      new GetPostSeriesesQuery(postId, userId),
+    );
+  }
+
+  async getUserSerieses(
+    userId: string,
+    take: number,
+    skip: number,
+  ): Promise<Series[]> {
+    return this._queryBus.execute<GetMySeriesesQuery, Series[]>(
+      new GetMySeriesesQuery(userId, take, skip),
     );
   }
 }

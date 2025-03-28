@@ -1,7 +1,12 @@
 import { SeriesRepository } from '@/app/boundaries/repository';
-import { IPostSeries, PostSeriesEntity } from '@/domain/series';
+import {
+  IPostSeries,
+  PostSeriesEntity,
+  PostSeriesVisibility,
+} from '@/domain/series';
 import { InjectModel, models, Schemas } from '@/infrastructure/database/mongo';
 import { PostSeries } from '@/infrastructure/database/mongo/schemas';
+import { FilterQuery } from 'mongoose';
 
 export class MongoSeriesRepository extends SeriesRepository {
   constructor(
@@ -55,6 +60,50 @@ export class MongoSeriesRepository extends SeriesRepository {
       throw new Error('Could not delete post');
     }
     return query.deletedCount === 1;
+  }
+
+  async getPostSerieses(
+    postId: string,
+    userId: string,
+  ): Promise<PostSeriesEntity[]> {
+    // TEMP: It is not responsibility of the infrastructure layer.
+    // Transition to cursor (async iterable) and application layer specification.
+    const orCondition: FilterQuery<PostSeries>[] = [
+      { visibility: PostSeriesVisibility.Public },
+    ];
+
+    if (userId) {
+      orCondition.push({
+        visibility: PostSeriesVisibility.Private,
+        owner: userId,
+      });
+    }
+
+    const serieses = await this._seriesModel
+      .find({
+        posts: { $has: postId },
+        $or: orCondition,
+      })
+      .lean();
+
+    return serieses.map((series) => this.#getSeriesEntity(series));
+  }
+
+  async getUserSerieses(
+    userId: string,
+    take: number,
+    skip: number,
+  ): Promise<PostSeriesEntity[]> {
+    const serieses = await this._seriesModel
+      .find({
+        owner: userId,
+        visibility: PostSeriesVisibility.Public,
+      })
+      .limit(take)
+      .skip(skip)
+      .lean();
+
+    return serieses.map((series) => this.#getSeriesEntity(series));
   }
 
   #getSeriesEntity(series: PostSeries): PostSeriesEntity {

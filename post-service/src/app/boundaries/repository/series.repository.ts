@@ -5,4 +5,15 @@ export abstract class SeriesRepository {
   abstract delete(id: string): Promise<boolean>;
   abstract getBySlug(slug: string): Promise<PostSeriesEntity | null>;
   abstract getById(id: string): Promise<PostSeriesEntity | null>;
+
+  abstract getPostSerieses(
+    postId: string,
+    userId?: string,
+  ): Promise<PostSeriesEntity[]>;
+
+  abstract getUserSerieses(
+    userId: string,
+    take: number,
+    skip: number,
+  ): Promise<PostSeriesEntity[]>;
 }

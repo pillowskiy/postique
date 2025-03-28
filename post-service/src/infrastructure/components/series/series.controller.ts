@@ -6,6 +6,8 @@ import {
   Delete,
   Body,
   UseGuards,
+  Get,
+  Query,
 } from '@nestjs/common';
 import { SeriesService } from './series.service';
 import * as input from '@/app/boundaries/dto/input';
@@ -58,5 +60,22 @@ export class SeriesController {
     @Param('postId') postId: string,
   ): Promise<void> {
     return this._seriesService.removePost(seriesId, postId, randomUUID());
+  }
+
+  @Get()
+  @UseGuards(AuthGuard)
+  async getUserSerieses(
+    @Query('take') take: number,
+    @Query('skip') skip: number,
+  ): Promise<output.Series[]> {
+    return this._seriesService.getUserSerieses(randomUUID(), take, skip);
+  }
+
+  @Get(':postId')
+  @UseGuards(AuthGuard)
+  async getPostSerieses(
+    @Param('postId') postId: string,
+  ): Promise<output.Series[]> {
+    return this._seriesService.getPostSerieses(postId, randomUUID());
   }
 }
