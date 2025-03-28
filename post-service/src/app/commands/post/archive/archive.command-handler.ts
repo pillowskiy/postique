@@ -22,7 +22,7 @@ export class ArchivePostCommandHandler extends Command<
       throw new NotFoundException('Post does not exist');
     }
 
-    post.archive();
+    //post.archive();
     await this._postRepository.save(post);
 
     return new ArchivePostOutput();

@@ -14,8 +14,8 @@ import { randomUUID } from 'crypto';
 
 import * as input from '@/app/boundaries/dto/input';
 import * as output from '@/app/boundaries/dto/output';
-import { PostsService } from './posts.service';
 import { AuthGuard } from '@/infrastructure/common/guards';
+import { PostsService } from './posts.service';
 
 @Controller('posts')
 export class PostsController {
@@ -30,6 +30,7 @@ export class PostsController {
   }
 
   @Patch(':id/visibility')
+  @UseGuards(AuthGuard)
   async changePostVisibility(
     @Param('id') id: string,
     @Body('visibility') visibility: string,
@@ -38,6 +39,7 @@ export class PostsController {
   }
 
   @Patch(':id/archive')
+  @UseGuards(AuthGuard)
   async archivePost(
     @Param('id') id: string,
   ): Promise<output.ArchivePostOutput> {
@@ -45,16 +47,19 @@ export class PostsController {
   }
 
   @Patch(':id/publish')
+  @UseGuards(AuthGuard)
   async publishPost(@Param('id') id: string): Promise<output.Post> {
     return this._postsService.publishPost(id);
   }
 
   @Delete(':id')
+  @UseGuards(AuthGuard)
   async deletePost(@Param('id') id: string): Promise<output.DeletePostOutput> {
     return this._postsService.deletePost(id);
   }
 
   @Patch(':id/transfer')
+  @UseGuards(AuthGuard)
   async transferPostOwnership(
     @Param('id') id: string,
     @Body('newOwner') newOwner: string,
@@ -63,6 +68,7 @@ export class PostsController {
   }
 
   @Patch(':id/delta')
+  @UseGuards(AuthGuard)
   async deltaSave(
     @Param('id') id: string,
     @Body('deltas') deltas: input.Delta[],

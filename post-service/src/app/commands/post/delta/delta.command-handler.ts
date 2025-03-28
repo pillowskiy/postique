@@ -8,16 +8,20 @@ import { Inject } from '@nestjs/common';
 import { CommandHandler } from '@nestjs/cqrs';
 import { Command } from '../../common';
 import { DeltaSaveCommand } from './delta.command';
-import { NotFoundException } from '@/app/boundaries/errors';
+import { NotFoundException, ForbiddenException } from '@/app/boundaries/errors';
 import { DeltaGroup } from '@/domain/content/delta/delta.entity';
 import { ContentChangeStrategy } from '@/domain/content/strategy/delta-update.strategy';
 import { Logger } from '@/app/boundaries/common';
+import { PostAccessControlList } from '@/app/boundaries/acl';
 
 @CommandHandler(DeltaSaveCommand)
 export class DeltaSaveCommandHandler extends Command<
   DeltaSaveCommand,
   DeltaSaveOutput
 > {
+  @Inject(PostAccessControlList)
+  private readonly _postACL: PostAccessControlList;
+
   @Inject(PostRepository)
   private readonly _postRepository: PostRepository;
 
@@ -37,6 +41,13 @@ export class DeltaSaveCommandHandler extends Command<
     const post = await this._postRepository.getById(input.postId);
     if (!post) {
       throw new NotFoundException('Post does not exist');
+    }
+
+    const hasPermission = await this._postACL.canModify(post.owner, post);
+    if (!hasPermission) {
+      throw new ForbiddenException(
+        'You do not have permission to modify this post',
+      );
     }
 
     const paragraphIds = await this._contentRepository.getPlainParagraphs(

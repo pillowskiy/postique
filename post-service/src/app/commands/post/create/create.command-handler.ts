@@ -1,6 +1,10 @@
 import { Logger } from '@/app/boundaries/common';
 import { CreatePostOutput } from '@/app/boundaries/dto/output';
-import { ConflictException, NotFoundException } from '@/app/boundaries/errors';
+import {
+  ConflictException,
+  ForbiddenException,
+  NotFoundException,
+} from '@/app/boundaries/errors';
 import {
   ContentRepository,
   PostRepository,
@@ -12,12 +16,16 @@ import { Inject } from '@nestjs/common';
 import { CommandHandler } from '@nestjs/cqrs';
 import slugify from 'slugify';
 import { CreatePostCommand } from './create.command';
+import { PostAccessControlList } from '@/app/boundaries/acl';
 
 @CommandHandler(CreatePostCommand)
 export class CreatePostCommandHandler extends Command<
   CreatePostCommand,
   CreatePostOutput
 > {
+  @Inject(PostAccessControlList)
+  private readonly _postACL: PostAccessControlList;
+
   @Inject(PostRepository)
   private readonly _postRepository: PostRepository;
 
@@ -47,6 +55,13 @@ export class CreatePostCommandHandler extends Command<
       visibility: visibility ?? PostVisibility.Public.toString(),
       ...restPost,
     });
+
+    const hasPermission = await this._postACL.canCreate(initiatedBy, post);
+    if (!hasPermission) {
+      throw new ForbiddenException(
+        'You do not have permission to create this post',
+      );
+    }
 
     const storedPost = await this._postRepository.getBySlug(post.slug);
     if (storedPost) {

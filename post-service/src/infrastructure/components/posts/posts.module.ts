@@ -19,10 +19,10 @@ import { CqrsModule } from '@nestjs/cqrs';
 import { PostsController } from './posts.controller';
 import { PostsService } from './posts.service';
 import { PreferencesRepository } from '@/app/boundaries/repository/preferences.repository';
-import { PermissionModule } from '@/infrastructure/service/permission';
+import { PostAccessControlListModule } from '@/infrastructure/acl/post';
 
 @Module({
-  imports: [MongoModule, CqrsModule.forRoot(), PermissionModule],
+  imports: [MongoModule, CqrsModule.forRoot(), PostAccessControlListModule],
   controllers: [PostsController],
   providers: [
     ...PostCommandHandlers,
