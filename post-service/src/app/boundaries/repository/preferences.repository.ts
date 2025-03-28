@@ -5,5 +5,6 @@ export abstract class PreferencesRepository {
     userId: string,
     preferences: PostPreferencesEntity,
   ): Promise<void>;
+
   abstract preferences(userId: string): Promise<PostPreferencesEntity>;
 }

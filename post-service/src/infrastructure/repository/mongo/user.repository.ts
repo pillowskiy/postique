@@ -45,6 +45,11 @@ export class MongoUserRepository extends UserRepository {
     return this._getUserEntity(user);
   }
 
+  async findManyUsers(ids: string[]): Promise<UserEntity[]> {
+    const users = await this._userModel.find({ _id: { $in: ids } }).lean();
+    return users.map((user) => this._getUserEntity(user));
+  }
+
   private _getUserFields(user: UserEntity): User {
     return {
       _id: user.id,

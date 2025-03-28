@@ -140,6 +140,11 @@ export class MongoPostRepository extends PostRepository {
     }
   }
 
+  async findManyPosts(ids: string[]): Promise<PostEntity[]> {
+    const posts = await this._postModel.find({ _id: { $in: ids } }).lean();
+    return posts.map((post) => this.#getPostEntity(post));
+  }
+
   #getPostEntity(post: Post): PostEntity {
     const postAggregate = PostEntity.create({
       id: post._id.toString(),

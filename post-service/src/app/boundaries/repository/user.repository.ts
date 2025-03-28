@@ -8,4 +8,5 @@ export abstract class UserRepository {
     username: string,
     email: string,
   ): Promise<UserEntity | null>;
+  abstract findManyUsers(ids: string[]): Promise<UserEntity[]>;
 }
