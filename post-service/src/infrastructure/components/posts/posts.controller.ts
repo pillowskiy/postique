@@ -15,9 +15,12 @@ import { randomUUID } from 'crypto';
 
 import * as input from '@/app/boundaries/dto/input';
 import * as output from '@/app/boundaries/dto/output';
-import { AuthGuard } from '@/infrastructure/common/guards';
+import { AuthGuard, OptionalAuthGuard } from '@/infrastructure/common/guards';
 import { PostsService } from './posts.service';
-import { InitiatedBy } from '@/infrastructure/common/decorators';
+import {
+  InitiatedBy,
+  OptionalInitiatedBy,
+} from '@/infrastructure/common/decorators';
 
 @Controller('posts')
 export class PostsController {
@@ -97,13 +100,14 @@ export class PostsController {
     return this._postsService.deltaSave(postId, deltas, initiatedBy);
   }
 
-  @Get('/cursor/:userId')
+  @Get('/cursor')
+  @UseGuards(OptionalAuthGuard)
   async getPosts(
-    @Param('userId', ParseUUIDPipe) userId: string,
     @Query('cursor') cursor: string,
     @Query('take') take: number,
+    @OptionalInitiatedBy() initiatedBy: string,
   ): Promise<output.CursorOutput<output.PostOutput>> {
-    return this._postsService.getPosts(userId, take, cursor);
+    return this._postsService.getPosts(initiatedBy, take, cursor);
   }
 
   @Get('/:slug')

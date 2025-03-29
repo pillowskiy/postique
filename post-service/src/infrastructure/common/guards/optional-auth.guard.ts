@@ -12,10 +12,6 @@ export class OptionalAuthGuard
   implements OnModuleInit, CanActivate
 {
   override async canActivate(context: ExecutionContext): Promise<boolean> {
-    try {
-      return super.canActivate(context);
-    } catch (err) {
-      return true;
-    }
+    return super.canActivate(context).catch(() => true);
   }
 }
