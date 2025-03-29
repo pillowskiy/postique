@@ -1,4 +1,4 @@
-import { Post } from '@/app/boundaries/dto/output';
+import { PostOutput } from '@/app/boundaries/dto/output';
 import {
   NotFoundException,
   ValidationException,
@@ -15,7 +15,7 @@ import { PostAccessControlList } from '@/app/boundaries/acl';
 @CommandHandler(ChangePostVisibilityCommand)
 export class ChangePostVisibilityCommandHandler extends Command<
   ChangePostVisibilityCommand,
-  Post
+  PostOutput
 > {
   @Inject(PostAccessControlList)
   private readonly _postACL: PostAccessControlList;
@@ -23,7 +23,9 @@ export class ChangePostVisibilityCommandHandler extends Command<
   @Inject(PostRepository)
   private readonly _postRepository: PostRepository;
 
-  protected async invoke(input: ChangePostVisibilityCommand): Promise<Post> {
+  protected async invoke(
+    input: ChangePostVisibilityCommand,
+  ): Promise<PostOutput> {
     const post = await this._postRepository.getById(input.postId);
     if (!post) {
       throw new NotFoundException('Post does not exist');

@@ -39,6 +39,6 @@ export class TransferPostOwnershipCommandHandler extends Command<
     post.transferOwnership(input.newOwner);
     await this._postRepository.save(post);
 
-    return new TransferPostOwnershipOutput();
+    return new TransferPostOwnershipOutput(post.id);
   }
 }

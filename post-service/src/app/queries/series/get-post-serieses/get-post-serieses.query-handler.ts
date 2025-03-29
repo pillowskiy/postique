@@ -2,17 +2,17 @@ import { Inject } from '@nestjs/common';
 import { Query } from '../../common';
 import { GetPostSeriesesQuery } from './get-post-serieses.query';
 import { SeriesRepository } from '@/app/boundaries/repository';
-import { Series } from '@/app/boundaries/dto/output';
+import { SeriesOutput } from '@/app/boundaries/dto/output';
 import { SeriesMapper } from '@/app/boundaries/mapper/series.mapper';
 
 export class GetPostSeriesesQueryHandler extends Query<
   GetPostSeriesesQuery,
-  Series[]
+  SeriesOutput[]
 > {
   @Inject(SeriesRepository)
   private readonly _seriesRepository: SeriesRepository;
 
-  protected async invoke(input: GetPostSeriesesQuery): Promise<Series[]> {
+  protected async invoke(input: GetPostSeriesesQuery): Promise<SeriesOutput[]> {
     const serieses = await this._seriesRepository.getPostSerieses(
       input.postId,
       input.initiatedBy,

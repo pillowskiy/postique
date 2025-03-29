@@ -1,6 +1,4 @@
-export class Post {
-  _paragraphs: PostParagraph[] = [];
-
+export class PostOutput {
   constructor(
     public readonly id: string,
     public readonly visibility: string,
@@ -12,28 +10,35 @@ export class Post {
     public readonly createdAt: Date,
     public readonly updatedAt: Date,
   ) {}
-
-  public get paragraphs(): Readonly<PostParagraph[]> {
-    return this._paragraphs;
-  }
-
-  appendParagraph(paragraph: PostParagraph) {
-    this._paragraphs.push(paragraph);
-  }
 }
 
-export class PostParagraph {
+export class DetailedPostOutput implements PostOutput {
+  constructor(
+    public readonly id: string,
+    public readonly visibility: string,
+    public readonly owner: string,
+    public readonly authors: string[],
+    public readonly slug: string,
+    public readonly status: string,
+    public readonly publishedAt: Date | null,
+    public readonly createdAt: Date,
+    public readonly updatedAt: Date,
+    public readonly paragraphs: PostParagraphOutput[],
+  ) {}
+}
+
+export class PostParagraphOutput {
   constructor(
     public readonly name: string,
     public readonly type: number,
     public readonly text: string,
-    public readonly markups: PostMarkup[],
-    public readonly metadata?: ImageMetadata,
-    public readonly codeMetadata?: CodeMetadata,
+    public readonly markups: PostMarkupOutput[],
+    public readonly metadata?: ImageMetadataOutput,
+    public readonly codeMetadata?: CodeMetadataOutput,
   ) {}
 }
 
-export class PostMarkup {
+export class PostMarkupOutput {
   constructor(
     public readonly type: number,
     public readonly start: number,
@@ -42,7 +47,7 @@ export class PostMarkup {
   ) {}
 }
 
-export class ImageMetadata {
+export class ImageMetadataOutput {
   constructor(
     public readonly src: string,
     public readonly originalWidth: number,
@@ -50,7 +55,7 @@ export class ImageMetadata {
   ) {}
 }
 
-export class CodeMetadata {
+export class CodeMetadataOutput {
   constructor(
     public readonly language: string,
     public readonly spellcheck: boolean,
@@ -61,10 +66,14 @@ export class CreatePostOutput {
   constructor(public readonly postId: string) {}
 }
 
-export class ArchivePostOutput {}
+export class ArchivePostOutput {
+  constructor(public readonly postId: string) {}
+}
 
 export class DeletePostOutput {
   constructor(public readonly postId: string) {}
 }
 
-export class TransferPostOwnershipOutput {}
+export class TransferPostOwnershipOutput {
+  constructor(public readonly postId: string) {}
+}

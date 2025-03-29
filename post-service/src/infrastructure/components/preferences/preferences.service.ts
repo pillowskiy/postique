@@ -1,12 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import {
-  Post,
+  PostOutput,
   ToggleAuthorOutput,
   TogglePostOutput,
-  User,
+  UserOutput,
+  PaginatedOutput,
 } from '@/app/boundaries/dto/output';
-import { Paginated } from '@/app/boundaries/dto/output/paginated.dto';
 import { ToggleAuthorCommand } from '@/app/commands/preferences/toggle-author';
 import { TogglePostCommand } from '@/app/commands/preferences/toggle-post';
 import { GetAuthorBlacklistQuery } from '@/app/queries/preferences/get-author-blacklist';
@@ -38,19 +38,21 @@ export class PreferencesService {
     userId: string,
     take: number,
     skip: number,
-  ): Promise<Paginated<User>> {
-    return this._queryBus.execute<GetAuthorBlacklistQuery, Paginated<User>>(
-      new GetAuthorBlacklistQuery(userId, take, skip),
-    );
+  ): Promise<PaginatedOutput<UserOutput>> {
+    return this._queryBus.execute<
+      GetAuthorBlacklistQuery,
+      PaginatedOutput<UserOutput>
+    >(new GetAuthorBlacklistQuery(userId, take, skip));
   }
 
   async getPostsBlacklist(
     userId: string,
     take: number,
     skip: number,
-  ): Promise<Paginated<Post>> {
-    return this._queryBus.execute<GetPostsBlacklistQuery, Paginated<Post>>(
-      new GetPostsBlacklistQuery(userId, take, skip),
-    );
+  ): Promise<PaginatedOutput<PostOutput>> {
+    return this._queryBus.execute<
+      GetPostsBlacklistQuery,
+      PaginatedOutput<PostOutput>
+    >(new GetPostsBlacklistQuery(userId, take, skip));
   }
 }

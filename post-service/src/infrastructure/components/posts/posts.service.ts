@@ -1,13 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import {
-  Post,
+  PostOutput,
+  DetailedPostOutput,
   ArchivePostOutput,
   TransferPostOwnershipOutput,
   DeletePostOutput,
   CreatePostOutput,
   DeltaSaveOutput,
-  Cursor,
+  CursorOutput,
 } from '@/app/boundaries/dto/output';
 import { CreatePostInput, Delta } from '@/app/boundaries/dto/input';
 
@@ -25,8 +26,6 @@ import { GetPostListQuery } from '@/app/queries/post/get-post-list';
 
 @Injectable()
 export class PostsService {
-  private readonly initiatorId: string = '5bd6a8f6-2c66-4464-9e35-5cc77ac3a4f8';
-
   constructor(
     private readonly _commandBus: CommandBus,
     private readonly _queryBus: QueryBus,
@@ -37,55 +36,66 @@ export class PostsService {
     { title, visibility, description }: CreatePostInput,
   ): Promise<CreatePostOutput> {
     return this._commandBus.execute<CreatePostCommand, CreatePostOutput>(
-      new CreatePostCommand(title, description, visibility, this.initiatorId),
+      new CreatePostCommand(title, description, visibility, owner),
     );
   }
 
   public async changePostVisibility(
     postId: string,
     visibility: string,
-  ): Promise<Post> {
-    return this._commandBus.execute<ChangePostVisibilityCommand, Post>(
-      new ChangePostVisibilityCommand(postId, visibility, ''),
+    initiatedBy: string,
+  ): Promise<PostOutput> {
+    return this._commandBus.execute<ChangePostVisibilityCommand, PostOutput>(
+      new ChangePostVisibilityCommand(postId, visibility, initiatedBy),
     );
   }
 
-  public async archivePost(postId: string): Promise<ArchivePostOutput> {
+  public async archivePost(
+    postId: string,
+    initiatedBy: string,
+  ): Promise<ArchivePostOutput> {
     return this._commandBus.execute<ArchivePostCommand, ArchivePostOutput>(
-      new ArchivePostCommand(postId, ''),
+      new ArchivePostCommand(postId, initiatedBy),
     );
   }
 
-  public async publishPost(postId: string): Promise<Post> {
-    return this._commandBus.execute<PublishPostCommand, Post>(
-      new PublishPostCommand(postId, ''),
+  public async publishPost(
+    postId: string,
+    initiatedBy: string,
+  ): Promise<PostOutput> {
+    return this._commandBus.execute<PublishPostCommand, PostOutput>(
+      new PublishPostCommand(postId, initiatedBy),
     );
   }
 
-  public async deletePost(postId: string): Promise<DeletePostOutput> {
+  public async deletePost(
+    postId: string,
+    initiatedBy: string,
+  ): Promise<DeletePostOutput> {
     return this._commandBus.execute<DeletePostCommand, DeletePostOutput>(
-      new DeletePostCommand(postId, ''),
+      new DeletePostCommand(postId, initiatedBy),
     );
   }
 
-  public async deltaSave(postId: string, deltas: Delta[]) {
+  public async deltaSave(postId: string, deltas: Delta[], initiatedBy: string) {
     return this._commandBus.execute<DeltaSaveCommand, DeltaSaveOutput>(
-      new DeltaSaveCommand(postId, deltas),
+      new DeltaSaveCommand(postId, deltas, initiatedBy),
     );
   }
 
   public async transferPostOwnership(
     postId: string,
     newOwner: string,
+    initiatedBy: string,
   ): Promise<TransferPostOwnershipOutput> {
     return this._commandBus.execute<
       TransferPostOwnershipCommand,
       TransferPostOwnershipOutput
-    >(new TransferPostOwnershipCommand(postId, newOwner, ''));
+    >(new TransferPostOwnershipCommand(postId, newOwner, initiatedBy));
   }
 
-  public async getPost(slug: string): Promise<Post> {
-    return this._queryBus.execute<GetDetailedPostQuery, Post>(
+  public async getPost(slug: string): Promise<DetailedPostOutput> {
+    return this._queryBus.execute<GetDetailedPostQuery, DetailedPostOutput>(
       new GetDetailedPostQuery(slug),
     );
   }
@@ -94,9 +104,9 @@ export class PostsService {
     userId: string,
     take: number,
     cursor: string = new Date().toISOString(),
-  ): Promise<Cursor<Post>> {
-    return this._queryBus.execute<GetPostListQuery, Cursor<Post>>(
-      new GetPostListQuery(this.initiatorId, take, cursor),
+  ): Promise<CursorOutput<PostOutput>> {
+    return this._queryBus.execute<GetPostListQuery, CursorOutput<PostOutput>>(
+      new GetPostListQuery(userId, take, cursor),
     );
   }
 
@@ -104,29 +114,24 @@ export class PostsService {
     userId: string,
     take: number,
     skip: number,
-  ): Promise<Post[]> {
-    return this._getByStatus(PostStatus.Draft, this.initiatorId, take, skip);
+  ): Promise<PostOutput[]> {
+    return this._getByStatus(PostStatus.Draft, userId, take, skip);
   }
 
   public async getPublished(
     userId: string,
     take: number,
     skip: number,
-  ): Promise<Post[]> {
-    return this._getByStatus(
-      PostStatus.Published,
-      this.initiatorId,
-      take,
-      skip,
-    );
+  ): Promise<PostOutput[]> {
+    return this._getByStatus(PostStatus.Published, userId, take, skip);
   }
 
   public async getArchived(
     userId: string,
     take: number,
     skip: number,
-  ): Promise<Post[]> {
-    return this._getByStatus(PostStatus.Archived, this.initiatorId, take, skip);
+  ): Promise<PostOutput[]> {
+    return this._getByStatus(PostStatus.Archived, userId, take, skip);
   }
 
   private _getByStatus(
@@ -134,9 +139,9 @@ export class PostsService {
     userId: string,
     take: number,
     skip: number,
-  ): Promise<Post[]> {
-    return this._queryBus.execute<GetMyPostsQuery, Post[]>(
-      new GetMyPostsQuery(status, this.initiatorId, take, skip),
+  ): Promise<PostOutput[]> {
+    return this._queryBus.execute<GetMyPostsQuery, PostOutput[]>(
+      new GetMyPostsQuery(status, userId, take, skip),
     );
   }
 }

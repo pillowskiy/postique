@@ -1,1 +1,3 @@
-export class DeltaSaveOutput {}
+export class DeltaSaveOutput {
+  constructor(public readonly postId: string) {}
+}

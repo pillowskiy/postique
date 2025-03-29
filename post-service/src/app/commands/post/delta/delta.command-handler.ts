@@ -78,7 +78,7 @@ export class DeltaSaveCommandHandler extends Command<
 
     await this._contentRepository.save(post.content, paragraphs);
 
-    return new DeltaSaveOutput();
+    return new DeltaSaveOutput(post.id);
   }
 
   private async applyChanges(

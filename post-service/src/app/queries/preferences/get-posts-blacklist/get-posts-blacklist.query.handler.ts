@@ -5,8 +5,8 @@ import {
   PostRepository,
   PreferencesRepository,
 } from '@/app/boundaries/repository';
-import { Paginated } from '@/app/boundaries/dto/output/paginated.dto';
-import { Post } from '@/app/boundaries/dto/output';
+import { PaginatedOutput } from '@/app/boundaries/dto/output/paginated.dto';
+import { PostOutput } from '@/app/boundaries/dto/output';
 import { GetPostsBlacklistQuery } from './get-posts-blacklist.query';
 import { PostMapper } from '@/app/boundaries/mapper';
 import { ArrayUtils } from '@/utils/array';
@@ -14,7 +14,7 @@ import { ArrayUtils } from '@/utils/array';
 @QueryHandler(GetPostsBlacklistQuery)
 export class GetPostsBlacklistQueryHandler extends Query<
   GetPostsBlacklistQuery,
-  Paginated<Post>
+  PaginatedOutput<PostOutput>
 > {
   @Inject(PostRepository)
   private readonly _postRepository: PostRepository;
@@ -24,11 +24,11 @@ export class GetPostsBlacklistQueryHandler extends Query<
 
   protected async invoke(
     input: GetPostsBlacklistQuery,
-  ): Promise<Paginated<Post>> {
+  ): Promise<PaginatedOutput<PostOutput>> {
     const pref = await this._preferencesRepository.preferences(input.userId);
 
     if (!pref) {
-      return new Paginated<Post>([], 0, 1);
+      return PaginatedOutput.empty<PostOutput>();
     }
 
     const postsBlacklist = ArrayUtils.fromSetWithOffset(
@@ -42,6 +42,6 @@ export class GetPostsBlacklistQueryHandler extends Query<
     const count = pref.postsBlacklist.size;
     const page = Math.floor(count / input.take) + 1;
 
-    return new Paginated<Post>(postsOutput, count, page);
+    return new PaginatedOutput(postsOutput, count, page);
   }
 }

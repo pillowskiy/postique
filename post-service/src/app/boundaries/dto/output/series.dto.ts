@@ -8,7 +8,7 @@ export class DeleteSeriesOutput extends IdentifierHolderOutput {}
 
 export class UpdateSeriesOutput extends IdentifierHolderOutput {}
 
-export class Series {
+export class SeriesOutput {
   constructor(
     public readonly id: string,
     public readonly title: string,
@@ -16,6 +16,5 @@ export class Series {
     public readonly owner: string,
     public readonly visibility: string,
     public readonly description: string,
-    public readonly posts: Readonly<string[]>,
   ) {}
 }

@@ -5,6 +5,7 @@ import {
   Delete,
   Get,
   Param,
+  ParseUUIDPipe,
   Patch,
   Post,
   Query,
@@ -16,6 +17,7 @@ import * as input from '@/app/boundaries/dto/input';
 import * as output from '@/app/boundaries/dto/output';
 import { AuthGuard } from '@/infrastructure/common/guards';
 import { PostsService } from './posts.service';
+import { InitiatedBy } from '@/infrastructure/common/decorators';
 
 @Controller('posts')
 export class PostsController {
@@ -25,67 +27,87 @@ export class PostsController {
   @UseGuards(AuthGuard)
   async createPost(
     @Body() data: input.CreatePostInput,
+    @InitiatedBy() initiatedBy: string,
   ): Promise<output.CreatePostOutput> {
-    return this._postsService.createPost(randomUUID(), data);
+    return this._postsService.createPost(initiatedBy, data);
   }
 
   @Patch(':id/visibility')
   @UseGuards(AuthGuard)
   async changePostVisibility(
-    @Param('id') id: string,
+    @Param('id', ParseUUIDPipe) postId: string,
     @Body('visibility') visibility: string,
-  ): Promise<output.Post> {
-    return this._postsService.changePostVisibility(id, visibility);
+    @InitiatedBy() initiatedBy: string,
+  ): Promise<output.PostOutput> {
+    return this._postsService.changePostVisibility(
+      postId,
+      visibility,
+      initiatedBy,
+    );
   }
 
   @Patch(':id/archive')
   @UseGuards(AuthGuard)
   async archivePost(
-    @Param('id') id: string,
+    @Param('id', ParseUUIDPipe) postId: string,
+    @InitiatedBy() initiatedBy: string,
   ): Promise<output.ArchivePostOutput> {
-    return this._postsService.archivePost(id);
+    return this._postsService.archivePost(postId, initiatedBy);
   }
 
   @Patch(':id/publish')
   @UseGuards(AuthGuard)
-  async publishPost(@Param('id') id: string): Promise<output.Post> {
-    return this._postsService.publishPost(id);
+  async publishPost(
+    @Param('id', ParseUUIDPipe) postId: string,
+    @InitiatedBy() initiatedBy: string,
+  ): Promise<output.PostOutput> {
+    return this._postsService.publishPost(postId, initiatedBy);
   }
 
   @Delete(':id')
   @UseGuards(AuthGuard)
-  async deletePost(@Param('id') id: string): Promise<output.DeletePostOutput> {
-    return this._postsService.deletePost(id);
+  async deletePost(
+    @Param('id', ParseUUIDPipe) postId: string,
+    @InitiatedBy() initiatedBy: string,
+  ): Promise<output.DeletePostOutput> {
+    return this._postsService.deletePost(postId, initiatedBy);
   }
 
   @Patch(':id/transfer')
   @UseGuards(AuthGuard)
   async transferPostOwnership(
-    @Param('id') id: string,
+    @Param('id', ParseUUIDPipe) postId: string,
     @Body('newOwner') newOwner: string,
+    @InitiatedBy() initiatedBy: string,
   ): Promise<output.TransferPostOwnershipOutput> {
-    return this._postsService.transferPostOwnership(id, newOwner);
+    return this._postsService.transferPostOwnership(
+      postId,
+      newOwner,
+      initiatedBy,
+    );
   }
 
   @Patch(':id/delta')
   @UseGuards(AuthGuard)
   async deltaSave(
-    @Param('id') id: string,
+    @Param('id', ParseUUIDPipe) postId: string,
     @Body('deltas') deltas: input.Delta[],
-  ) {
-    return this._postsService.deltaSave(id, deltas);
+    @InitiatedBy() initiatedBy: string,
+  ): Promise<output.DeltaSaveOutput> {
+    return this._postsService.deltaSave(postId, deltas, initiatedBy);
   }
 
-  @Get('/cursor')
+  @Get('/cursor/:userId')
   async getPosts(
+    @Param('userId', ParseUUIDPipe) userId: string,
     @Query('cursor') cursor: string,
     @Query('take') take: number,
-  ): Promise<output.Cursor<output.Post>> {
-    return this._postsService.getPosts(randomUUID(), take, cursor);
+  ): Promise<output.CursorOutput<output.PostOutput>> {
+    return this._postsService.getPosts(userId, take, cursor);
   }
 
   @Get('/:slug')
-  async getPost(@Param('slug') slug: string): Promise<output.Post> {
+  async getPost(@Param('slug') slug: string): Promise<output.PostOutput> {
     return this._postsService.getPost(slug);
   }
 
@@ -94,7 +116,7 @@ export class PostsController {
     @Param('status') status: string,
     @Query('take') take: number,
     @Query('skip') skip: number,
-  ): Promise<output.Post[]> {
+  ): Promise<output.PostOutput[]> {
     switch (status) {
       case 'draft':
         return this._postsService.getDrafts(randomUUID(), take, skip);

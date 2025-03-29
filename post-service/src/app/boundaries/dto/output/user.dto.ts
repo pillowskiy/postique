@@ -2,7 +2,7 @@ export class SaveUserOutput {
   constructor(public readonly userId: string) {}
 }
 
-export class User {
+export class UserOutput {
   constructor(
     public readonly id: string,
     public readonly username: string,

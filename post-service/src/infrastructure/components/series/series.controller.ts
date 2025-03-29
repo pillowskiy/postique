@@ -8,12 +8,16 @@ import {
   UseGuards,
   Get,
   Query,
+  ParseUUIDPipe,
 } from '@nestjs/common';
-import { SeriesService } from './series.service';
 import * as input from '@/app/boundaries/dto/input';
 import * as output from '@/app/boundaries/dto/output';
-import { randomUUID } from 'crypto';
-import { AuthGuard } from '@/infrastructure/common/guards';
+import { AuthGuard, OptionalAuthGuard } from '@/infrastructure/common/guards';
+import {
+  InitiatedBy,
+  OptionalInitiatedBy,
+} from '@/infrastructure/common/decorators';
+import { SeriesService } from './series.service';
 
 @Controller('series')
 export class SeriesController {
@@ -23,43 +27,48 @@ export class SeriesController {
   @UseGuards(AuthGuard)
   async createSeries(
     @Body() series: input.CreateSeriesInput,
+    @InitiatedBy() initiatedBy: string,
   ): Promise<output.CreateSeriesOutput> {
-    return this._seriesService.createSeries(series, randomUUID());
+    return this._seriesService.createSeries(series, initiatedBy);
   }
 
   @Delete(':id')
   @UseGuards(AuthGuard)
   async deleteSeries(
-    @Param('id') seriesId: string,
+    @Param('id', ParseUUIDPipe) seriesId: string,
+    @InitiatedBy() initiatedBy: string,
   ): Promise<output.DeleteSeriesOutput> {
-    return this._seriesService.deleteSeries(seriesId, randomUUID());
+    return this._seriesService.deleteSeries(seriesId, initiatedBy);
   }
 
   @Patch(':id')
   @UseGuards(AuthGuard)
   async updateSeries(
-    @Param('id') seriesId: string,
+    @Param('id', ParseUUIDPipe) seriesId: string,
     @Body() series: input.UpdateSeriesInput,
+    @InitiatedBy() initiatedBy: string,
   ): Promise<output.UpdateSeriesOutput> {
-    return this._seriesService.updateSeries(seriesId, series, randomUUID());
+    return this._seriesService.updateSeries(seriesId, series, initiatedBy);
   }
 
   @Post(':seriesId/posts/:postId')
   @UseGuards(AuthGuard)
   async addPost(
-    @Param('seriesId') seriesId: string,
-    @Param('postId') postId: string,
+    @Param('seriesId', ParseUUIDPipe) seriesId: string,
+    @Param('postId', ParseUUIDPipe) postId: string,
+    @InitiatedBy() initiatedBy: string,
   ): Promise<void> {
-    return this._seriesService.addPost(seriesId, postId, randomUUID());
+    return this._seriesService.addPost(seriesId, postId, initiatedBy);
   }
 
   @Delete(':seriesId/posts/:postId')
   @UseGuards(AuthGuard)
   async removePost(
-    @Param('seriesId') seriesId: string,
-    @Param('postId') postId: string,
+    @Param('seriesId', ParseUUIDPipe) seriesId: string,
+    @Param('postId', ParseUUIDPipe) postId: string,
+    @InitiatedBy() initiatedBy: string,
   ): Promise<void> {
-    return this._seriesService.removePost(seriesId, postId, randomUUID());
+    return this._seriesService.removePost(seriesId, postId, initiatedBy);
   }
 
   @Get()
@@ -67,15 +76,17 @@ export class SeriesController {
   async getUserSerieses(
     @Query('take') take: number,
     @Query('skip') skip: number,
-  ): Promise<output.Series[]> {
-    return this._seriesService.getUserSerieses(randomUUID(), take, skip);
+    @InitiatedBy() initiatedBy: string,
+  ): Promise<output.SeriesOutput[]> {
+    return this._seriesService.getUserSerieses(initiatedBy, take, skip);
   }
 
   @Get(':postId')
-  @UseGuards(AuthGuard)
+  @UseGuards(OptionalAuthGuard)
   async getPostSerieses(
-    @Param('postId') postId: string,
-  ): Promise<output.Series[]> {
-    return this._seriesService.getPostSerieses(postId, randomUUID());
+    @Param('postId', ParseUUIDPipe) postId: string,
+    @OptionalInitiatedBy() initiatedBy?: string,
+  ): Promise<output.SeriesOutput[]> {
+    return this._seriesService.getPostSerieses(postId, initiatedBy);
   }
 }

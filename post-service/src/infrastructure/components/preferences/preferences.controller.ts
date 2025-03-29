@@ -2,14 +2,15 @@ import {
   Controller,
   Get,
   Param,
+  ParseUUIDPipe,
   Patch,
   Query,
   UseGuards,
 } from '@nestjs/common';
 import * as output from '@/app/boundaries/dto/output';
 import { PreferencesService } from './preferences.service';
-import { randomUUID } from 'crypto';
 import { AuthGuard } from '@/infrastructure/common/guards';
+import { InitiatedBy } from '@/infrastructure/common/decorators';
 
 @Controller('preferences')
 export class PreferencesController {
@@ -18,17 +19,19 @@ export class PreferencesController {
   @Patch('authors/:id')
   @UseGuards(AuthGuard)
   async toggleAuthor(
-    @Param('id') authorId: string,
+    @Param('id', ParseUUIDPipe) authorId: string,
+    @InitiatedBy() initiatedBy: string,
   ): Promise<output.ToggleAuthorOutput> {
-    return this._preferencesService.toggleAuthor(authorId, randomUUID());
+    return this._preferencesService.toggleAuthor(authorId, initiatedBy);
   }
 
   @Patch('posts/:id')
   @UseGuards(AuthGuard)
   async togglePost(
-    @Param('id') postId: string,
+    @Param('id', ParseUUIDPipe) postId: string,
+    @InitiatedBy() initiatedBy: string,
   ): Promise<output.ToggleAuthorOutput> {
-    return this._preferencesService.togglePost(postId, randomUUID());
+    return this._preferencesService.togglePost(postId, initiatedBy);
   }
 
   @Get('posts')
@@ -36,8 +39,9 @@ export class PreferencesController {
   async getPostsBlacklist(
     @Query('take') take: number,
     @Query('skip') skip: number,
-  ): Promise<output.Paginated<output.Post>> {
-    return this._preferencesService.getPostsBlacklist(randomUUID(), take, skip);
+    @InitiatedBy() initiatedBy: string,
+  ): Promise<output.PaginatedOutput<output.PostOutput>> {
+    return this._preferencesService.getPostsBlacklist(initiatedBy, take, skip);
   }
 
   @Get('authors')
@@ -45,11 +49,8 @@ export class PreferencesController {
   async getAuthorBlacklist(
     @Query('take') take: number,
     @Query('skip') skip: number,
-  ): Promise<output.Paginated<output.User>> {
-    return this._preferencesService.getAuthorBlacklist(
-      randomUUID(),
-      take,
-      skip,
-    );
+    @InitiatedBy() initiatedBy: string,
+  ): Promise<output.PaginatedOutput<output.UserOutput>> {
+    return this._preferencesService.getAuthorBlacklist(initiatedBy, take, skip);
   }
 }

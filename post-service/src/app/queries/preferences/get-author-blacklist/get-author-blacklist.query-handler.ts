@@ -5,16 +5,15 @@ import {
   PreferencesRepository,
   UserRepository,
 } from '@/app/boundaries/repository';
-import { Paginated } from '@/app/boundaries/dto/output/paginated.dto';
+import { PaginatedOutput, UserOutput } from '@/app/boundaries/dto/output';
 import { GetAuthorBlacklistQuery } from './get-author-blacklist.query';
 import { UserMapper } from '@/app/boundaries/mapper';
 import { ArrayUtils } from '@/utils/array';
-import { User } from '@/app/boundaries/dto/output/user.dto';
 
 @QueryHandler(GetAuthorBlacklistQuery)
 export class GetAuthorBlacklistQueryHandler extends Query<
   GetAuthorBlacklistQuery,
-  Paginated<User>
+  PaginatedOutput<UserOutput>
 > {
   @Inject(UserRepository)
   private readonly _userRepository: UserRepository;
@@ -24,11 +23,11 @@ export class GetAuthorBlacklistQueryHandler extends Query<
 
   protected async invoke(
     input: GetAuthorBlacklistQuery,
-  ): Promise<Paginated<User>> {
+  ): Promise<PaginatedOutput<UserOutput>> {
     const pref = await this._preferencesRepository.preferences(input.userId);
 
     if (!pref) {
-      return new Paginated<User>([], 0, 1);
+      return new PaginatedOutput<UserOutput>([], 0, 1);
     }
 
     const authorBlacklist = ArrayUtils.fromSetWithOffset(
@@ -42,6 +41,6 @@ export class GetAuthorBlacklistQueryHandler extends Query<
     const count = pref.authorBlacklist.size;
     const page = Math.floor(count / input.take) + 1;
 
-    return new Paginated<User>(usersOutput, count, page);
+    return new PaginatedOutput<UserOutput>(usersOutput, count, page);
   }
 }

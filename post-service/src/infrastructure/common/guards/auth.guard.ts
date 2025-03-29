@@ -36,8 +36,17 @@ export class AuthGuard implements OnModuleInit, CanActivate {
     }
 
     try {
-      const payload = await JWTService.verify(token, this._cert, this._alg);
-      (request as Record<string, any>).user = payload;
+      const payload = await JWTService.verify<Record<string, unknown>>(
+        token,
+        this._cert,
+        this._alg,
+      );
+
+      if (!('uid' in payload) || typeof payload.uid !== 'string') {
+        throw new UnauthorizedException('Invalid token payload');
+      }
+
+      (request as Record<string, any>).userId = payload.uid;
       return true;
     } catch (err) {
       throw new UnauthorizedException('Invalid token');

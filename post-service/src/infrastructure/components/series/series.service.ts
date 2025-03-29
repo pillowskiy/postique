@@ -5,7 +5,7 @@ import {
 import {
   CreateSeriesOutput,
   DeleteSeriesOutput,
-  Series,
+  SeriesOutput,
   UpdateSeriesOutput,
 } from '@/app/boundaries/dto/output';
 import { AddSeriesPostCommand } from '@/app/commands/series/add-post';
@@ -73,8 +73,11 @@ export class SeriesService {
     );
   }
 
-  async getPostSerieses(postId: string, userId?: string): Promise<Series[]> {
-    return this._queryBus.execute<GetPostSeriesesQuery, Series[]>(
+  async getPostSerieses(
+    postId: string,
+    userId?: string,
+  ): Promise<SeriesOutput[]> {
+    return this._queryBus.execute<GetPostSeriesesQuery, SeriesOutput[]>(
       new GetPostSeriesesQuery(postId, userId),
     );
   }
@@ -83,8 +86,8 @@ export class SeriesService {
     userId: string,
     take: number,
     skip: number,
-  ): Promise<Series[]> {
-    return this._queryBus.execute<GetMySeriesesQuery, Series[]>(
+  ): Promise<SeriesOutput[]> {
+    return this._queryBus.execute<GetMySeriesesQuery, SeriesOutput[]>(
       new GetMySeriesesQuery(userId, take, skip),
     );
   }

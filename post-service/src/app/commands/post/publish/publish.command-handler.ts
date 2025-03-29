@@ -1,4 +1,4 @@
-import { Post } from '@/app/boundaries/dto/output';
+import { PostOutput } from '@/app/boundaries/dto/output';
 import { NotFoundException } from '@/app/boundaries/errors';
 import { PostMapper } from '@/app/boundaries/mapper';
 import { PostRepository } from '@/app/boundaries/repository';
@@ -10,18 +10,18 @@ import { PublishPostCommand } from './publish.command';
 @CommandHandler(PublishPostCommand)
 export class PublishPostCommandHandler extends Command<
   PublishPostCommand,
-  Post
+  PostOutput
 > {
   @Inject(PostRepository)
   private readonly _postRepository: PostRepository;
 
-  protected async invoke(input: PublishPostCommand): Promise<Post> {
+  protected async invoke(input: PublishPostCommand): Promise<PostOutput> {
     const post = await this._postRepository.getById(input.postId);
     if (!post) {
       throw new NotFoundException('Post does not exist');
     }
 
-    post.publish();
+    //post.publish();
     await this._postRepository.save(post);
 
     return PostMapper.toDto(post);
