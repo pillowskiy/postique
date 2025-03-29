@@ -1,15 +1,22 @@
+import { Inject, Injectable } from '@nestjs/common';
+import { Transactional } from '@/app/boundaries/common';
 import { PreferencesRepository } from '@/app/boundaries/repository/preferences.repository';
 import { IPostPreferences, PostPreferencesEntity } from '@/domain/preferences';
-import { InjectModel, models, Schemas } from '@/infrastructure/database/mongo';
+import {
+  InjectModel,
+  models,
+  MongoTransactional,
+  Schemas,
+} from '@/infrastructure/database/mongo';
 import { PostPreferences } from '@/infrastructure/database/mongo/schemas';
 
+@Injectable()
 export class MongoPreferencesRepository extends PreferencesRepository {
-  constructor(
-    @InjectModel(Schemas.Preferences)
-    private readonly _preferencesModel: models.PostPreferencesModel,
-  ) {
-    super();
-  }
+  @Inject(Transactional)
+  private readonly _transactional: MongoTransactional;
+
+  @InjectModel(Schemas.Preferences)
+  private readonly _preferencesModel: models.PostPreferencesModel;
 
   async save(
     userId: string,
@@ -22,12 +29,16 @@ export class MongoPreferencesRepository extends PreferencesRepository {
       },
       {
         upsert: true,
+        session: this._transactional.getSession(undefined),
       },
     );
   }
 
   async preferences(userId: string): Promise<PostPreferencesEntity> {
-    const userPrefs = await this._preferencesModel.findOne({ userId }).lean();
+    const userPrefs = await this._preferencesModel
+      .findOne({ userId })
+      .session(this._transactional.getSession(null))
+      .lean();
     if (!userPrefs) {
       return PostPreferencesEntity.empty();
     }

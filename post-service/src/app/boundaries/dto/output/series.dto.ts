@@ -1,5 +1,5 @@
-export class IdentifierHolderOutput {
-  constructor(public readonly identifier: string) {}
+class IdentifierHolderOutput {
+  constructor(public readonly seriesId: string) {}
 }
 
 export class CreateSeriesOutput extends IdentifierHolderOutput {}

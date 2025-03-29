@@ -1,20 +1,25 @@
+import { Inject, Injectable } from '@nestjs/common';
+import { Transactional } from '@/app/boundaries/common';
 import {
   CursorField,
   PostRepository,
   SortField,
 } from '@/app/boundaries/repository';
 import { IPost, PostEntity, PostStatus, PostVisibility } from '@/domain/post';
-import { InjectModel, Schemas, models } from '@/infrastructure/database/mongo';
+import {
+  InjectModel,
+  MongoTransactional,
+  Schemas,
+  models,
+} from '@/infrastructure/database/mongo';
 import { Post } from '@/infrastructure/database/mongo/schemas';
-import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class MongoPostRepository extends PostRepository {
-  constructor(
-    @InjectModel(Schemas.Posts) private readonly _postModel: models.PostModel,
-  ) {
-    super();
-  }
+  @InjectModel(Schemas.Posts) private readonly _postModel: models.PostModel;
+
+  @Inject(Transactional)
+  private readonly _transactional: MongoTransactional;
 
   async save(post: PostEntity): Promise<void> {
     await this._postModel
@@ -38,14 +43,17 @@ export class MongoPostRepository extends PostRepository {
         },
         {
           upsert: true,
-          strict: false,
+          session: this._transactional.getSession(undefined),
         },
       )
       .lean();
   }
 
   async getBySlug(slug: string): Promise<PostEntity | null> {
-    const post = await this._postModel.findOne({ slug }).lean();
+    const post = await this._postModel
+      .findOne({ slug })
+      .session(this._transactional.getSession(null))
+      .lean();
     if (!post) {
       return null;
     }
@@ -53,7 +61,10 @@ export class MongoPostRepository extends PostRepository {
   }
 
   async getById(id: string): Promise<PostEntity | null> {
-    const post = await this._postModel.findOne({ _id: id }).lean();
+    const post = await this._postModel
+      .findOne({ _id: id })
+      .session(this._transactional.getSession(null))
+      .lean();
     if (!post) {
       return null;
     }
@@ -61,7 +72,9 @@ export class MongoPostRepository extends PostRepository {
   }
 
   async delete(postId: string): Promise<boolean> {
-    const query = await this._postModel.deleteOne({ _id: postId });
+    const query = await this._postModel
+      .deleteOne({ _id: postId })
+      .session(this._transactional.getSession(null));
     if (!query.acknowledged) {
       throw new Error('Could not delete post');
     }
@@ -83,6 +96,7 @@ export class MongoPostRepository extends PostRepository {
       .sort({ [sortField]: 1 })
       .limit(take)
       .skip(skip)
+      .session(this._transactional.getSession(null))
       .lean();
 
     return posts.map((post) => this.#getPostEntity(post));
@@ -109,6 +123,7 @@ export class MongoPostRepository extends PostRepository {
       .sort({ [sortField]: 1 })
       .limit(take)
       .skip(skip)
+      .session(this._transactional.getSession(null))
       .lean();
 
     return posts.map((post) => this.#getPostEntity(post));
@@ -132,7 +147,9 @@ export class MongoPostRepository extends PostRepository {
         publishedAt: { $exists: true },
       })
       .sort({ [sortBy]: 1 })
+      // TEMP: Magic number
       .limit(200)
+      .session(this._transactional.getSession(null))
       .cursor();
 
     for await (const doc of dataCursor) {
@@ -141,7 +158,10 @@ export class MongoPostRepository extends PostRepository {
   }
 
   async findManyPosts(ids: string[]): Promise<PostEntity[]> {
-    const posts = await this._postModel.find({ _id: { $in: ids } }).lean();
+    const posts = await this._postModel
+      .find({ _id: { $in: ids } })
+      .session(this._transactional.getSession(null))
+      .lean();
     return posts.map((post) => this.#getPostEntity(post));
   }
 

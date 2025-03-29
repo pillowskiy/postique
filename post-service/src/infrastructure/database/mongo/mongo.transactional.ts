@@ -7,24 +7,24 @@ import { RequestScope } from 'nj-request-scope';
 @Injectable()
 @RequestScope()
 export class MongoTransactional extends Transactional {
-  private session: ClientSession | null;
+  private _session: ClientSession | null;
 
   constructor(@InjectConnection() private readonly connection: Connection) {
     super();
   }
 
   public async start() {
-    if (this.session) {
-      if (this.session.inTransaction()) {
-        await this.session.abortTransaction();
-        await this.session.endSession();
+    if (this._session) {
+      if (this._session.inTransaction()) {
+        await this._session.abortTransaction();
+        await this._session.endSession();
         throw new Error('Session already in transaction');
       }
-      await this.session.endSession();
+      await this._session.endSession();
     }
 
-    this.session = await this.connection.startSession();
-    this.session.startTransaction({
+    this._session = await this.connection.startSession();
+    this._session.startTransaction({
       readConcern: { level: 'majority' },
       writeConcern: { w: 'majority' },
       readPreference: 'primary',
@@ -33,21 +33,30 @@ export class MongoTransactional extends Transactional {
   }
 
   public async commit() {
-    const session = this.getSession();
+    const session = this._forceSession();
     await session.commitTransaction();
     return void session.endSession();
   }
 
   public async rollback() {
-    const session = this.getSession();
+    const session = this._forceSession();
     await session.abortTransaction();
     return void session.endSession();
   }
 
-  private getSession(): ClientSession {
-    if (!this.session) {
+  public getSession<T extends null | undefined>(
+    nullable: T,
+  ): ClientSession | T {
+    if (!this._session) {
+      return nullable;
+    }
+    return this._session;
+  }
+
+  private _forceSession(): ClientSession {
+    if (!this._session) {
       throw new Error('Session not started');
     }
-    return this.session;
+    return this._session;
   }
 }

@@ -1,20 +1,27 @@
+import { Inject, Injectable } from '@nestjs/common';
+import { Transactional } from '@/app/boundaries/common';
 import { SeriesRepository } from '@/app/boundaries/repository';
 import {
   IPostSeries,
   PostSeriesEntity,
   PostSeriesVisibility,
 } from '@/domain/series';
-import { InjectModel, models, Schemas } from '@/infrastructure/database/mongo';
+import {
+  InjectModel,
+  models,
+  MongoTransactional,
+  Schemas,
+} from '@/infrastructure/database/mongo';
 import { PostSeries } from '@/infrastructure/database/mongo/schemas';
-import { FilterQuery } from 'mongoose';
+import type { FilterQuery } from 'mongoose';
 
+@Injectable()
 export class MongoSeriesRepository extends SeriesRepository {
-  constructor(
-    @InjectModel(Schemas.Series)
-    private readonly _seriesModel: models.PostSeriesModel,
-  ) {
-    super();
-  }
+  @Inject(Transactional)
+  private readonly _transactional: MongoTransactional;
+
+  @InjectModel(Schemas.Series)
+  private readonly _seriesModel: models.PostSeriesModel;
 
   async save(series: PostSeriesEntity): Promise<void> {
     await this._seriesModel.updateOne(
@@ -32,12 +39,16 @@ export class MongoSeriesRepository extends SeriesRepository {
       },
       {
         upsert: true,
+        session: this._transactional.getSession(undefined),
       },
     );
   }
 
   async getBySlug(slug: string): Promise<PostSeriesEntity | null> {
-    const series = await this._seriesModel.findOne({ slug }).lean();
+    const series = await this._seriesModel
+      .findOne({ slug })
+      .session(this._transactional.getSession(null))
+      .lean();
     if (!series) {
       return null;
     }
@@ -46,7 +57,10 @@ export class MongoSeriesRepository extends SeriesRepository {
   }
 
   async getById(id: string): Promise<PostSeriesEntity | null> {
-    const series = await this._seriesModel.findById(id).lean();
+    const series = await this._seriesModel
+      .findById(id)
+      .session(this._transactional.getSession(null))
+      .lean();
     if (!series) {
       return null;
     }
@@ -55,7 +69,9 @@ export class MongoSeriesRepository extends SeriesRepository {
   }
 
   async delete(id: string): Promise<boolean> {
-    const query = await this._seriesModel.deleteOne({ _id: id });
+    const query = await this._seriesModel
+      .deleteOne({ _id: id })
+      .session(this._transactional.getSession(null));
     if (!query.acknowledged) {
       throw new Error('Could not delete post');
     }
@@ -84,6 +100,7 @@ export class MongoSeriesRepository extends SeriesRepository {
         posts: { $has: postId },
         $or: orCondition,
       })
+      .session(this._transactional.getSession(null))
       .lean();
 
     return serieses.map((series) => this.#getSeriesEntity(series));
@@ -101,6 +118,7 @@ export class MongoSeriesRepository extends SeriesRepository {
       })
       .limit(take)
       .skip(skip)
+      .session(this._transactional.getSession(null))
       .lean();
 
     return serieses.map((series) => this.#getSeriesEntity(series));
