@@ -30,6 +30,6 @@ export class GetDetailedPostQueryHandler extends Query<
       storedPost.content,
     );
 
-    return PostMapper.toDetailedDto(storedPost, paragraphs);
+    return PostMapper.toDetailedDto(storedPost, paragraphs ?? []);
   }
 }
