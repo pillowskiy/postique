@@ -34,6 +34,13 @@ export class ContentChangeStrategy {
   }
 
   public insertDelta(delta: DeltaEntity) {
+    const paragraph = this._paragraphs[delta.index];
+    if (paragraph) {
+      // Redirecting to update to ensure system reliability for users.
+      // Throwing a violation is an option, but keeping it simple for now.
+      return this.updateDelta(delta);
+    }
+
     this._paragraphs.splice(delta.index, 0, delta.paragraph.id);
     this._changeList.push(
       new BulkOperation(
