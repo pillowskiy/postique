@@ -22,7 +22,7 @@ export class Post {
   @Prop({ type: mongoose.Types.UUID, ref: Schemas.Content, required: true })
   content: string;
 
-  @Prop({ type: String, required: true })
+  @Prop({ type: mongoose.Types.UUID, ref: Schemas.Users, required: true })
   owner: string;
 
   @Prop({ type: [mongoose.Types.UUID], ref: Schemas.Users, required: true })

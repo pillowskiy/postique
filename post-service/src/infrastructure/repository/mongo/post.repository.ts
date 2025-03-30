@@ -13,6 +13,7 @@ import {
   models,
 } from '@/infrastructure/database/mongo';
 import { Post } from '@/infrastructure/database/mongo/schemas';
+import { FilterQuery } from 'mongoose';
 
 @Injectable()
 export class MongoPostRepository extends PostRepository {
@@ -129,14 +130,37 @@ export class MongoPostRepository extends PostRepository {
     return posts.map((post) => this.#getPostEntity(post));
   }
 
-  async *cursor(
+  cursor(
     field: CursorField,
     sortBy: SortField,
     cursor: string | Date,
   ): AsyncGenerator<PostEntity> {
-    const dataCursor = this._postModel
-      .find({
+    return this._cursor(
+      {
         [field]: { $lt: cursor },
+      },
+      sortBy,
+      {
+        visibility: PostVisibility.Public,
+        status: PostStatus.Published,
+        publishedAt: { $exists: true },
+      },
+    );
+  }
+
+  cursorFromList(
+    postIds: string[],
+    field: CursorField,
+    sortBy: SortField,
+    cursor: string | Date,
+  ): AsyncGenerator<PostEntity> {
+    return this._cursor(
+      {
+        [field]: { $lt: cursor },
+      },
+      sortBy,
+      {
+        _id: { $in: postIds },
         $or: [
           { visibility: PostVisibility.Public },
           {
@@ -145,11 +169,24 @@ export class MongoPostRepository extends PostRepository {
         ],
         status: PostStatus.Published,
         publishedAt: { $exists: true },
+      },
+    );
+  }
+
+  private async *_cursor(
+    cursorFilter: Partial<FilterQuery<Post>>,
+    sortBy: SortField,
+    filter: FilterQuery<Post>,
+  ): AsyncGenerator<PostEntity> {
+    const dataCursor = this._postModel
+      .find({
+        ...filter,
+        ...cursorFilter,
       })
       .sort({ [sortBy]: 1 })
-      // TEMP: Magic number
-      .limit(200)
       .session(this._transactional.getSession(null))
+      .lean()
+      .batchSize(100)
       .cursor();
 
     for await (const doc of dataCursor) {

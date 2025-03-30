@@ -4,8 +4,6 @@ import {
   PostRepository,
   UserRepository,
 } from '@/app/boundaries/repository';
-import PostCommandHandlers from '@/app/commands/post';
-import PostQueryHandlers from '@/app/queries/post';
 import { MongoModule } from '@/infrastructure/database/mongo';
 import {
   MongoPostRepository,
@@ -20,6 +18,9 @@ import { PostsController } from './posts.controller';
 import { PostsService } from './posts.service';
 import { PreferencesRepository } from '@/app/boundaries/repository/preferences.repository';
 import { PostAccessControlListModule } from '@/infrastructure/acl/post';
+import { PostPreferenceFilterService } from '@/app/services';
+import PostCommandHandlers from '@/app/commands/post';
+import PostQueryHandlers from '@/app/queries/post';
 
 @Module({
   imports: [MongoModule, CqrsModule.forRoot(), PostAccessControlListModule],
@@ -48,8 +49,8 @@ import { PostAccessControlListModule } from '@/infrastructure/acl/post';
       provide: PreferencesRepository,
       useClass: MongoPreferencesRepository,
     },
+    PostPreferenceFilterService,
     PostsService,
   ],
-  exports: [...PostCommandHandlers],
 })
 export class PostsModule {}

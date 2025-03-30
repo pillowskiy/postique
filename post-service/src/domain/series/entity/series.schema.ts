@@ -45,11 +45,11 @@ export class PostSeriesSchema implements IPostSeries {
   })
   description: string = '';
 
-  @IsArray({ message: 'Series posts must be an array' })
-  @ArrayNotEmpty({ message: 'Series posts cannot be empty' })
   @IsUUID('4', {
     each: true,
-    message: 'Series post must be a valid UUID v4',
+    message: 'Series post must be a reference',
   })
+  @ArrayNotEmpty({ message: 'Series posts cannot be empty' })
+  @IsArray({ message: 'Series posts must be an array' })
   posts: Readonly<string[]>;
 }

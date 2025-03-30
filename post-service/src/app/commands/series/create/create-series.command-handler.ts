@@ -1,13 +1,15 @@
+import { Inject } from '@nestjs/common';
+import { CommandHandler } from '@nestjs/cqrs';
 import { CreateSeriesOutput } from '@/app/boundaries/dto/output';
 import { Command } from '../../common';
 import { CreateSeriesCommand } from './create-series.command';
 import { SeriesRepository } from '@/app/boundaries/repository';
-import { Inject } from '@nestjs/common';
 import { PostSeriesEntity } from '@/domain/series';
 import slugify from 'slugify';
 import { ConflictException, ForbiddenException } from '@/app/boundaries/errors';
 import { SeriesAccessControlList } from '@/app/boundaries/acl';
 
+@CommandHandler(CreateSeriesCommand)
 export class CreateSeriesCommandHandler extends Command<
   CreateSeriesCommand,
   CreateSeriesOutput
@@ -24,8 +26,9 @@ export class CreateSeriesCommandHandler extends Command<
     const series = PostSeriesEntity.create({
       title: input.series.title,
       description: input.series.description,
+      posts: input.posts,
       // TEMP: It is the responsibility of the infrastructure layer.
-      slug: slugify(input.series.title, { lower: true, strict: true }),
+      slug: slugify(input.series.title ?? '', { lower: true, strict: true }),
       owner: input.initiatedBy,
     });
 

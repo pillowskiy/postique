@@ -5,6 +5,7 @@ import {
 import {
   CreateSeriesOutput,
   DeleteSeriesOutput,
+  DetailedSeriesOutput,
   SeriesOutput,
   UpdateSeriesOutput,
 } from '@/app/boundaries/dto/output';
@@ -13,6 +14,7 @@ import { CreateSeriesCommand } from '@/app/commands/series/create';
 import { DeleteSeriesCommand } from '@/app/commands/series/delete';
 import { RemoveSeriesPostCommand } from '@/app/commands/series/remove-post';
 import { UpdateSeriesCommand } from '@/app/commands/series/update';
+import { GetDetailedSeriesQuery } from '@/app/queries/series/get-detailed';
 import { GetMySeriesesQuery } from '@/app/queries/series/get-my-serieses';
 import { GetPostSeriesesQuery } from '@/app/queries/series/get-post-serieses';
 import { Injectable } from '@nestjs/common';
@@ -30,7 +32,7 @@ export class SeriesService {
     initiatedBy: string,
   ): Promise<CreateSeriesOutput> {
     return this._commandBus.execute<CreateSeriesCommand, CreateSeriesOutput>(
-      new CreateSeriesCommand(series, initiatedBy),
+      new CreateSeriesCommand(series, series.posts, initiatedBy),
     );
   }
 
@@ -70,6 +72,15 @@ export class SeriesService {
   ): Promise<void> {
     return this._commandBus.execute<RemoveSeriesPostCommand, void>(
       new RemoveSeriesPostCommand(seriesId, postId, initiatedBy),
+    );
+  }
+
+  async getDetailed(
+    slug: string,
+    initiatedBy?: string,
+  ): Promise<DetailedSeriesOutput> {
+    return this._queryBus.execute<GetDetailedSeriesQuery, DetailedSeriesOutput>(
+      new GetDetailedSeriesQuery(slug, initiatedBy),
     );
   }
 

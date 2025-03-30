@@ -71,17 +71,25 @@ export class SeriesController {
     return this._seriesService.removePost(seriesId, postId, initiatedBy);
   }
 
-  @Get()
-  @UseGuards(AuthGuard)
+  @Get(':slug')
+  @UseGuards(OptionalAuthGuard)
+  async getDetailed(
+    @Param('slug') slug: string,
+    @OptionalInitiatedBy() initiatedBy?: string,
+  ): Promise<output.DetailedSeriesOutput> {
+    return this._seriesService.getDetailed(slug, initiatedBy);
+  }
+
+  @Get('users/:userId')
   async getUserSerieses(
     @Query('take') take: number,
     @Query('skip') skip: number,
-    @InitiatedBy() initiatedBy: string,
+    @Param('userId', ParseUUIDPipe) userId: string,
   ): Promise<output.SeriesOutput[]> {
-    return this._seriesService.getUserSerieses(initiatedBy, take, skip);
+    return this._seriesService.getUserSerieses(userId, take, skip);
   }
 
-  @Get(':postId')
+  @Get('posts/:postId')
   @UseGuards(OptionalAuthGuard)
   async getPostSerieses(
     @Param('postId', ParseUUIDPipe) postId: string,

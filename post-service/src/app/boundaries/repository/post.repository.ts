@@ -34,5 +34,12 @@ export abstract class PostRepository {
     cursor: string | Date,
   ): AsyncIterable<PostEntity>;
 
+  abstract cursorFromList(
+    postIds: string[],
+    field: CursorField,
+    sortField: SortField,
+    cursor: string | Date,
+  ): AsyncIterable<PostEntity>;
+
   abstract findManyPosts(ids: string[]): Promise<PostEntity[]>;
 }
