@@ -1,13 +1,14 @@
-import { Logger } from '@/app/boundaries/common';
-import AppModule from '@/infrastructure/app.module';
-import { AppConfigService } from '@/infrastructure/globals/config';
 import { NestFactory } from '@nestjs/core';
 import {
   FastifyAdapter,
   NestFastifyApplication,
 } from '@nestjs/platform-fastify';
+import { Logger } from '@/app/boundaries/common';
+import AppModule from '@/infrastructure/app.module';
+import { AppConfigService } from '@/infrastructure/globals/config';
 import { ApplicationExceptionFilter } from '@/infrastructure/common/filters';
-import { UsersRMQService } from './infrastructure/rabbitmq';
+import { UsersRMQService } from '@/infrastructure/rabbitmq';
+import compression from '@fastify/compress';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestFastifyApplication>(
@@ -19,8 +20,8 @@ async function bootstrap() {
   const appLogger = await app.resolve(Logger);
   app.useLogger(appLogger);
   app.setGlobalPrefix('/api/v1');
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
   app.useGlobalFilters(app.get(ApplicationExceptionFilter));
+  await app.register(compression, { encodings: ['gzip', 'deflate'] });
 
   await app.init();
   app.connectMicroservice(app.get(UsersRMQService).getOptions());
