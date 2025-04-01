@@ -1,3 +1,5 @@
+import { render } from '#lib/ejs/render.js';
+
 import express from 'express';
 
 /**
@@ -16,6 +18,13 @@ export function AppRoutes(authRouter, authMiddlewares, middlewares) {
         (_, res) => {
             res.send('pong');
         },
+    );
+
+    appRouter.get('/', async (req, res) => render(res).template('index', {}));
+    appRouter.get('/workbench', async (req, res) =>
+        render(res)
+            .template('workbench/workbench-page', {})
+            .layout('workbench/workbench-layout'),
     );
 
     appRouter.use(authRouter);

@@ -1,4 +1,5 @@
 import ejs from 'ejs';
+import path, { dirname, relative } from 'path';
 
 /**
  * @param {string} path
@@ -27,7 +28,7 @@ export async function ejsView(path, data, cb) {
 function renderResponse(res, path, data) {
     return res.render(path, data, (err, html) => {
         if (err) {
-            return res.status(500).send(err);
+            throw err;
         }
 
         return res.send(html);
@@ -40,7 +41,7 @@ function renderResponse(res, path, data) {
 export function render(res) {
     /**
      * @typedef {Object} RenderNode
-     * @property {keyof render.Templates | null} targetPath
+     * @property {string | null} targetPath
      * @property {string | null} parent
      * @property {string} engine
      * @property {render.Templates[keyof render.Templates] & { title?: string }} options
@@ -67,7 +68,7 @@ export function render(res) {
 
         if (renderNode.parent) {
             return renderResponse(res, renderNode.parent, {
-                __renderTarget: target,
+                __renderTarget: relative(dirname(renderNode.parent), target),
                 ...renderNode.options,
                 ...defaultOptions,
             });
@@ -96,6 +97,7 @@ export function render(res) {
             if (targetPath.split('.').length > 1) {
                 renderNode.parent = null;
             }
+
             renderNode.targetPath = targetPath;
             renderNode.options = Object.assign(renderNode.options, options);
             return exports;
