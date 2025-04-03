@@ -1,0 +1,275 @@
+<div id="editor"></div>
+
+<style>
+    .ql-editor {
+        display: grid;
+        padding: 48px 16px;
+        place-items: center;
+    }
+
+    .ql-editor > * {
+        cursor: text;
+    }
+
+    .ql-editor p,
+    .ql-editor ol,
+    .ql-editor ul,
+    .ql-editor pre,
+    .ql-editor blockquote,
+    .ql-editor h1,
+    .ql-editor h2,
+    .ql-editor h3,
+    .ql-editor h4,
+    .ql-editor h5,
+    .ql-editor h6 {
+        width: 100%;
+        max-width: 840px;
+        padding: 0 16px;
+        margin-left: 0;
+        margin-right: 0;
+        position: relative;
+        text-wrap: pretty;
+        box-sizing: border-box;
+    }
+
+    .ql-editor li {
+        margin-left: 32px;
+        margin-bottom: 16px;
+        padding-left: 0;
+    }
+
+    .ql-editor ul {
+        margin-top: 32px;
+        list-style-type: disc;
+    }
+
+    .ql-editor ol {
+        margin-top: 32px;
+        list-style-type: decimal;
+    }
+
+    .ql-editor p,
+    ol,
+    pre,
+    li,
+    blockquote {
+        font-family: var(--plain-font);
+        font-size: var(--sl-font-size-large);
+    }
+
+    .ql-editor h1,
+    h2 {
+        font-family: var(--title-font), 'Times New Roman', Times, serif;
+        font-size: var(--sl-font-size-3x-large);
+        font-weight: 500;
+        line-height: 1.25;
+        letter-spacing: 0;
+        margin-bottom: 0.5em;
+    }
+
+    .ql-editor h3,
+    h4,
+    h5 {
+        font-weight: 700;
+        line-height: 1.25;
+        letter-spacing: 0;
+        font-family: var(--plain-font);
+        font-size: var(--sl-font-size-x-large) !important;
+        margin-bottom: 0.5em;
+    }
+
+    .ql-editor *[ql-v-visible]::after {
+        content: attr(ql-v-text);
+        position: absolute;
+        z-index: -1;
+        transform: translateY(-100%);
+        color: #ccc;
+    }
+
+    .ql-editor:focus-within h1::before,
+    .ql-editor:focus-within h2::before {
+        position: absolute;
+        padding: 1em 0.5em 0 0.5em;
+        left: 0;
+        content: 'Title';
+        transform: translate(-100%, -0.5em);
+        font-size: var(--sl-font-size-small);
+        height: 100%;
+        font-weight: normal;
+        color: #ccc;
+        border-right: 1px solid #ccc;
+    }
+</style>
+
+<script defer>
+    const Parchment = Quill.import('parchment');
+    const Delta = Quill.import('delta');
+
+    const VirtualText = new Parchment.Attributor.Attribute(
+        '_virtualText',
+        'ql-v-text',
+    );
+    const VirtualVisible = new Parchment.Attributor.Attribute(
+        '_virtualVisible',
+        'ql-v-visible',
+    );
+    Parchment.register(VirtualText);
+    Parchment.register(VirtualVisible);
+
+    const Break = Quill.import('blots/break');
+    class Placeholder extends Break {
+        static blotName = 'placeholder';
+        static tagName = 'DIV';
+
+        static create(value) {
+            const node = super.create();
+
+            const placeholder = document.createElement('span');
+            placeholder.style =
+                'position:absolute;z-index: -1;color:#ccc;width:100%;';
+            placeholder.textContent = value;
+            placeholder.setAttribute('contenteditable', false);
+
+            node.appendChild(placeholder);
+            node.appendChild(Break.create());
+
+            return node;
+        }
+
+        optimize(context) {
+            super.optimize(context);
+            const block = this.parent;
+
+            if (
+                (block && block.children.length > 1) ||
+                (block.children.length === 1 && block.children.head !== this)
+            ) {
+                this.remove();
+            }
+        }
+    }
+    Quill.register('blots/placeholder', Placeholder);
+
+    const Header = Quill.import('formats/header');
+    class PostTitle extends Header {
+        static blotName = 'postTitle';
+
+        static create({ placeholder = 'Title', value = 2 }) {
+            const node = super.create(value);
+            node.setAttribute('ql-v-text', placeholder);
+            node.setAttribute('ql-v-visible', true);
+            return node;
+        }
+
+        constructor(node, ...args) {
+            super(node, ...args);
+        }
+
+        enterInsertFormat() {
+            return { header: 3 };
+        }
+    }
+
+    Quill.register('formats/postTitle', PostTitle);
+    const toolbarRoot = document.createElement('div');
+    toolbarRoot.id = 'toolbar';
+    toolbarRoot.className = 'ql-toolbar';
+    toolbarRoot.innerHTML = `
+        <span class="ql-formats">
+            <button type="button" class="ql-bold"></button>
+            <button type="button" class="ql-italic"></button>
+            <button type="button" class="ql-link"></button>
+        </span>
+        <span class="ql-formats">
+            <button type="button" class="ql-header" value="1"></button>
+            <button type="button" class="ql-header" value="2"></button>
+            <button type="button" class="ql-blockquote"></button>
+        </span>
+    `;
+
+    const quill = new Quill('#editor', {
+        theme: 'bubble',
+        modules: { toolbar: { containter: toolbarRoot } },
+    });
+
+    quill.setContents([
+        {
+            insert: '\n',
+            attributes: {
+                postTitle: { placeholder: 'Tell your story' },
+            },
+        },
+        {
+            insert: '\n',
+            attributes: {},
+        },
+    ]);
+
+    function handleVirtualTextVisibility(action, node) {
+        switch (action) {
+            case 'show':
+                if (node.textContent.length > 0) break;
+                console.log('Adding placeholder to line');
+                node.setAttribute('ql-v-visible', true);
+                return;
+            case 'hide':
+                console.log('Removing placeholder from line');
+                node.removeAttribute('ql-v-visible');
+                return;
+        }
+    }
+
+    function handleSelectionChangeForRange(range, type) {
+        const [line] = quill.getLine(range.index);
+        if (!line?.domNode.hasAttribute('ql-v-text')) {
+            return;
+        }
+        const action = type === 'old' ? 'show' : 'hide';
+        handleVirtualTextVisibility(action, line.domNode);
+    }
+
+    quill.on('selection-change', function (range, oldRange, source) {
+        if (source !== Quill.sources.USER) return;
+        if (range) handleSelectionChangeForRange(range, 'new');
+        if (oldRange) handleSelectionChangeForRange(oldRange, 'old');
+    });
+
+    function insertNewLineAndToggleFormats(range, oldFormats, newFormats) {
+        const [line, offset] = quill.getLine(range.index);
+        const delta = new Delta()
+            .retain(range.index)
+            .insert('\n', oldFormats)
+            .retain(line.length() - offset - 1)
+            .retain(1, newFormats);
+        quill.updateContents(delta, Quill.sources.USER);
+        quill.setSelection(range.index + 1, Quill.sources.SILENT);
+    }
+
+    quill.keyboard.bindings[13].unshift(
+        {
+            key: 'Enter',
+            collapsed: true,
+            format: ['postTitle', 'header'],
+            handler: function (range, context) {
+                insertNewLineAndToggleFormats(range, context.format, {
+                    postTitle: null,
+                    header: null,
+                    _virtualVisible: null,
+                    _virtualText: null,
+                });
+                console.log('PostTitle triggered for', range, context);
+            },
+        },
+        {
+            key: 'Enter',
+            collapsed: true,
+            format: ['blockquote'],
+            handler: function (range, context) {
+                insertNewLineAndToggleFormats(range, context.format, {
+                    blockquote: null,
+                });
+                console.log('Hedaer triggered for', range, context);
+            },
+        },
+    );
+</script>

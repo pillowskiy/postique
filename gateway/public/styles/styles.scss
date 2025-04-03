@@ -1,6 +1,4 @@
 @import 'variables.scss';
-// @import '../../node_modules/bootstrap/scss/bootstrap';
-// @import 'overrides.scss';
 
 .div .input-wrapper {
     user-select: none;
@@ -19,10 +17,10 @@ body {
     background: var(--md-sys-color-background);
     color: var(--md-sys-color-on-background);
 
-    --my-brand-font: 'Open Sans';
-    --my-headline-font: 'Montserrat';
-    --my-title-font: 'Montserrat';
-    --my-plain-font: system-ui;
+    --brand-font: 'Open Sans';
+    --headline-font: 'Montserrat';
+    --title-font: 'Playfair Display';
+    --plain-font: system-ui;
 
     --md-ref-typeface-brand: var(--my-brand-font);
     --md-ref-typeface-plain: var(--my-plain-font);
@@ -146,10 +144,15 @@ sl-button[variant='default'] {
 }
 
 .workbench-content {
-    &__container {
+    &__wrapper {
         width: 100%;
         max-width: 800px;
         margin: 0 auto;
+    }
+
+    &__container {
+        width: 100%;
+        margin: 64px 0;
     }
 }
 
