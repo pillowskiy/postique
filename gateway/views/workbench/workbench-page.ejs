@@ -39,13 +39,24 @@
     }
 
     .ql-editor ul {
-        margin-top: 32px;
+        margin-bottom: 32px;
         list-style-type: disc;
     }
 
     .ql-editor ol {
-        margin-top: 32px;
+        margin-bottom: 32px;
         list-style-type: decimal;
+    }
+
+    .ql-editor blockquote {
+        padding: 4px 16px !important;
+        border-left: 3px solid var(--sl-color-neutral-700) !important;
+        margin-bottom: 24px !important;
+    }
+
+    .ql-editor p,
+    pre {
+        margin-bottom: 24px !important;
     }
 
     .ql-editor p,
@@ -64,7 +75,7 @@
         font-weight: 500;
         line-height: 1.25;
         letter-spacing: 0;
-        margin-bottom: 0.5em;
+        margin-bottom: 32px;
     }
 
     .ql-editor h3,
@@ -94,6 +105,7 @@
         content: 'Title';
         transform: translate(-100%, -0.5em);
         font-size: var(--sl-font-size-small);
+        font-family: var(--sl-font-sans);
         height: 100%;
         font-weight: normal;
         color: #ccc;
@@ -105,68 +117,147 @@
     const Parchment = Quill.import('parchment');
     const Delta = Quill.import('delta');
 
-    const VirtualText = new Parchment.Attributor.Attribute(
-        '_virtualText',
-        'ql-v-text',
-    );
-    const VirtualVisible = new Parchment.Attributor.Attribute(
-        '_virtualVisible',
-        'ql-v-visible',
-    );
-    Parchment.register(VirtualText);
-    Parchment.register(VirtualVisible);
-
-    const Break = Quill.import('blots/break');
-    class Placeholder extends Break {
-        static blotName = 'placeholder';
-        static tagName = 'DIV';
-
-        static create(value) {
-            const node = super.create();
-
-            const placeholder = document.createElement('span');
-            placeholder.style =
-                'position:absolute;z-index: -1;color:#ccc;width:100%;';
-            placeholder.textContent = value;
-            placeholder.setAttribute('contenteditable', false);
-
-            node.appendChild(placeholder);
-            node.appendChild(Break.create());
-
-            return node;
+    const Clipboard = Quill.import('modules/clipboard');
+    class FixedClipboard extends Clipboard {
+        constructor(...args) {
+            super(...args);
         }
 
-        optimize(context) {
-            super.optimize(context);
-            const block = this.parent;
+        onPaste(e) {
+            const range = this.quill.getSelection(true);
 
-            if (
-                (block && block.children.length > 1) ||
-                (block.children.length === 1 && block.children.head !== this)
-            ) {
-                this.remove();
+            // Get the formatting of the line in the current position to apply it to the first pasted line
+            const formats = range ? this.quill.getFormat(range.index) : null;
+
+            // Remove the remaining content of the current line starting from the cursor position
+            const [line, offset] = this.quill.getLine(range.index);
+            const delta = new Delta()
+                .retain(range.index)
+                .delete(line.length() - range.index);
+            this.quill.updateContents(delta, Quill.sources.SILENT);
+
+            // Perform the default paste behavior (inserts the clipboard contents)
+            super.onPaste(e);
+
+            if (formats) {
+                // Use a macrotask to ensure this runs after the default paste handling completes
+                setTimeout(() => {
+                    // Reapply the original formats to the newly inserted first line
+                    // NOTE: This could potentially be optimized with a Delta, but works fine for now
+                    Object.entries(formats).forEach(([name, value]) => {
+                        this.quill.formatLine(range.index, name, value);
+                    });
+                }, 1);
             }
         }
     }
-    Quill.register('blots/placeholder', Placeholder);
+    Quill.register('modules/clipboard', FixedClipboard);
+
+    function PlaceholderDecorator(blot) {
+        return class PlaceholderHelper extends blot {
+            static withPlaceholder = true;
+            static defaultPlaceholder = 'My placeholder';
+
+            constructor(...args) {
+                super(...args);
+            }
+
+            static create(input) {
+                const isValueHolder =
+                    input instanceof Object && 'value' in input;
+                const value = isValueHolder ? input.value : input;
+
+                const withPlaceholder =
+                    input instanceof Object && 'placeholder' in input;
+                const placeholder = withPlaceholder
+                    ? input.placeholder
+                    : this.defaultPlaceholder;
+
+                const node = super.create(value);
+                node.setAttribute('ql-v-text', placeholder);
+                node.setAttribute('ql-v-visible', !node.textContent.length);
+                return node;
+            }
+
+            handlePlaceholder(node) {
+                const isVirtualVisible =
+                    this.domNode.getAttribute('ql-v-visible');
+                const isCurrentEmpty = this.domNode.textContent.length === 0;
+                if (isVirtualVisible === isCurrentEmpty) {
+                    return;
+                }
+
+                if (isCurrentEmpty) {
+                    this.domNode.setAttribute('ql-v-visible', true);
+                } else {
+                    this.domNode.removeAttribute('ql-v-visible');
+                }
+            }
+        };
+    }
+
+    function OneInstanceDecorator(blot, alternativeBlot) {
+        return class OneInstanceHelper extends blot {
+            static oneInstance = true;
+            static instance = null;
+            static blotName = null;
+
+            constructor(node, value) {
+                super(node, value);
+
+                if (!OneInstanceHelper.instance) {
+                    OneInstanceHelper.instance = node;
+                }
+            }
+
+            static create(value) {
+                if (OneInstanceHelper.instance) {
+                    return alternativeBlot.create(value);
+                }
+
+                return super.create(value);
+            }
+
+            static formats(domNode) {
+                if (OneInstanceHelper.instance) {
+                    return alternativeBlot.formats(domNode);
+                }
+                return super.formats(domNode);
+            }
+
+            clone() {
+                const blot = super.clone();
+                if (OneInstanceHelper.instance) {
+                    blot.replaceWith(alternativeBlot.blotName);
+                }
+                return blot;
+            }
+
+            remove() {
+                if (OneInstanceHelper.instance === this.domNode) {
+                    OneInstanceHelper.instance = null;
+                }
+                return super.remove();
+            }
+        };
+    }
 
     const Header = Quill.import('formats/header');
-    class PostTitle extends Header {
+    const Block = Quill.import('blots/block');
+    class PostTitle extends OneInstanceDecorator(
+        PlaceholderDecorator(Header),
+        Header,
+    ) {
         static blotName = 'postTitle';
 
-        static create({ placeholder = 'Title', value = 2 }) {
-            const node = super.create(value);
-            node.setAttribute('ql-v-text', placeholder);
-            node.setAttribute('ql-v-visible', true);
+        static create(...args) {
+            const node = super.create(...args);
+            node.setAttribute('data-title', true);
             return node;
         }
 
         constructor(node, ...args) {
             super(node, ...args);
-        }
-
-        enterInsertFormat() {
-            return { header: 3 };
         }
     }
 
@@ -205,33 +296,16 @@
         },
     ]);
 
-    function handleVirtualTextVisibility(action, node) {
-        switch (action) {
-            case 'show':
-                if (node.textContent.length > 0) break;
-                console.log('Adding placeholder to line');
-                node.setAttribute('ql-v-visible', true);
-                return;
-            case 'hide':
-                console.log('Removing placeholder from line');
-                node.removeAttribute('ql-v-visible');
-                return;
-        }
-    }
-
-    function handleSelectionChangeForRange(range, type) {
-        const [line] = quill.getLine(range.index);
-        if (!line?.domNode.hasAttribute('ql-v-text')) {
+    quill.on('text-change', function (delta, oldContents, source) {
+        let index = quill.getSelection()?.index;
+        if (typeof index !== 'number') {
             return;
         }
-        const action = type === 'old' ? 'show' : 'hide';
-        handleVirtualTextVisibility(action, line.domNode);
-    }
 
-    quill.on('selection-change', function (range, oldRange, source) {
-        if (source !== Quill.sources.USER) return;
-        if (range) handleSelectionChangeForRange(range, 'new');
-        if (oldRange) handleSelectionChangeForRange(oldRange, 'old');
+        const [line] = quill.getLine(index);
+        if ('handlePlaceholder' in line) {
+            line.handlePlaceholder();
+        }
     });
 
     function insertNewLineAndToggleFormats(range, oldFormats, newFormats) {
@@ -243,33 +317,83 @@
             .retain(1, newFormats);
         quill.updateContents(delta, Quill.sources.USER);
         quill.setSelection(range.index + 1, Quill.sources.SILENT);
+        quill.scrollIntoView();
     }
 
-    quill.keyboard.bindings[13].unshift(
-        {
-            key: 'Enter',
-            collapsed: true,
-            format: ['postTitle', 'header'],
-            handler: function (range, context) {
-                insertNewLineAndToggleFormats(range, context.format, {
-                    postTitle: null,
-                    header: null,
-                    _virtualVisible: null,
-                    _virtualText: null,
-                });
-                console.log('PostTitle triggered for', range, context);
-            },
+    quill.keyboard.bindings[13].unshift({
+        key: 'Enter',
+        collapsed: true,
+        format: ['postTitle', 'header', 'blockquote'],
+        handler: function (range, context) {
+            insertNewLineAndToggleFormats(range, context.format, {
+                postTitle: null,
+                header: null,
+                blockquote: null,
+            });
         },
-        {
-            key: 'Enter',
-            collapsed: true,
-            format: ['blockquote'],
-            handler: function (range, context) {
-                insertNewLineAndToggleFormats(range, context.format, {
-                    blockquote: null,
-                });
-                console.log('Hedaer triggered for', range, context);
-            },
-        },
-    );
+    });
+</script>
+
+<script>
+    const parchment = Quill.import('parchment');
+
+    class Image extends parchment.Block {
+        static blotName = 'image';
+        static tagName = 'FIGURE';
+
+        static create(value) {
+            const node = super.create(value);
+            const img = document.createElement('img');
+            img.setAttribute('loading', 'lazy');
+
+            if (typeof value === 'string') {
+                img.setAttribute('src', this.sanitize(value));
+            }
+
+            node.appendChild(img);
+            return node;
+        }
+
+        static formats(domNode) {
+            return ATTRIBUTES.reduce((formats, attribute) => {
+                if (domNode.hasAttribute(attribute)) {
+                    formats[attribute] = domNode.getAttribute(attribute);
+                }
+                return formats;
+            }, {});
+        }
+
+        static match(url) {
+            return (
+                /\.(jpe?g|gif|png)$/.test(url) ||
+                /^data:image\/.+;base64/.test(url)
+            );
+        }
+
+        static sanitize(url) {
+            return sanitize(url, ['http', 'https', 'data']) ? url : '//:0';
+        }
+
+        static value(domNode) {
+            return domNode.getAttribute('src');
+        }
+
+        constructor(...args) {
+            super(...args);
+        }
+
+        format(name, value) {
+            if (ATTRIBUTES.indexOf(name) > -1) {
+                if (value) {
+                    this.domNode.setAttribute(name, value);
+                } else {
+                    this.domNode.removeAttribute(name);
+                }
+            } else {
+                super.format(name, value);
+            }
+        }
+    }
+
+    Quill.register('formats/image', Image);
 </script>

@@ -11,23 +11,25 @@
 }
 
 body {
-    padding: 0;
-    margin: 0;
-
-    background: var(--md-sys-color-background);
-    color: var(--md-sys-color-on-background);
-
     --brand-font: 'Open Sans';
     --headline-font: 'Montserrat';
     --title-font: 'Playfair Display';
     --plain-font: system-ui;
 
-    --md-ref-typeface-brand: var(--my-brand-font);
-    --md-ref-typeface-plain: var(--my-plain-font);
+    --background-color: var(--sl-color-neutral-50);
+    --foreground-color: var(--sl-color-neutral-900);
 
-    --md-sys-typescale-headline-font: var(--my-headline-font);
-    --md-sys-typescale-title-font: var(--my-title-font);
-    font-family: var(--md-ref-typeface-plain);
+    padding: 0;
+    margin: 0;
+
+    background: var(--background-color);
+    color: var(--foreground-color);
+    font-family: var(--sl-font-sans);
+    font-weight: var(--sl-font-weight-normal);
+    overflow-x: hidden;
+
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-font-smoothing: antialiased;
 }
 
 sl-button[variant='default'] {
@@ -161,6 +163,7 @@ sl-button[variant='default'] {
         position: sticky;
         top: 0;
         width: 100%;
+        background: var(--sl-color-background);
         padding: 0 20px;
     }
 
