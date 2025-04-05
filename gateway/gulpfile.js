@@ -1,5 +1,5 @@
-/* eslint-disable consistent-return */
-/* eslint-disable arrow-body-style */
+import alias from '@rollup/plugin-alias';
+import resolve from '@rollup/plugin-node-resolve';
 import gulp from 'gulp';
 import autoprefixer from 'gulp-autoprefixer';
 import babel from 'gulp-babel';
@@ -10,6 +10,9 @@ import purgecss from 'gulp-purgecss';
 import rename from 'gulp-rename';
 import gulpSass from 'gulp-sass';
 import uglify from 'gulp-uglify';
+import { rollup } from 'rollup';
+import cjs from 'rollup-plugin-cjs-es';
+import { terser } from 'rollup-plugin-terser';
 import * as sass from 'sass';
 
 const isProduction = process.env.NODE_ENV === 'production';
@@ -60,6 +63,11 @@ function styles() {
         .pipe(
             purgecss({
                 content: [paths.views.src],
+                safelist: {
+                    standard: [/^ql/],
+                    deep: [/^ql/],
+                    greedy: [/^ql/],
+                },
             }),
         )
         .pipe(gulp.dest(paths.styles.dest));
@@ -77,6 +85,30 @@ function scripts() {
         .pipe(gulp.dest(paths.scripts.dest));
 }
 
-const build = gulp.parallel(styles, scripts);
+async function bundle() {
+    const res = await rollup({
+        input: 'public/js/quill/index.js',
+        plugins: [
+            resolve(),
+            cjs({ nested: true }),
+            terser(),
+            alias({
+                entries: [
+                    { find: 'quill', replacement: 'quill/dist/quill.js' },
+                ],
+            }),
+        ],
+        treeshake: true,
+    });
+
+    return res.write({
+        file: `_static/js/quill.min.js`,
+        format: 'iife',
+        sourcemap: true,
+        compact: true,
+    });
+}
+
+const build = gulp.parallel(styles, scripts, bundle);
 
 export default gulp.series(clean, build);
