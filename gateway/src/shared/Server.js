@@ -82,10 +82,10 @@ export default class Server {
         const app = express();
         app.set('view engine', 'ejs');
         app.engine('ejs', ejsView);
-        app.set('views', this.#config.viewsDir);
-        app.use(express.static(this.#config.staticDir));
         app.disable('x-powered-by');
         app.use(router);
+        app.set('views', this.#config.viewsDir);
+        app.use(express.static(this.#config.staticDir));
         return app;
     }
 }
