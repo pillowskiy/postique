@@ -163,7 +163,8 @@ sl-button[variant='default'] {
         position: sticky;
         top: 0;
         width: 100%;
-        background: var(--sl-color-background);
+        background: var(--background-color);
+        z-index: 20;
         padding: 0 20px;
     }
 
