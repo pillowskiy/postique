@@ -55,6 +55,17 @@
         margin-bottom: 24px !important;
     }
 
+    .ql-editor figure {
+        display: grid;
+        place-items: center;
+    }
+
+    .ql-editor figcaption:empty::before {
+        content: attr(data-placeholder);
+        color: var(--sl-color-neutral-500);
+        pointer-events: none;
+    }
+
     .ql-editor figure:hover > img {
         cursor: pointer;
         transition: all 128ms ease-in-out;
