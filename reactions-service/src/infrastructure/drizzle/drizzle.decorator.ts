@@ -1,4 +1,4 @@
 import { Inject } from '@nestjs/common';
-import { DrizzleAsyncProvider } from './drizzle.provider';
+import { DrizzleConnection } from './drizzle.connection';
 
-export const InjectConnection = () => Inject(DrizzleAsyncProvider);
+export const InjectConnection = () => Inject(DrizzleConnection);
