@@ -9,7 +9,6 @@ export class LikeEntity extends ReactionEntity {
   static create(input: IncomingEntity<LikeEntity>): LikeEntity {
     const validLike = EntityFactory.create(LikeSchema, input);
     return new LikeEntity(
-      validLike.id!,
       validLike.userId,
       validLike.targetId,
       validLike.createdAt,

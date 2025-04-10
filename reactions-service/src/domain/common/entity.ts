@@ -3,19 +3,7 @@ import { DomainInvariantViolation } from './error';
 export type IncomingEntity<
   E extends Record<string, any>,
   P extends Partial<Record<keyof E | string, any>> = object,
-> = Partial<
-  Omit<
-    {
-      [K in keyof E]: E[K] extends (...args: any[]) => any
-        ? never
-        : E[K] extends { call: any } | CallableFunction
-          ? never
-          : K;
-    }[keyof E],
-    keyof P
-  >
-> &
-  P;
+> = Partial<Omit<E, keyof P>> & P;
 
 export class EntityFactory {
   public static create<

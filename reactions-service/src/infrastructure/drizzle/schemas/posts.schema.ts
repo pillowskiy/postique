@@ -20,7 +20,7 @@ export const postsStatistic = pgTable('posts_statistic', (t) => ({
 
 export const postsRelations = relations(posts, ({ one }) => ({
   statistic: one(postsStatistic, {
-    fields: [postsStatistic.postId],
-    references: [posts.id],
+    fields: [posts.id],
+    references: [postsStatistic.postId],
   }),
 }));

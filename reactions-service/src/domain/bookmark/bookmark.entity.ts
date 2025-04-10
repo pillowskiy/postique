@@ -17,9 +17,9 @@ export class BookmarkEntity extends ReactionEntity {
   }
 
   private constructor(
-    id: string,
-    userId: string,
-    targetId: string,
+    public readonly id: string,
+    public readonly userId: string,
+    public readonly targetId: string,
     createdAt: Date,
     updatedAt: Date,
     private _collectionId?: string,

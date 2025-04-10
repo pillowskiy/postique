@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 export const configSchema = z.object({
-  PORT: z.number().min(1).max(65535),
+  PORT: z.string().nonempty(),
   DATABASE_URL: z.string().nonempty(),
 });
 
@@ -13,7 +13,7 @@ export class Config implements AppConfig {
   }
 
   private constructor(
-    public readonly PORT: number,
+    public readonly PORT: string,
     public readonly DATABASE_URL: string,
   ) {}
 }

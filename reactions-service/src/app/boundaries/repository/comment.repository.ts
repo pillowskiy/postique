@@ -6,7 +6,6 @@ export abstract class CommentRepository {
   abstract findByParent(parentId: string): Promise<CommentEntity[]>;
   abstract findByUser(userId: string): Promise<CommentEntity[]>;
   abstract save(comment: CommentEntity): Promise<void>;
-  abstract update(commentId: string, content: string): Promise<void>;
   abstract delete(commentId: string): Promise<void>;
   abstract countByPost(postId: string): Promise<number>;
 }
