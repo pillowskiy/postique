@@ -76,7 +76,6 @@ export class PostgresLikeRepository extends LikeRepository {
 
   #toEntity(result: InferSelectModel<typeof likes>): LikeEntity {
     return LikeEntity.create({
-      id: `${result.userId}-${result.targetId}`,
       userId: result.userId ?? undefined,
       targetId: result.targetId!,
       createdAt: result.createdAt,

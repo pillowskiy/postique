@@ -23,7 +23,7 @@ export class PostgresBookmarkRepository extends BookmarkRepository {
     return this.#toEntity(result);
   }
 
-  async findByUserAndTarget(
+  async findUserBookmark(
     userId: string,
     targetId: string,
   ): Promise<BookmarkEntity | null> {

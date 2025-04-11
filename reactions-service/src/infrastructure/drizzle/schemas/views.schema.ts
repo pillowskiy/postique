@@ -1,11 +1,10 @@
-import { pgTable, uniqueIndex } from 'drizzle-orm/pg-core';
+import { pgTable, primaryKey, uniqueIndex } from 'drizzle-orm/pg-core';
 import { users } from './users.schema';
 import { posts } from './posts.schema';
 
 export const views = pgTable(
   'views',
   (t) => ({
-    id: t.uuid('id').primaryKey().defaultRandom(),
     userId: t.uuid('user_id').references(() => users.id, {
       onDelete: 'set null',
     }),
@@ -21,10 +20,9 @@ export const views = pgTable(
   }),
   (t) => {
     return {
-      targetIdIdx: uniqueIndex('views_target_id_idx').on(t.targetId),
-      userIdIdx: uniqueIndex('views_user_id_idx').on(t.userId),
       createdAtIdx: uniqueIndex('views_created_at_idx').on(t.createdAt),
       referrerIdx: uniqueIndex('views_referrer_idx').on(t.referrer),
+      compositeUniqueIdx: primaryKey({ columns: [t.targetId, t.userId] }),
     };
   },
 );

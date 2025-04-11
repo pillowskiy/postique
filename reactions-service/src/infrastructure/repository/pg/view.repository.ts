@@ -10,20 +10,6 @@ import { DrizzleTransactional } from '@/infrastructure/drizzle';
 export class PostgresViewRepository extends ViewRepository {
   @Inject(Transactional) private readonly _txHost: DrizzleTransactional;
 
-  async findById(id: string): Promise<ViewEntity | null> {
-    const [result] = await this._txHost.exec
-      .select()
-      .from(views)
-      .where(eq(views.id, id))
-      .limit(1);
-
-    if (!result) {
-      return null;
-    }
-
-    return this.#toEntity(result);
-  }
-
   async findByTarget(targetId: string): Promise<ViewEntity[]> {
     const results = await this._txHost.exec
       .select()
@@ -53,7 +39,6 @@ export class PostgresViewRepository extends ViewRepository {
 
   async save(view: ViewEntity): Promise<void> {
     await this._txHost.exec.insert(views).values({
-      id: view.id,
       userId: view.isAnonymous() ? null : view.userId,
       targetId: view.targetId,
       readPercentage: view.readPercentage,
@@ -105,7 +90,6 @@ export class PostgresViewRepository extends ViewRepository {
 
   #toEntity(result: InferSelectModel<typeof views>): ViewEntity {
     return ViewEntity.create({
-      id: result.id,
       userId: result.userId ?? undefined,
       targetId: result.targetId,
       readPercentage: result.readPercentage,
