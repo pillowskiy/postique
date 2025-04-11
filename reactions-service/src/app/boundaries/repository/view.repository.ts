@@ -1,7 +1,6 @@
 import { ViewEntity } from '@/domain/view/view.entity';
 
 export abstract class ViewRepository {
-  abstract findById(id: string): Promise<ViewEntity | null>;
   abstract findUserView(
     userId: string,
     targetId: string,

@@ -7,10 +7,9 @@ export class ViewEntity extends ReactionEntity {
     const validView = EntityFactory.create(ViewSchema, input);
 
     return new ViewEntity(
-      validView.id!,
       validView.userId,
       validView.targetId,
-      validView.createdAt,
+      validView.createdAt!,
       validView.readPercentage,
       validView.readingTime,
       validView.referrer,
@@ -19,7 +18,6 @@ export class ViewEntity extends ReactionEntity {
   }
 
   private constructor(
-    id: string,
     userId: string | null,
     targetId: string,
     createdAt: Date,
@@ -28,7 +26,7 @@ export class ViewEntity extends ReactionEntity {
     private readonly _referrer?: string,
     private readonly _userAgent?: string,
   ) {
-    super(id, userId || 'anonymous', targetId, createdAt, createdAt);
+    super(userId || 'anonymous', targetId, createdAt, createdAt);
   }
 
   type(): ReactionType {

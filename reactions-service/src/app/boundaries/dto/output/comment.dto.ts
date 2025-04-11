@@ -13,3 +13,12 @@ export class CommentOutput {
 }
 
 export class CreateCommentOutput extends IdentifierDto {}
+export class EditCommentOutput {
+  constructor(
+    public readonly id: string,
+    public readonly content: string,
+    public readonly createdAt: Date,
+    public readonly updatedAt: Date,
+  ) {}
+}
+export class DeleteCommentOutput extends IdentifierDto {}

@@ -11,19 +11,18 @@ export class LikeEntity extends ReactionEntity {
     return new LikeEntity(
       validLike.userId,
       validLike.targetId,
-      validLike.createdAt,
-      validLike.updatedAt,
+      validLike.createdAt!,
+      validLike.updatedAt!,
     );
   }
 
   private constructor(
-    public readonly id: string,
     public readonly userId: string,
     public readonly targetId: string,
     createdAt: Date,
     updatedAt: Date,
   ) {
-    super(id, userId, targetId, createdAt, updatedAt);
+    super(userId, targetId, createdAt, updatedAt);
   }
 
   type(): ReactionType {

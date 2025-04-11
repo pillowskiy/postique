@@ -8,7 +8,6 @@ export enum ReactionType {
 
 export abstract class ReactionEntity {
   protected constructor(
-    public readonly id: string,
     public readonly userId: string,
     public readonly targetId: string,
     protected _createdAt: Date,

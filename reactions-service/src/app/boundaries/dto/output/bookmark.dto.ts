@@ -11,4 +11,8 @@ export class BookmarkOutput {
   ) {}
 }
 
-export class CreateBookmarkOutput extends IdentifierDto {}
+export class AddBookmarkOutput extends IdentifierDto {}
+
+export class DeleteBookmarkOutput extends IdentifierDto {}
+
+export class MoveBookmarkOutput extends IdentifierDto {}

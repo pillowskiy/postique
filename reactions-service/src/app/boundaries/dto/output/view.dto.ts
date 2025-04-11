@@ -1,8 +1,5 @@
-import { IdentifierDto } from '../common';
-
 export class ViewOutput {
   constructor(
-    public readonly id: string,
     public readonly userId: string | null,
     public readonly targetId: string,
     public readonly readPercentage: number,
@@ -13,4 +10,4 @@ export class ViewOutput {
   ) {}
 }
 
-export class CreateViewOutput extends IdentifierDto {}
+export class RegisterViewOutput {}

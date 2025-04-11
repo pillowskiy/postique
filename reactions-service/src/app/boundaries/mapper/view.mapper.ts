@@ -4,7 +4,6 @@ import { ViewOutput } from '../dto/output';
 export class ViewMapper {
   static toDto(view: ViewEntity): ViewOutput {
     return new ViewOutput(
-      view.id,
       view.isAnonymous() ? null : view.userId,
       view.targetId,
       view.readPercentage,

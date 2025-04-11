@@ -3,6 +3,6 @@ import { LikeOutput } from '../dto/output';
 
 export class LikeMapper {
   static toDto(like: LikeEntity): LikeOutput {
-    return new LikeOutput(like.id, like.userId, like.targetId, like.createdAt);
+    return new LikeOutput(like.userId, like.targetId, like.createdAt);
   }
 }

@@ -10,8 +10,8 @@ export class BookmarkEntity extends ReactionEntity {
       validBookmark.id!,
       validBookmark.userId,
       validBookmark.targetId,
-      validBookmark.createdAt,
-      validBookmark.updatedAt,
+      validBookmark.createdAt!,
+      validBookmark.updatedAt!,
       validBookmark.collectionId,
     );
   }
@@ -24,7 +24,7 @@ export class BookmarkEntity extends ReactionEntity {
     updatedAt: Date,
     private _collectionId?: string,
   ) {
-    super(id, userId, targetId, createdAt, updatedAt);
+    super(userId, targetId, createdAt, updatedAt);
   }
 
   type(): ReactionType {
