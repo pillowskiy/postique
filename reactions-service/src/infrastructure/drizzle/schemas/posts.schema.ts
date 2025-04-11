@@ -3,6 +3,9 @@ import { pgTable } from 'drizzle-orm/pg-core';
 
 export const posts = pgTable('posts', (t) => ({
   id: t.uuid('id').primaryKey().defaultRandom(),
+  title: t.text('title').notNull(),
+  description: t.text('description').default(''),
+  coverImage: t.text('cover_image'),
 }));
 
 export const postsStatistic = pgTable('posts_statistic', (t) => ({

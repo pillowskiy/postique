@@ -1,10 +1,12 @@
 import { Transactional } from '@/app/boundaries/common';
 import { CommentRepository } from '@/app/boundaries/repository';
+import { CommentAggregate } from '@/domain/comment/comment.aggregate';
 import { CommentEntity } from '@/domain/comment/comment.entity';
+import { UserEntity } from '@/domain/user';
 import { DrizzleTransactional } from '@/infrastructure/drizzle';
-import { comments } from '@/infrastructure/drizzle/schemas';
+import { comments, users } from '@/infrastructure/drizzle/schemas';
 import { Inject, Injectable } from '@nestjs/common';
-import { count, eq, InferSelectModel } from 'drizzle-orm';
+import { and, count, eq, gt, type InferSelectModel } from 'drizzle-orm';
 
 @Injectable()
 export class PostgresCommentRepository extends CommentRepository {
@@ -23,34 +25,46 @@ export class PostgresCommentRepository extends CommentRepository {
     return this.#toEntity(result);
   }
 
-  async findByPost(postId: string): Promise<CommentEntity[]> {
+  async findByPost(
+    postId: string,
+    cursor?: string,
+    pageSize: number = 30,
+  ): Promise<CommentAggregate[]> {
     const results = await this._txHost.exec
       .select()
       .from(comments)
-      .where(eq(comments.postId, postId))
-      .limit(100);
+      .where(
+        cursor
+          ? and(
+              eq(comments.postId, postId),
+              gt(comments.createdAt, cursor),
+              eq(comments.parentId, null),
+            )
+          : undefined,
+      )
+      .leftJoin(users, eq(comments.userId, users.id))
+      .limit(pageSize);
 
-    return results.map((result) => this.#toEntity(result));
+    return results.map((result) => this.#toAggregate(result));
   }
 
-  async findByParent(parentId: string): Promise<CommentEntity[]> {
+  async findByParent(
+    parentId: string,
+    cursor?: string,
+    pageSize: number = 30,
+  ): Promise<CommentAggregate[]> {
     const results = await this._txHost.exec
       .select()
       .from(comments)
-      .where(eq(comments.parentId, parentId))
-      .limit(100);
+      .where(
+        cursor
+          ? and(eq(comments.parentId, parentId), gt(comments.createdAt, cursor))
+          : undefined,
+      )
+      .leftJoin(users, eq(comments.userId, users.id))
+      .limit(pageSize);
 
-    return results.map((result) => this.#toEntity(result));
-  }
-
-  async findByUser(userId: string): Promise<CommentEntity[]> {
-    const results = await this._txHost.exec
-      .select()
-      .from(comments)
-      .where(eq(comments.userId, userId))
-      .limit(100);
-
-    return results.map((result) => this.#toEntity(result));
+    return results.map((result) => this.#toAggregate(result));
   }
 
   async save(comment: CommentEntity): Promise<void> {
@@ -101,5 +115,28 @@ export class PostgresCommentRepository extends CommentRepository {
       updatedAt: result.updatedAt,
       parentId: result.parentId ?? undefined,
     });
+  }
+
+  // TEMP: It might be a good temporary read model.
+  #toAggregate(result: {
+    comments: InferSelectModel<typeof comments>;
+    users: InferSelectModel<typeof users> | null;
+  }): CommentAggregate {
+    const comment = CommentAggregate.fromEntity(
+      this.#toEntity(result.comments),
+    );
+
+    const user = result.users;
+    if (user) {
+      comment.setAuthor(
+        UserEntity.create({
+          id: user.id,
+          username: user.username,
+          avatarPath: user.avatarPath!,
+          email: user.email,
+        }),
+      );
+    }
+    return comment;
   }
 }

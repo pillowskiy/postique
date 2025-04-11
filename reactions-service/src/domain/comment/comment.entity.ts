@@ -16,7 +16,7 @@ export class CommentEntity {
     );
   }
 
-  private constructor(
+  protected constructor(
     public readonly id: string,
     public readonly userId: string,
     public readonly postId: string,

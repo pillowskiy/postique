@@ -1,9 +1,18 @@
+import { BookmarkAggregate } from '@/domain/bookmark/bookmark.aggregate';
 import { BookmarkEntity } from '@/domain/bookmark/bookmark.entity';
 
 export abstract class BookmarkRepository {
   abstract findById(id: string): Promise<BookmarkEntity | null>;
-  abstract findByUser(userId: string): Promise<BookmarkEntity[]>;
-  abstract findByTarget(targetId: string): Promise<BookmarkEntity[]>;
+  abstract findByUser(
+    userId: string,
+    cursor?: string,
+    pageSize?: number,
+  ): Promise<BookmarkAggregate[]>;
+  abstract findByCollection(
+    collectionId: string,
+    cursor?: string,
+    pageSize?: number,
+  ): Promise<BookmarkAggregate[]>;
   abstract findUserBookmark(
     userId: string,
     targetId: string,
