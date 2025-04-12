@@ -19,8 +19,8 @@ func New(log *slog.Logger, cfg *config.Config) *App {
 	pgStorage := pg.MustConnect(cfg.Postgres)
 	userPub := rmq.MustRabbitMQProducer(
 		cfg.RabbitMQ.URL,
+		cfg.RabbitMQ.Exchange,
 		"",
-		cfg.RabbitMQ.UserQueue,
 	)
 
 	roleRepo := pg.NewRoleStorage(pgStorage)

@@ -17,8 +17,8 @@ postgres:
   ssl: disable
 
 rmq:
-  url: amqp://guest:guest@rabbitmq:5672
-  user_queue: user_queue
+  url: amqp://guest:guest@rabbitmq.rabbitmq.svc.cluster.local:5672
+  exchange: user.events
 
 logger:
   mode: development

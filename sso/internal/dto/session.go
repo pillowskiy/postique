@@ -20,5 +20,5 @@ type Session struct {
 }
 
 type UserPayload struct {
-	UserID string
+	UserID string `json:"uid"`
 }

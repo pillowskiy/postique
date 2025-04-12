@@ -29,8 +29,8 @@ type Session struct {
 }
 
 type RabbitMQ struct {
-	URL       string `yaml:"url" env-required:"true"`
-	UserQueue string `yaml:"user_queue" env-required:"true"`
+	URL      string `yaml:"url" env-required:"true"`
+	Exchange string `yaml:"exchange" env-required:"true"`
 }
 
 type Postgres struct {
