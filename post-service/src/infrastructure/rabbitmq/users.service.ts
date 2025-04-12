@@ -11,7 +11,8 @@ export class UsersRMQService {
       transport: Transport.RMQ,
       options: {
         noAck,
-        urls: [this._configService.get('RABBIT_MQ_URI')],
+        urls: [this._configService.get('RABBIT_MQ_USERS_URL')],
+        exchange: this._configService.get('RABBIT_MQ_USERS_EXCHANGE'),
         persistent: true,
         queueOptions: {
           durable: true,

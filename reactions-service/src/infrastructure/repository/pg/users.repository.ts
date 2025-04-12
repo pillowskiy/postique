@@ -4,7 +4,7 @@ import { UserEntity } from '@/domain/user';
 import { DrizzleTransactional } from '@/infrastructure/drizzle';
 import { users } from '@/infrastructure/drizzle/schemas';
 import { Inject, Injectable } from '@nestjs/common';
-import { eq, InferSelectModel } from 'drizzle-orm';
+import { and, eq, InferSelectModel } from 'drizzle-orm';
 
 @Injectable()
 export class PostgresUsersRepository extends UsersRepository {
@@ -30,6 +30,23 @@ export class PostgresUsersRepository extends UsersRepository {
       .select()
       .from(users)
       .where(eq(users.username, username))
+      .limit(1);
+
+    if (!result) {
+      return null;
+    }
+
+    return this.#toEntity(result);
+  }
+
+  async findUnique(
+    username: string,
+    email: string,
+  ): Promise<UserEntity | null> {
+    const [result] = await this._txHost.exec
+      .select()
+      .from(users)
+      .where(and(eq(users.username, username), eq(users.email, email)))
       .limit(1);
 
     if (!result) {
