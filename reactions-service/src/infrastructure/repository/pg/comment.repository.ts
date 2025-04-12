@@ -31,7 +31,7 @@ export class PostgresCommentRepository extends CommentRepository {
     pageSize: number = 30,
   ): Promise<CommentAggregate[]> {
     const results = await this._txHost.exec
-      .select()
+      .select({ comments, users })
       .from(comments)
       .where(
         cursor
@@ -54,7 +54,7 @@ export class PostgresCommentRepository extends CommentRepository {
     pageSize: number = 30,
   ): Promise<CommentAggregate[]> {
     const results = await this._txHost.exec
-      .select()
+      .select({ comments, users })
       .from(comments)
       .where(
         cursor

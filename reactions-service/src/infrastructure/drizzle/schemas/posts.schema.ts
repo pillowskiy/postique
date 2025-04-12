@@ -16,6 +16,7 @@ export const postsStatistic = pgTable('posts_statistic', (t) => ({
   viewsCount: t.integer('views_count').notNull().default(0),
   likesCount: t.integer('likes_count').notNull().default(0),
   commentsCount: t.integer('comments_count').notNull().default(0),
+  bookmarksCount: t.integer('bookmarks_count').notNull().default(0),
 }));
 
 export const postsRelations = relations(posts, ({ one }) => ({

@@ -1,4 +1,4 @@
-export enum UserEvent {
+export enum UsersEvents {
   Registered = 'user_registered',
   Profile = 'user_profile',
 }
