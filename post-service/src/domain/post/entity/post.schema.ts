@@ -20,7 +20,7 @@ export class PostSchema implements IPost {
   id: string = randomUUID();
 
   @IsString({ message: 'Title must be a string' })
-  @IsOptional()
+  @IsNotEmpty({ message: 'Title cannot be empty' })
   @MaxLength(128, { message: 'Title must be at most 128 characters' })
   title: string;
 

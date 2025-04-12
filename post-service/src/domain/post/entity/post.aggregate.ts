@@ -30,34 +30,6 @@ export class PostAggregate extends PostEntity implements IDetailedPost {
     return this._paragraphs;
   }
 
-  publish() {
-    if (this.status !== PostStatus.Draft) {
-      throw new DomainBusinessRuleViolation('Post is not in draft state');
-    }
-
-    const contentLength = this.paragraphs.reduce(
-      (acc, p) => acc + p.text.length,
-      0,
-    );
-    if (contentLength < 128) {
-      throw new DomainBusinessRuleViolation(
-        'Post content must have at least 128 characters',
-      );
-    }
-
-    this._status = PostStatus.Published;
-    this._publishedAt = new Date();
-  }
-
-  archive() {
-    if (this.status === PostStatus.Archived) {
-      throw new DomainBusinessRuleViolation('Post is already archived');
-    }
-
-    this._status = PostStatus.Archived;
-    this._publishedAt = null;
-  }
-
   appendParagraph(paragraph: ParagraphAggregate) {
     this._paragraphs.push(paragraph);
   }

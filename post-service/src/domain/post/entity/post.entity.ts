@@ -115,4 +115,28 @@ export class PostEntity implements IPost {
   transferOwnership(userId: string) {
     this._owner = userId;
   }
+
+  publish() {
+    if (this.status !== PostStatus.Draft) {
+      throw new DomainBusinessRuleViolation('Post is not in draft state');
+    }
+
+    if (this.description.length < 64) {
+      throw new DomainBusinessRuleViolation(
+        'Post description must have at least 64 characters',
+      );
+    }
+
+    this._status = PostStatus.Published;
+    this._publishedAt = new Date();
+  }
+
+  archive() {
+    if (this.status === PostStatus.Archived) {
+      throw new DomainBusinessRuleViolation('Post is already archived');
+    }
+
+    this._status = PostStatus.Archived;
+    this._publishedAt = null;
+  }
 }

@@ -5,7 +5,6 @@ import { Inject } from '@nestjs/common';
 import { CommandHandler } from '@nestjs/cqrs';
 import { Command } from '../../common';
 import { ArchivePostCommand } from './archive.command';
-import { PostAggregate } from '@/domain/post';
 
 @CommandHandler(ArchivePostCommand)
 export class ArchivePostCommandHandler extends Command<
@@ -23,8 +22,7 @@ export class ArchivePostCommandHandler extends Command<
       throw new NotFoundException('Post does not exist');
     }
 
-    const aggregate = PostAggregate.create(post);
-    aggregate.archive();
+    post.archive();
     await this._postRepository.save(post);
 
     return new ArchivePostOutput(post.id);
