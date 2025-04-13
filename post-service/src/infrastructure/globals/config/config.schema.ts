@@ -6,6 +6,7 @@ import {
   Length,
   Matches,
   Max,
+  MaxLength,
   Min,
   validateSync,
 } from 'class-validator';
@@ -43,18 +44,12 @@ export class Config {
   @Min(0, { message: 'Must be greater than 0' })
   PORT: number;
 
-  @IsNotEmpty({ message: 'Cannot be empty' })
   @IsString({ message: 'Must be a string' })
-  @Length(3, 50, {
-    message: 'Must be between 3 and 50 characters long',
-  })
+  @MaxLength(50, { message: 'Must be less than 50 characters long' })
   RABBIT_MQ_USERS_QUEUE: string;
 
-  @IsNotEmpty({ message: 'Cannot be empty' })
   @IsString({ message: 'Must be a string' })
-  @Length(3, 50, {
-    message: 'Must be between 3 and 50 characters long',
-  })
+  @MaxLength(50, { message: 'Must be less than 50 characters long' })
   RABBIT_MQ_USERS_EXCHANGE: string;
 
   @IsNotEmpty({ message: 'Cannot be empty' })
@@ -64,6 +59,22 @@ export class Config {
       'Must be a valid RabbitMQ URI (e.g., amqp://username:password@host:port)',
   })
   RABBIT_MQ_USERS_URL: string;
+
+  @IsString({ message: 'Must be a string' })
+  @MaxLength(50, { message: 'Must be less than 50 characters long' })
+  RABBIT_MQ_POSTS_QUEUE: string;
+
+  @IsString({ message: 'Must be a string' })
+  @MaxLength(50, { message: 'Must be less than 50 characters long' })
+  RABBIT_MQ_POSTS_EXCHANGE: string;
+
+  @IsNotEmpty({ message: 'Cannot be empty' })
+  @IsString({ message: 'Must be a string' })
+  @Matches(/^amqp:\/\/.*$/, {
+    message:
+      'Must be a valid RabbitMQ URI (e.g., amqp://username:password@host:port)',
+  })
+  RABBIT_MQ_POSTS_URL: string;
 
   @IsNotEmpty({ message: 'Cannot be empty' })
   @IsString({ message: 'Must be a string' })

@@ -7,6 +7,8 @@ export class PostMapper {
   static toDto(post: PostEntity): PostOutput {
     const postDto = new PostOutput(
       post.id,
+      post.title,
+      post.description,
       post.visibility,
       post.owner,
       [...post.authors],
@@ -30,6 +32,8 @@ export class PostMapper {
 
     const postDto = new DetailedPostOutput(
       post.id,
+      post.title,
+      post.description,
       post.visibility,
       post.owner,
       [...post.authors],

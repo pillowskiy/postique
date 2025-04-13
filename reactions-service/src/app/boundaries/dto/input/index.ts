@@ -4,3 +4,4 @@ export * from './comment.dto';
 export * from './like.dto';
 export * from './view.dto';
 export * from './user.dto';
+export * from './post.dto';

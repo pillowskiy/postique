@@ -21,6 +21,7 @@
   },
   "dependencies": {
     "@fastify/compress": "^8.0.1",
+    "@golevelup/nestjs-rabbitmq": "^5.7.0",
     "@grpc/grpc-js": "^1.13.0",
     "@grpc/proto-loader": "^0.7.13",
     "@nestjs/common": "^11.0.1",

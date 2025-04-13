@@ -1,6 +1,8 @@
 export class PostOutput {
   constructor(
     public readonly id: string,
+    public readonly title: string,
+    public readonly description: string,
     public readonly visibility: string,
     public readonly owner: string,
     public readonly authors: string[],
@@ -15,6 +17,8 @@ export class PostOutput {
 export class DetailedPostOutput implements PostOutput {
   constructor(
     public readonly id: string,
+    public readonly title: string,
+    public readonly description: string,
     public readonly visibility: string,
     public readonly owner: string,
     public readonly authors: string[],

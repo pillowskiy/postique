@@ -6,12 +6,12 @@ export const configSchema = z.object({
   DATABASE_URL: z.string().nonempty(),
 
   RABBIT_MQ_USERS_URL: z.string().nonempty(),
-  RABBIT_MQ_USERS_EXCHANGE: z.string().nonempty(),
-  RABBIT_MQ_USERS_QUEUE: z.string().nonempty(),
+  RABBIT_MQ_USERS_EXCHANGE: z.string(),
+  RABBIT_MQ_USERS_QUEUE: z.string(),
 
   RABBIT_MQ_POSTS_URL: z.string().nonempty(),
-  RABBIT_MQ_POSTS_EXCHANGE: z.string().nonempty(),
-  RABBIT_MQ_POSTS_QUEUE: z.string().nonempty(),
+  RABBIT_MQ_POSTS_EXCHANGE: z.string(),
+  RABBIT_MQ_POSTS_QUEUE: z.string(),
 
   JWT_KEY_PATH: z
     .string()

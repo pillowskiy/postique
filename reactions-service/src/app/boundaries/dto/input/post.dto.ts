@@ -1,13 +1,10 @@
-import { IdentifierDto } from '../common';
-
-export class PostOutput {
+export class PostInput {
   constructor(
     public readonly id: string,
     public readonly title: string,
     public readonly description: string,
     public readonly coverImage: string | null,
+    public readonly visibility: string,
+    public readonly status: string,
   ) {}
 }
-
-export class CreatePostOutput extends IdentifierDto {}
-export class EditPostOutput extends IdentifierDto {}

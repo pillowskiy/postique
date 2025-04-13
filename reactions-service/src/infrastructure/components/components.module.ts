@@ -5,11 +5,13 @@ import { CollectionsModule } from './collections';
 import { CommentsModule } from './comments';
 import { LikesModule } from './likes';
 import { ViewsModule } from './views';
+import { PostsModule } from './posts';
 
 @Module({
   imports: [
     BookmarksModule,
     CollectionsModule,
+    PostsModule,
     CommentsModule,
     LikesModule,
     UsersModule,

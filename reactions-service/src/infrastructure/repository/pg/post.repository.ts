@@ -31,6 +31,8 @@ export class PostgresPostRepository extends PostRepository {
         title: post.title,
         description: post.description,
         coverImage: post.coverImage,
+        visibility: post.visibility,
+        status: post.status,
       })
       .onConflictDoUpdate({
         target: [posts.id],
@@ -38,6 +40,8 @@ export class PostgresPostRepository extends PostRepository {
           title: post.title,
           description: post.description,
           coverImage: post.coverImage,
+          visibility: post.visibility,
+          status: post.status,
         },
       });
   }

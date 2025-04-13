@@ -13,10 +13,11 @@ import {
 import { Command } from '@/app/commands/common';
 import { PostEntity, PostVisibility } from '@/domain/post';
 import { Inject } from '@nestjs/common';
-import { CommandHandler } from '@nestjs/cqrs';
+import { CommandHandler, EventBus } from '@nestjs/cqrs';
 import slugify from 'slugify';
 import { CreatePostCommand } from './create.command';
 import { PostAccessControlList } from '@/app/boundaries/acl';
+import { PostCreatedEvent } from '@/app/events/post/post-created';
 
 @CommandHandler(CreatePostCommand)
 export class CreatePostCommandHandler extends Command<
@@ -34,6 +35,9 @@ export class CreatePostCommandHandler extends Command<
 
   @Inject(ContentRepository)
   private readonly _contentRepository: ContentRepository;
+
+  @Inject(EventBus)
+  private readonly _eventBus: EventBus;
 
   @Inject(Logger)
   private readonly _logger: Logger;
@@ -79,6 +83,17 @@ export class CreatePostCommandHandler extends Command<
       this._contentRepository.save(post.content, []),
       this._postRepository.save(post),
     ]);
+
+    this._eventBus.publish(
+      new PostCreatedEvent(
+        post.id,
+        post.title,
+        post.description,
+        null,
+        post.visibility,
+        post.status,
+      ),
+    );
 
     this._logger.debug?.('Post saved', { post });
     return new CreatePostOutput(post.id);
