@@ -12,9 +12,14 @@
     function popToasts() {
         const toastNode = toastsContainer.lastElementChild;
         Array.from(toastsContainer.children).forEach((toastNode) => {
-            const toast = bootstrap.Toast.getOrCreateInstance(toastNode);
-            toastNode.setAttribute('data-show', true);
-            toast.show();
+            setTimeout(() => {
+                if (
+                    'toast' in toastNode &&
+                    typeof toastNode.toast === 'function'
+                ) {
+                    toastNode.toast();
+                }
+            }, 200);
         });
     }
 
