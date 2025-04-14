@@ -1,0 +1,85 @@
+<main class="auth-wrapper">
+    <div class="auth-container">
+        <div class="visual-side">
+            <div class="featured-content">
+                <svg
+                    class="featured-image"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                >
+                    <path
+                        d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z"
+                        stroke="#3182CE"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                    />
+                    <path
+                        d="M9.09 9C9.3251 8.33167 9.78915 7.76811 10.4 7.40913C11.0108 7.05016 11.7289 6.91894 12.4272 7.03871C13.1255 7.15849 13.7588 7.52152 14.2151 8.06353C14.6713 8.60553 14.9211 9.29152 14.92 10C14.92 12 11.92 13 11.92 13"
+                        stroke="#3182CE"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                    />
+                    <path
+                        d="M12 17H12.01"
+                        stroke="#3182CE"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                    />
+                </svg>
+                <blockquote class="quote">
+                    «Ваше майбутнє створюється тим, що ви робите сьогодні, а не
+                    завтра».
+                </blockquote>
+                <div class="quote-author">
+                    <sl-avatar
+                        label="Author"
+                        image="https://kinesis.money/wp-content/uploads/2024/05/Rober-Kiyosaki@1x-1.jpg"
+                    >
+                    </sl-avatar>
+                    <div class="author-info">
+                        <span class="author-name">Роберт Кійосакі</span>
+                        <span class="author-title">Бізнесмен</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <%- __formChild %>
+    </div>
+</main>
+
+<script>
+    const form = document.querySelector('#form');
+    let handled = {};
+
+    if (form) {
+        const inputs = Array.from(form.querySelectorAll('sl-input'));
+        console.log(`Inputs`, inputs);
+        inputs.map((input) => {
+            console.log(`Input event on`, input);
+            input.addEventListener('sl-change', (e) => {
+                const key = `error-${input.id}`;
+                console.log(`Input event on key`, key);
+                if (handled[key]) {
+                    return;
+                }
+
+                handled[key] = true;
+                input.removeAttribute('data-invalid');
+                const el = form.querySelector(`#${key}`);
+                if (el) {
+                    el.setAttribute('hidden', '');
+                }
+            });
+        });
+
+        form.addEventListener('submit', (e) => {
+            console.log(`Submit event`, e);
+            handled = {};
+        });
+    }
+</script>

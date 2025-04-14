@@ -33,6 +33,11 @@ const paths = /** @type {const} */ {
         src: 'public/**/*.js',
         dest: DEST_DIR,
     },
+    assets: {
+        changed: `${DEST_DIR}/assets`,
+        src: 'public/assets/**/*',
+        dest: `${DEST_DIR}/assets`,
+    },
 };
 
 /**
@@ -64,9 +69,9 @@ function styles() {
             purgecss({
                 content: [paths.views.src],
                 safelist: {
-                    standard: [/^ql/],
-                    deep: [/^ql/],
-                    greedy: [/^ql/],
+                    standard: [/^ql/, /^sl-/],
+                    deep: [/^ql/, /^sl-/],
+                    greedy: [/^ql/, /^sl-/],
                 },
             }),
         )
@@ -83,6 +88,16 @@ function scripts() {
         .pipe(babel())
         .pipe(uglify())
         .pipe(gulp.dest(paths.scripts.dest));
+}
+
+function assets() {
+    return gulp
+        .src(paths.assets.src, {
+            since: gulp.lastRun(assets),
+            sourcemaps: true,
+        })
+        .pipe(changed(paths.assets.changed))
+        .pipe(gulp.dest(paths.assets.dest));
 }
 
 async function bundle() {
@@ -109,6 +124,6 @@ async function bundle() {
     });
 }
 
-const build = gulp.parallel(styles, scripts, bundle);
+const build = gulp.parallel(styles, assets, scripts, bundle);
 
 export default gulp.series(clean, build);

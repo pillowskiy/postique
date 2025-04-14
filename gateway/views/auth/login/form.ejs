@@ -1,64 +1,111 @@
-<form
-    class="h-100 row align-items-center"
-    hx-post="/login"
-    hx-target="this"
-    hx-swap="none"
->
-    <div>
-        <h2>Hello, Again</h2>
-        <p class="lead">We are happy to have you back!</p>
+<div class="form-side">
+    <div class="form-header">
+        <h2>Раді знову вас бачити</h2>
+        <p>Будь ласка, введіть свої дані для входу</p>
+    </div>
 
+    <form
+        id="form"
+        hx-post="/login"
+        hx-target="this"
+        hx-swap="none"
+        class="login-form"
+    >
         <input type="hidden" name="csrfToken" value="<%= csrfToken %>" />
-        <div class="form-outline mb-4">
-            <label class="form-label" for="loginName">Email</label>
-            <input
-                type="email"
-                id="loginName"
-                name="email"
-                class="form-control"
-            />
-            <small id="error-email" class="d-none"></small>
-        </div>
 
-        <div class="form-outline mb-4">
-            <label class="form-label" for="loginPassword">Password</label>
-            <input
-                type="password"
-                id="loginPassword"
-                name="password"
-                class="form-control"
-            />
-            <small id="error-password" class="d-none"></small>
-        </div>
-    </div>
-
-    <div>
-        <div class="row">
-            <div class="col-md-6">
-                <div class="form-check">
-                    <input
-                        class="form-check-input"
-                        type="checkbox"
-                        value=""
-                        id="rememberMe"
-                        name="rememberMe"
-                        checked
+        <div class="social-login">
+            <button type="button" class="social-btn">
+                <svg
+                    class="social-icon"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                >
+                    <path
+                        d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+                        fill="#4285F4"
                     />
-                    <label class="form-check-label" for="rememberMe">
-                        Remember me
-                    </label>
-                </div>
-            </div>
+                    <path
+                        d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+                        fill="#34A853"
+                    />
+                    <path
+                        d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"
+                        fill="#FBBC05"
+                    />
+                    <path
+                        d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
+                        fill="#EA4335"
+                    />
+                </svg>
+                Google
+            </button>
+            <button type="button" class="social-btn">
+                <svg
+                    class="social-icon"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                >
+                    <path
+                        d="M12 2C6.477 2 2 6.477 2 12C2 16.991 5.657 21.128 10.438 21.878V14.891H7.898V12H10.438V9.797C10.438 7.291 11.93 5.907 14.215 5.907C15.309 5.907 16.453 6.102 16.453 6.102V8.562H15.193C13.95 8.562 13.563 9.333 13.563 10.124V12H16.336L15.893 14.89H13.563V21.878C18.343 21.128 22 16.991 22 12C22 6.477 17.523 2 12 2Z"
+                        fill="#1877F2"
+                    />
+                </svg>
+                Facebook
+            </button>
         </div>
 
-        <button
-            type="submit"
-            class="btn btn-primary d-block w-100 text-center"
-            style="margin: 8px 0"
-        >
-            Sign in
-        </button>
+        <div class="divider">або продовжити з</div>
 
-        <small>Need an account? <a href="/register">Sign up</a></small>
+        <div>
+            <sl-input
+                id="email"
+                name="email"
+                label="Ел. Пошта*"
+                placeholder="user@gmail.com"
+            >
+                <sl-icon
+                    class="font-size: 1.3rem;"
+                    name="envelope"
+                    slot="prefix"
+                ></sl-icon>
+            </sl-input>
+            <small id="error-email" class="form-error" hidden></small>
+        </div>
+
+        <div>
+            <sl-input
+                id="password"
+                name="password"
+                label="Пароль*"
+                type="password"
+                placeholder="Введіть ваш пароль"
+                password-toggle
+            >
+                <sl-icon
+                    class="font-size: 1.3rem;"
+                    name="key"
+                    slot="prefix"
+                ></sl-icon>
+            </sl-input>
+            <small id="error-password" class="form-error" hidden></small>
+        </div>
+
+        <div class="remember-forgot">
+            <sl-checkbox id="rememberMe" name="rememberMe" checked>
+                Запам'ятати мене
+            </sl-checkbox>
+            <a href="#" class="link">Забули пароль?</a>
+        </div>
+
+        <sl-button variant="primary" type="submit">Увійти</sl-button>
+    </form>
+
+    <div class="form-footer">
+        <p>
+            Не маєте облікового запису?
+            <a href="/register" class="link"> Зареєструйтесь </a>
+        </p>
     </div>
-</form>
+</div>

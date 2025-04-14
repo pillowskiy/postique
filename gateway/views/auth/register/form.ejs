@@ -1,74 +1,101 @@
-<form class="h-100 row align-items-center" hx-post="/register" hx-swap="none">
-    <h2 class="mb-4">Create an account</h2>
+<div class="form-side">
+    <div class="form-header">
+        <h2>Реєстрація облікового запису</h2>
+        <p>Будь ласка, введіть свої дані для реєстрації</p>
+    </div>
 
-    <div>
+    <form
+        id="form"
+        hx-post="/register"
+        hx-target="this"
+        hx-swap="none"
+        class="login-form"
+    >
         <input type="hidden" name="csrfToken" value="<%= csrfToken %>" />
 
-        <div class="form-outline mb-4">
-            <label class="form-label" for="username">Username</label>
-            <input
-                type="text"
-                name="username"
+        <div>
+            <sl-input
                 id="username"
-                class="form-control"
-            />
-            <small id="error-username" class="d-none"></small>
+                name="username"
+                label="Ім'я користувача*"
+                placeholder="Введіть бажане ім'я"
+            >
+                <sl-icon
+                    class="font-size: 1.3rem;"
+                    name="person-bounding-box"
+                    slot="prefix"
+                ></sl-icon>
+            </sl-input>
+            <small id="error-username" hidden></small>
         </div>
 
-        <div class="form-outline mb-4">
-            <label class="form-label" for="email">Email</label>
-            <input type="email" name="email" id="email" class="form-control" />
-            <small id="error-email" class="d-none"></small>
+        <div>
+            <sl-input
+                id="email"
+                name="email"
+                label="Ел. Пошта*"
+                placeholder="user@gmail.com"
+            >
+                <sl-icon
+                    class="font-size: 1.3rem;"
+                    name="envelope"
+                    slot="prefix"
+                ></sl-icon>
+            </sl-input>
+            <small id="error-email" hidden></small>
         </div>
 
-        <div class="form-outline mb-4">
-            <label class="form-label" for="password">Password</label>
-            <input
-                type="password"
-                name="password"
+        <div>
+            <sl-input
                 id="password"
-                class="form-control"
-            />
-            <small id="error-password" class="d-none"></small>
-        </div>
-
-        <div class="form-outline mb-4">
-            <label class="form-label" for="passwordConfirm">
-                Repeat password
-            </label>
-            <input
+                name="password"
+                label="Пароль*"
                 type="password"
-                name="passwordConfirm"
-                id="passwordConfirm"
-                class="form-control"
-            />
-            <small id="error-password-confirm" class="d-none"></small>
+                placeholder="Введіть ваш пароль"
+                password-toggle
+            >
+                <sl-icon
+                    class="font-size: 1.3rem;"
+                    name="key"
+                    slot="prefix"
+                ></sl-icon>
+            </sl-input>
+            <small id="error-password" hidden></small>
         </div>
-    </div>
 
-    <div>
-        <div class="form-check d-flex">
-            <input
-                class="form-check-input me-2"
-                type="checkbox"
-                value=""
-                id="terms"
-                aria-describedby="checkHelpText"
-                required
-            />
-            <label class="form-check-label" for="terms">
-                I have read and agree to the terms
-            </label>
+        <div>
+            <sl-input
+                id="password-confirm"
+                name="passwordConfirm"
+                label="Повторіть пароль*"
+                type="password"
+                placeholder="Повторіть пароль"
+            >
+                <sl-icon
+                    class="font-size: 1.3rem;"
+                    name="key"
+                    slot="prefix"
+                ></sl-icon>
+            </sl-input>
+            <small id="error-password-confirm" hidden></small>
         </div>
-        <button
-            type="submit"
-            class="btn btn-primary d-block w-100 text-center"
-            style="margin: 8px 0"
+
+        <sl-checkbox
+            id="rememberMe"
+            name="rememberMe"
+            help-text="Я погоджуюсь з умовами та правилами користування сайтом"
+            data-required
+            checked
         >
-            Sign up
-        </button>
-        <small>
-            <a class="text-sm" href="/login">Already have an account?</a>
-        </small>
+            Підтвердити правила користування
+        </sl-checkbox>
+
+        <sl-button variant="primary" type="submit">Зареєструватися</sl-button>
+    </form>
+    <div class="form-footer">
+        <p>
+            Вже маєте обліковий запис?
+            <a href="/login" class="link"> Увійти </a>
+        </p>
     </div>
-</form>
+</div>
