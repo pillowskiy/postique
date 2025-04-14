@@ -61,7 +61,7 @@ export class AuthController {
     async loginUser(req, res) {
         const errors = validate(req);
         if (!errors.isEmpty()) {
-            return render(res).template('auth/register/form-errors.oob', {
+            return render(res).template('auth/login/form-errors.oob', {
                 errors: errors.mapped(),
             });
         }

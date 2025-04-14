@@ -6,6 +6,7 @@
     </head>
 
     <body>
+        <%- await include('./components/header.ejs') %>
         <div id="root" class="global-container">
             <%- await include(__renderTarget) %>
         </div>

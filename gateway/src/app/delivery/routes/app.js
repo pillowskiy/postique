@@ -10,6 +10,7 @@ import express from 'express';
 export function AppRoutes(authRouter, authMiddlewares, middlewares) {
     const appRouter = express.Router();
 
+    appRouter.use(authMiddlewares.withGlobalAuthLocals.bind(authMiddlewares));
     appRouter.use(middlewares.responseResult.bind(middlewares));
 
     appRouter.get(

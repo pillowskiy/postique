@@ -12,6 +12,9 @@ export class AuthMiddlewares {
     /** @type {AuthService} */
     #authService;
 
+    // TEMP: DIP, remove this
+    #fallbackCache = new Map();
+
     #exception = new ClientException(
         'Only authorizied users can access this resource',
         401,
@@ -24,6 +27,39 @@ export class AuthMiddlewares {
     constructor(logger, authService) {
         this.#logger = logger;
         this.#authService = authService;
+    }
+
+    /**
+     * @param {import('express').Request} req
+     * @param {import('express').Response} res
+     * @param {import('express').NextFunction} next
+     */
+    async withGlobalAuthLocals(req, res, next) {
+        try {
+            if (req.method !== 'GET') {
+                return;
+            }
+
+            const start = Date.now();
+            const token = this.#tokenFromCookie(req);
+            if (!token) {
+                res.locals.user = null;
+                return;
+            }
+
+            const user = await this.#unsafe_dirtyVerify(token).catch(
+                () => null,
+            );
+            const end = Date.now();
+            this.#logger.debug?.(
+                {},
+                'User verification took %dms',
+                end - start,
+            );
+            res.locals.user = user;
+        } finally {
+            return void next();
+        }
     }
 
     /**
@@ -89,6 +125,24 @@ export class AuthMiddlewares {
     async #verify(token) {
         const user = await this.#authService.verify(token);
         this.#logger.info({ user }, 'User successfully verified');
+        return user;
+    }
+
+    /**
+     * This is temporary solution to verify user with look aside cache
+     * In the future it should be replaced with a more sophisticated solution
+     * e.g. validation lifetime of jwt token manually
+     * @param {string} token
+     * @returns {Promise<import('#app/models').User>}
+     */
+    async #unsafe_dirtyVerify(token) {
+        const cachedUser = this.#fallbackCache.get(token);
+        if (cachedUser) {
+            return cachedUser;
+        }
+
+        const user = await this.#verify(token);
+        this.#fallbackCache.set(token, user);
         return user;
     }
 
