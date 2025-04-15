@@ -1,7 +1,7 @@
 import path from 'path';
 
 /**
- * @typedef {AppConfig & LoggerConfig & AuthServiceConfig & FileServiceConfig} Config
+ * @typedef {AppConfig & LoggerConfig & AuthServiceConfig & FileServiceConfig & PostServiceConfig} Config
  *
  * @typedef {Object} AppConfig
  * @property {number} port
@@ -20,10 +20,15 @@ import path from 'path';
  * @property {string} authService.address
  * @property {string} authService.appName
  *
- * @typedef {Object} FileServiceConfig 
- * @property {Object} fileService 
+ * @typedef {Object} FileServiceConfig
+ * @property {Object} fileService
  * @property {string} fileService.address
  * @property {string} fileService.token
+ *
+ * @typedef {Object} PostServiceConfig
+ * @property {Object} postService
+ * @property {string} postService.address
+ * @property {number} postService.timeout
  */
 
 const dirname = new URL('.', import.meta.url).pathname;
@@ -42,11 +47,15 @@ export default function Config() {
         },
         authService: {
             appName: 'www',
-            address: 'sso:4000',
+            address: 'localhost:4000',
         },
         fileService: {
-            address: 'file:6000',
+            address: 'localhost:6000',
             token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJidWNrZXQiOiJ1c2VycyIsImlhdCI6MTc0MDY3OTQyOCwibmFtZSI6InNzbyJ9.g-AqHn7jInVvBhaiBowk3axWylRyMbYr6cL9Jjcen7U',
+        },
+        postService: {
+            address: 'http://localhost:7001/api/v1',
+            timeout: 5000,
         },
     };
 }

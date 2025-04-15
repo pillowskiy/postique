@@ -76,6 +76,7 @@ export class AuthMiddlewares {
 
             const user = await this.#verify(accessToken);
             req.user = user;
+            req.token = accessToken;
         } catch (err) {
             if (err instanceof ClientException && err.status === 401) {
                 this.#logger.info({}, 'Session expired, refreshing');
@@ -106,6 +107,7 @@ export class AuthMiddlewares {
             storeSession(res, session);
             const user = await this.#verify(session.accessToken);
             req.user = user;
+            req.token = session.accessToken;
         } catch (err) {
             this.#logger.error(
                 { message: err.message },

@@ -4,10 +4,16 @@ import express from 'express';
 
 /**
  * @param {express.Router} authRouter
+ * @param {express.Router} postRouter
  * @param {import("#app/delivery/middlewares").AuthMiddlewares} authMiddlewares
  * @param {import("#app/delivery/middlewares").GeneralMiddlewares} middlewares
  */
-export function AppRoutes(authRouter, authMiddlewares, middlewares) {
+export function AppRoutes(
+    authRouter,
+    postRouter,
+    authMiddlewares,
+    middlewares,
+) {
     const appRouter = express.Router();
 
     appRouter.use(authMiddlewares.withGlobalAuthLocals.bind(authMiddlewares));
@@ -29,6 +35,7 @@ export function AppRoutes(authRouter, authMiddlewares, middlewares) {
     );
 
     appRouter.use(authRouter);
+    appRouter.use('/p', postRouter);
     appRouter.use(middlewares.exception.bind(middlewares));
 
     return appRouter;

@@ -1,8 +1,11 @@
-/** @typedef {import('express').Request} Request */
-/** @typedef {import('express').Response} Response */
 import { LoginDTO, RegisterDTO } from '#app/dto/index.js';
 import { render } from '#lib/ejs/render.js';
 import { validate } from '#lib/validator/validator.js';
+
+/**
+ * @typedef {import('express').Request} Request
+ * @typedef {import('express').Response} Response
+ */
 
 import { storeSession } from '../common/session.js';
 
