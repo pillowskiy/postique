@@ -1,3 +1,34 @@
+export const DeltaType = /** @type {const} */ {
+    Create: 0,
+    Delete: 1,
+    Update: 2,
+};
+
+export const ParagraphType = /** @type {const} */ {
+    Text: 0,
+    Code: 1,
+    Figure: 2,
+    Quote: 3,
+    UnorderedList: 4,
+    OrderedList: 5,
+    Heading: 6,
+    Title: 7,
+};
+
+export const MarkupType = /** @type {const} */ {
+    Bold: 0,
+    Italic: 1,
+    Underline: 2,
+    Strike: 3,
+    Code: 4,
+    Link: 5,
+    Anchor: 6,
+    Image: 7,
+    Video: 8,
+    Quote: 9,
+    NewLine: 10,
+};
+
 export class Delta {
     constructor(paragraph, index, type) {
         this.paragraph = paragraph;
@@ -7,8 +38,7 @@ export class Delta {
 }
 
 export class Paragraph {
-    constructor(id, type, text, markups, metadata, codeMetadata) {
-        this.id = id;
+    constructor(type, text, markups, metadata, codeMetadata) {
         this.type = type;
         this.text = text;
         this.markups = markups || [];
