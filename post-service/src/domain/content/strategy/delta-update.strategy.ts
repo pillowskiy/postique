@@ -33,7 +33,7 @@ export class ContentChangeStrategy {
     }
   }
 
-  public insertDelta(delta: DeltaEntity) {
+  public insertDelta(delta: DeltaEntity): void {
     const paragraph = this._paragraphs[delta.index];
     if (paragraph) {
       // Redirecting to update to ensure system reliability for users.
@@ -59,8 +59,14 @@ export class ContentChangeStrategy {
     );
   }
 
-  public updateDelta(delta: DeltaEntity) {
-    const _ = this._getParagraph(delta.index);
+  public updateDelta(delta: DeltaEntity): void {
+    const paragraph = this._paragraphs[delta.index];
+    if (!paragraph) {
+      // Redirecting to create to ensure system reliability for users.
+      // Throwing a violation is an option, but keeping it simple for now.
+      return this.insertDelta(delta);
+    }
+
     this._changeList.push(
       new BulkOperation(
         BulkOperationType.Save,

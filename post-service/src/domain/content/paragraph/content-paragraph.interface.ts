@@ -10,6 +10,7 @@ export enum ParagraphType {
   UnorderedList,
   OrderedList,
   Heading,
+  Title,
 }
 
 export type IncomingParagraph = IncomingEntity<IParagraph, { type: number }>;

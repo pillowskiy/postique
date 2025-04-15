@@ -49,6 +49,7 @@ export class DeltaSaveCommandHandler extends Command<
         'You do not have permission to modify this post',
       );
     }
+    this._logger.debug?.(`User has permission to modify post ${post.id}`);
 
     const paragraphIds = await this._contentRepository.getPlainParagraphs(
       post.content,
