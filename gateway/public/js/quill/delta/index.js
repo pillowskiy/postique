@@ -1,28 +1,31 @@
 import {
     CodeMetadata,
     Delta,
+    DeltaType,
     ImageMetadata,
     Markup,
+    MarkupType,
     Paragraph,
+    ParagraphType,
 } from './models.js';
 
 export class DeltaApplier {
-    static _formatNames = [
-        'align',
-        'indent',
-        'direction',
-        'list',
-        'header',
-        'postTitle',
-        'code',
-        'blockquote',
-        'code-block',
-    ];
-
     constructor(quill) {
         this.quill = quill;
         this.batchDeltas = [];
         this.timeoutId = null;
+        this.lineFormatKeysSet = new Set([
+            'align',
+            'indent',
+            'direction',
+            'list',
+            'header',
+            'postTitle',
+            'code',
+            'blockquote',
+            'code-block',
+            'codeblock',
+        ]);
 
         this.previousParagraphs = this.getParagraphs();
         console.log('Initial paragraphs:', this.previousParagraphs);
@@ -34,6 +37,7 @@ export class DeltaApplier {
             this.timeoutId = setTimeout(() => {
                 const changes = this.processChanges();
                 console.log('Paragraph changes:', changes);
+                quill.emitter.emit('debounce-change', changes);
             }, 3000);
         });
     }
@@ -45,9 +49,7 @@ export class DeltaApplier {
         let currentParagraphText = '';
         let currentParagraphFormats = {};
         let currentMarkups = [];
-
         let currentPosition = 0;
-
         let paragraphIndex = 0;
 
         for (const op of contents.ops) {
@@ -56,21 +58,22 @@ export class DeltaApplier {
 
                 for (let i = 0; i < textParts.length; i++) {
                     const text = textParts[i];
-
                     currentParagraphText += text;
 
                     if (op.attributes) {
                         const inlineFormatKeys = Object.keys(
                             op.attributes,
-                        ).filter((k) => !DeltaApplier._formatNames.includes(k));
+                        ).filter((k) => !this.lineFormatKeysSet.has(k));
 
                         if (text.length > 0 && inlineFormatKeys.length > 0) {
                             const startPos = currentPosition;
                             const endPos = startPos + text.length;
 
                             for (const formatKey of inlineFormatKeys) {
+                                const formatType =
+                                    this.determineMarkupType(formatKey);
                                 currentMarkups.push(
-                                    new Markup(formatKey, startPos, endPos),
+                                    new Markup(formatType, startPos, endPos),
                                 );
                             }
                         }
@@ -79,21 +82,15 @@ export class DeltaApplier {
                     currentPosition += text.length;
 
                     if (i < textParts.length - 1) {
-                        let paragraphType = 'paragraph';
-                        let imageMetadata = undefined;
-                        let codeMetadata = undefined;
+                        let paragraphType = ParagraphType.Text;
+                        let codeMetadata;
 
                         if (op.attributes) {
-                            for (const key of DeltaApplier._formatNames) {
-                                if (op.attributes[key] !== undefined) {
-                                    const value = op.attributes[key];
-                                    const newKey = this.lineFormatMapper(
-                                        key,
-                                        value,
-                                    );
-                                    if (newKey) {
-                                        currentParagraphFormats[newKey] = value;
-                                    }
+                            for (const [key, value] of Object.entries(
+                                op.attributes,
+                            )) {
+                                if (this.lineFormatKeysSet.has(key)) {
+                                    currentParagraphFormats[key] = value;
                                 }
                             }
 
@@ -101,7 +98,10 @@ export class DeltaApplier {
                                 currentParagraphFormats,
                             );
 
-                            if (currentParagraphFormats.code) {
+                            if (
+                                currentParagraphFormats['code-block'] ||
+                                currentParagraphFormats.code
+                            ) {
                                 codeMetadata = new CodeMetadata(
                                     currentParagraphFormats.language || 'plain',
                                     true,
@@ -109,20 +109,17 @@ export class DeltaApplier {
                             }
                         }
 
-                        const id = this.generateId();
-
-                        const paragraph = new Paragraph(
-                            id,
-                            paragraphType,
-                            currentParagraphText,
-                            currentMarkups,
-                            imageMetadata,
-                            codeMetadata,
+                        paragraphs.push(
+                            new Paragraph(
+                                paragraphType,
+                                currentParagraphText,
+                                [...currentMarkups],
+                                undefined,
+                                codeMetadata,
+                            ),
                         );
 
-                        paragraphs.push(paragraph);
                         paragraphIndex++;
-
                         currentParagraphText = '';
                         currentParagraphFormats = {};
                         currentMarkups = [];
@@ -140,20 +137,11 @@ export class DeltaApplier {
                         op.attributes?.height || 0,
                     );
 
-                    const id = this.generateId();
-
-                    const paragraph = new Paragraph(
-                        id,
-                        'image',
-                        '',
-                        [],
-                        imageMetadata,
-                        undefined,
+                    paragraphs.push(
+                        new Paragraph('image', '[image]', [], imageMetadata),
                     );
 
-                    paragraphs.push(paragraph);
                     paragraphIndex++;
-
                     currentParagraphText = '';
                     currentParagraphFormats = {};
                     currentMarkups = [];
@@ -163,77 +151,66 @@ export class DeltaApplier {
         }
 
         if (currentParagraphText || currentMarkups.length > 0) {
-            const id = this.generateId();
-
             const paragraphType = this.determineParagraphType(
                 currentParagraphFormats,
             );
-            let codeMetadata = undefined;
+            let codeMetadata;
 
-            if (currentParagraphFormats.code) {
+            if (
+                currentParagraphFormats['code-block'] ||
+                currentParagraphFormats.code
+            ) {
                 codeMetadata = new CodeMetadata(
                     currentParagraphFormats.language || 'plain',
-                    false,
+                    true,
                 );
             }
 
-            const paragraph = new Paragraph(
-                id,
-                paragraphType,
-                currentParagraphText,
-                currentMarkups,
-                undefined,
-                codeMetadata,
+            paragraphs.push(
+                new Paragraph(
+                    paragraphType,
+                    currentParagraphText,
+                    currentMarkups,
+                    undefined,
+                    codeMetadata,
+                ),
             );
-
-            paragraphs.push(paragraph);
         }
 
         return paragraphs;
     }
 
-    lineFormatMapper(attr, value) {
-        switch (attr) {
-            case 'align':
-            case 'indent':
-            case 'direction':
-            case 'list':
-            case 'header':
-            case 'code':
-            case 'blockquote':
-                return attr;
-            case 'postTitle':
-                if (value === 1) {
-                    return 'title';
-                }
-                return 'header';
-            case 'code-block':
-                return 'code';
-            default:
-                return null;
-        }
-    }
+    determineMarkupType(format) {
+        if (format.link) return MarkupType.Link;
+        if (format.anchor) return MarkupType.Anchor;
+        if (format.image) return MarkupType.Image;
+        if (format.video) return MarkupType.Video;
+        if (format.quote) return MarkupType.Quote;
+        if (format.strike) return MarkupType.Strike;
+        if (format.newLine) return MarkupType.NewLine;
+        if (format.bold) return MarkupType.Bold;
+        if (format.code) return MarkupType.Code;
+        if (format.italic) return MarkupType.Italic;
+        if (format.underline) return MarkupType.Underline;
 
-    generateId() {
-        return Math.random().toString(36).slice(2, 8);
+        return MarkupType.Bold;
     }
 
     determineParagraphType(formats) {
-        if (formats.postTitle) return 'postTitle';
-        if (formats.header) return `h${formats.header}`;
-        if (formats.list === 'ordered') return 'orderedList';
-        if (formats.list === 'bullet') return 'unorderedList';
-        if (formats['code-block'] || formats.code) return 'code';
-        if (formats.blockquote) return 'blockquote';
-
-        return 'paragraph'; // default type
+        if (formats.postTitle) return ParagraphType.Title;
+        if (formats.header) return ParagraphType.Heading;
+        if (formats.list === 'ordered') return ParagraphType.OrderedList;
+        if (formats.list === 'bullet') return ParagraphType.UnorderedList;
+        if (formats['code-block'] || formats.code) return ParagraphType.Code;
+        if (formats.blockquote) return ParagraphType.Quote;
+        if (formats.figure || formats.image) return ParagraphType.Figure;
+        return ParagraphType.Text;
     }
 
     processChanges() {
         if (this.batchDeltas.length === 0) return [];
 
         const currentParagraphs = this.getParagraphs();
-
         const deltas = this.determineParagraphChanges(
             this.previousParagraphs,
             currentParagraphs,
@@ -246,14 +223,34 @@ export class DeltaApplier {
     }
 
     determineParagraphChanges(oldParagraphs, newParagraphs) {
+        if (!oldParagraphs.length && !newParagraphs.length) return [];
+        if (!oldParagraphs.length) {
+            return newParagraphs.map(
+                (p, i) => new Delta(p, i, DeltaType.Create),
+            );
+        }
+        if (!newParagraphs.length) {
+            return oldParagraphs.map(
+                (p, i) => new Delta(p, i, DeltaType.Delete),
+            );
+        }
+
         const deltas = [];
+        const oldSize = oldParagraphs.length;
+        const newSize = newParagraphs.length;
+        const maxSize = Math.max(oldSize, newSize);
 
-        const lcsMatrix = Array.from({ length: oldParagraphs.length + 1 }, () =>
-            Array(newParagraphs.length + 1).fill(0),
-        );
+        if (maxSize <= 10) {
+            return this.simpleDiff(oldParagraphs, newParagraphs);
+        }
 
-        for (let i = 1; i <= oldParagraphs.length; i++) {
-            for (let j = 1; j <= newParagraphs.length; j++) {
+        const lcsMatrix = new Array(oldSize + 1);
+        for (let i = 0; i <= oldSize; i++) {
+            lcsMatrix[i] = new Array(newSize + 1).fill(0);
+        }
+
+        for (let i = 1; i <= oldSize; i++) {
+            for (let j = 1; j <= newSize; j++) {
                 if (
                     this.areParagraphsEqual(
                         oldParagraphs[i - 1],
@@ -270,14 +267,11 @@ export class DeltaApplier {
             }
         }
 
-        const changes = {
-            added: [],
-            deleted: [],
-            modified: [],
-        };
+        const added = [];
+        const deleted = [];
 
-        let i = oldParagraphs.length;
-        let j = newParagraphs.length;
+        let i = oldSize;
+        let j = newSize;
 
         while (i > 0 || j > 0) {
             if (
@@ -294,64 +288,102 @@ export class DeltaApplier {
                 j > 0 &&
                 (i === 0 || lcsMatrix[i][j - 1] >= lcsMatrix[i - 1][j])
             ) {
-                changes.added.push({
-                    index: j - 1,
-                    paragraph: newParagraphs[j - 1],
-                });
+                added.push({ index: j - 1, paragraph: newParagraphs[j - 1] });
                 j--;
-            } else if (
-                i > 0 &&
-                (j === 0 || lcsMatrix[i][j - 1] < lcsMatrix[i - 1][j])
-            ) {
-                changes.deleted.push({
-                    index: i - 1,
-                    paragraph: oldParagraphs[i - 1],
-                });
+            } else if (i > 0) {
+                deleted.push({ index: i - 1, paragraph: oldParagraphs[i - 1] });
                 i--;
             }
         }
 
-        const potentialModifications = [];
+        for (const del of deleted) {
+            const similarAddIndex = added.findIndex(
+                (add) =>
+                    Math.abs(del.index - add.index) <= 2 &&
+                    this.getTextSimilarity(
+                        del.paragraph.text,
+                        add.paragraph.text,
+                    ) > 0.5,
+            );
 
-        for (const deleted of changes.deleted) {
-            for (const added of changes.added) {
+            if (similarAddIndex !== -1) {
+                const add = added[similarAddIndex];
+                add.paragraph.id = del.paragraph.id;
+
+                deltas.push(
+                    new Delta(add.paragraph, add.index, DeltaType.Update),
+                );
+
+                added.splice(similarAddIndex, 1);
+                continue;
+            }
+
+            deltas.push(new Delta(del.paragraph, del.index, DeltaType.Delete));
+        }
+
+        for (const add of added) {
+            deltas.push(new Delta(add.paragraph, add.index, DeltaType.Create));
+        }
+
+        return deltas.sort((a, b) => a.index - b.index);
+    }
+
+    simpleDiff(oldParagraphs, newParagraphs) {
+        const deltas = [];
+        const oldSize = oldParagraphs.length;
+        const newSize = newParagraphs.length;
+        const minSize = Math.min(oldSize, newSize);
+
+        let startMatches = 0;
+        while (
+            startMatches < minSize &&
+            this.areParagraphsEqual(
+                oldParagraphs[startMatches],
+                newParagraphs[startMatches],
+            )
+        ) {
+            startMatches++;
+        }
+
+        let endMatches = 0;
+        while (
+            endMatches < minSize - startMatches &&
+            this.areParagraphsEqual(
+                oldParagraphs[oldSize - 1 - endMatches],
+                newParagraphs[newSize - 1 - endMatches],
+            )
+        ) {
+            endMatches++;
+        }
+
+        const oldStart = startMatches;
+        const oldEnd = oldSize - endMatches;
+        const newStart = startMatches;
+        const newEnd = newSize - endMatches;
+
+        if (oldEnd - oldStart === newEnd - newStart) {
+            for (let i = 0; i < oldEnd - oldStart; i++) {
                 if (
-                    deleted.paragraph.id === added.paragraph.id ||
-                    (Math.abs(deleted.index - added.index) <= 2 &&
-                        this.getTextSimilarity(
-                            deleted.paragraph.text,
-                            added.paragraph.text,
-                        ) > 0.5)
+                    !this.areParagraphsEqual(
+                        oldParagraphs[oldStart + i],
+                        newParagraphs[newStart + i],
+                    )
                 ) {
-                    potentialModifications.push({
-                        oldIndex: deleted.index,
-                        newIndex: added.index,
-                        oldParagraph: deleted.paragraph,
-                        newParagraph: added.paragraph,
-                    });
-                    break;
+                    const newPara = newParagraphs[newStart + i];
+                    newPara.id = oldParagraphs[oldStart + i].id;
+                    deltas.push(
+                        new Delta(newPara, newStart + i, DeltaType.Update),
+                    );
                 }
             }
-        }
+        } else {
+            for (let i = oldStart; i < oldEnd; i++) {
+                deltas.push(new Delta(oldParagraphs[i], i, DeltaType.Delete));
+            }
 
-        for (const mod of potentialModifications) {
-            mod.newParagraph.id = mod.oldParagraph.id;
-            deltas.push(new Delta(mod.newParagraph, mod.newIndex, 'update'));
-
-            changes.added = changes.added.filter(
-                (add) => add.index !== mod.newIndex,
-            );
-            changes.deleted = changes.deleted.filter(
-                (del) => del.index !== mod.oldIndex,
-            );
-        }
-
-        for (const added of changes.added) {
-            deltas.push(new Delta(added.paragraph, added.index, 'create'));
-        }
-
-        for (const deleted of changes.deleted) {
-            deltas.push(new Delta(deleted.paragraph, deleted.index, 'delete'));
+            for (let i = newStart; i < newEnd; i++) {
+                deltas.push(new Delta(newParagraphs[i], i, DeltaType.Update));
+            }
         }
 
         return deltas.sort((a, b) => a.index - b.index);
@@ -359,27 +391,32 @@ export class DeltaApplier {
 
     areParagraphsEqual(p1, p2) {
         if (!p1 || !p2) return false;
-
         if (p1.text !== p2.text || p1.type !== p2.type) return false;
-
         if (p1.markups.length !== p2.markups.length) return false;
 
-        const sortedMarkups1 = [...p1.markups].sort((a, b) => {
-            if (a.start !== b.start) return a.start - b.start;
-            if (a.end !== b.end) return a.end - b.end;
-            return a.type.localeCompare(b.type);
-        });
+        if (p1.markups.length <= 1) {
+            if (p1.markups.length === 0) return true;
+            const m1 = p1.markups[0];
+            const m2 = p2.markups[0];
+            return (
+                m1.type === m2.type &&
+                m1.start === m2.start &&
+                m1.end === m2.end
+            );
+        }
 
-        const sortedMarkups2 = [...p2.markups].sort((a, b) => {
+        const byPosition = (a, b) => {
             if (a.start !== b.start) return a.start - b.start;
             if (a.end !== b.end) return a.end - b.end;
             return a.type.localeCompare(b.type);
-        });
+        };
+
+        const sortedMarkups1 = [...p1.markups].sort(byPosition);
+        const sortedMarkups2 = [...p2.markups].sort(byPosition);
 
         for (let i = 0; i < sortedMarkups1.length; i++) {
             const m1 = sortedMarkups1[i];
             const m2 = sortedMarkups2[i];
-
             if (
                 m1.type !== m2.type ||
                 m1.start !== m2.start ||
@@ -391,7 +428,6 @@ export class DeltaApplier {
 
         if ((p1.metadata && !p2.metadata) || (!p1.metadata && p2.metadata))
             return false;
-
         if (p1.metadata && p2.metadata) {
             if (
                 p1.metadata.src !== p2.metadata.src ||
@@ -407,7 +443,6 @@ export class DeltaApplier {
             (!p1.codeMetadata && p2.codeMetadata)
         )
             return false;
-
         if (p1.codeMetadata && p2.codeMetadata) {
             if (
                 p1.codeMetadata.lang !== p2.codeMetadata.lang ||
@@ -421,33 +456,77 @@ export class DeltaApplier {
     }
 
     getTextSimilarity(str1, str2) {
+        if (str1 === str2) return 1.0;
+
         const maxLen = Math.max(str1.length, str2.length);
-        if (maxLen === 0) return 1.0; // Both empty strings
+        if (maxLen === 0) return 1.0;
+
+        if (maxLen > 100) {
+            // For longer strings, use approximate matching
+            return this.approximateSimilarity(str1, str2);
+        }
 
         const distance = this.levenshteinDistance(str1, str2);
         return 1 - distance / maxLen;
+    }
+
+    approximateSimilarity(str1, str2) {
+        const lenDiff = Math.abs(str1.length - str2.length);
+        if (lenDiff > str1.length * 0.5) return 0;
+
+        const freq1 = {};
+        const freq2 = {};
+
+        for (const char of str1) {
+            freq1[char] = (freq1[char] || 0) + 1;
+        }
+
+        for (const char of str2) {
+            freq2[char] = (freq2[char] || 0) + 1;
+        }
+
+        let common = 0;
+        const allChars = new Set([
+            ...Object.keys(freq1),
+            ...Object.keys(freq2),
+        ]);
+
+        for (const char of allChars) {
+            common += Math.min(freq1[char] || 0, freq2[char] || 0);
+        }
+
+        return common / Math.max(str1.length, str2.length);
     }
 
     levenshteinDistance(str1, str2) {
         const m = str1.length;
         const n = str2.length;
 
-        const dp = Array.from({ length: m + 1 }, () => Array(n + 1).fill(0));
+        if (m === 0) return n;
+        if (n === 0) return m;
 
-        for (let i = 0; i <= m; i++) dp[i][0] = i;
-        for (let j = 0; j <= n; j++) dp[0][j] = j;
+        let prevRow = new Array(n + 1);
+        let curRow = new Array(n + 1);
 
-        for (let i = 1; i <= m; i++) {
-            for (let j = 1; j <= n; j++) {
-                const cost = str1[i - 1] === str2[j - 1] ? 0 : 1;
-                dp[i][j] = Math.min(
-                    dp[i - 1][j] + 1, // deletion
-                    dp[i][j - 1] + 1, // insertion
-                    dp[i - 1][j - 1] + cost, // substitution
-                );
-            }
+        for (let j = 0; j <= n; j++) {
+            prevRow[j] = j;
         }
 
-        return dp[m][n];
+        for (let i = 1; i <= m; i++) {
+            curRow[0] = i;
+
+            for (let j = 1; j <= n; j++) {
+                const cost = str1[i - 1] === str2[j - 1] ? 0 : 1;
+                curRow[j] = Math.min(
+                    prevRow[j] + 1, // deletion
+                    curRow[j - 1] + 1, // insertion
+                    prevRow[j - 1] + cost, // substitution
+                );
+            }
+
+            [prevRow, curRow] = [curRow, prevRow];
+        }
+
+        return prevRow[n];
     }
 }
