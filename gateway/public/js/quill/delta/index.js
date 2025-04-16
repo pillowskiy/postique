@@ -21,6 +21,7 @@ export class DeltaApplier {
             'list',
             'header',
             'postTitle',
+            'title',
             'code',
             'blockquote',
             'code-block',

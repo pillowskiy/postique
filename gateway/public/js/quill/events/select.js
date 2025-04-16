@@ -1,8 +1,16 @@
+import { updateStatusText } from '../state';
+
 export const selectChangeEvent = {
     name: 'selection-change',
     handler: function (quill, range, oldRange, source) {
         if (source !== 'user') {
             return true;
+        }
+
+        if (range && range.length > 0) {
+            updateStatusText(`Виділено ${range.length} символів`);
+        } else {
+            updateStatusText();
         }
 
         const [line] = quill.getLine(range ? range.index : oldRange.index);

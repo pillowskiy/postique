@@ -130,7 +130,6 @@ export class PostService {
             })
             .json()
             .catch((err) => {
-                err.response.json().then(console.log);
                 console.log(err, deltas);
                 throw err;
             });

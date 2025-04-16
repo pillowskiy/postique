@@ -1,4 +1,18 @@
 /**
+ *
+ * @param {string} paramName
+ * @param {string} pattern
+ * @returns {string|null}
+ */
+export function windowDynamicParam(paramName, pattern) {
+    return (
+        window.history.state?.[paramName] ??
+        matchPath(pattern, window.location.pathname)?.[paramName] ??
+        null
+    );
+}
+
+/**
  * @param {string} pattern
  * @param {string} actualPath
  * @returns {Object}

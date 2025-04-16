@@ -2,13 +2,19 @@
     <div class="workbench-container workbench-header__container">
         <div class="workbench-header__block">
             <div class="workbench-header__logo">My Logo</div>
-            <p class="workbench-header__name">Draft in Fagodfagod</p>
+            <p id="workbench-status-state" class="workbench-header__name"></p>
 
-            <span class="workbench-header__status">Saved</span>
+            <span
+                id="workbench-status-text"
+                class="workbench-header__status"
+            ></span>
         </div>
 
         <div class="workbench-header__block">
-            <sl-button size="small" variant="primary" pill>Publish</sl-button>
+            <sl-button id="publish-button" size="small" variant="primary" pill>
+                Publish
+            </sl-button>
+
             <sl-tooltip content="Actions">
                 <sl-icon-button
                     style="font-size: 1.25rem"
@@ -17,12 +23,57 @@
                 ></sl-icon-button>
             </sl-tooltip>
 
+            <% if (user) { %>
             <sl-icon-button
-                style="font-size: 1.25rem"
                 name="bell"
                 label="Notifications"
+                pill
             ></sl-icon-button>
-            <sl-avatar style="--size: 2.5rem" label="User avatar"></sl-avatar>
+            <sl-dropdown distance="12">
+                <sl-avatar
+                    type="button"
+                    role="button"
+                    slot="trigger"
+                    initials="<%= user.username.substring(0,2) %>"
+                    style="--size: 2.5rem"
+                    label="User avatar"
+                ></sl-avatar>
+
+                <sl-menu style="width: 240px">
+                    <sl-menu-item class="accent" value="profile">
+                        <sl-icon name="person" slot="prefix"></sl-icon>
+                        Профіль
+                    </sl-menu-item>
+                    <sl-menu-item class="accent" value="library">
+                        <sl-icon name="book" slot="prefix"></sl-icon>
+                        Бібліотека
+                    </sl-menu-item>
+                    <sl-menu-item class="accent" value="stories">
+                        <sl-icon name="stickies" slot="prefix"></sl-icon>
+                        Публікації
+                    </sl-menu-item>
+                    <sl-menu-item class="accent" value="stats">
+                        <sl-icon name="bar-chart-line" slot="prefix"></sl-icon>
+                        Статистика
+                    </sl-menu-item>
+                    <sl-divider></sl-divider>
+                    <sl-menu-item value="settings">Налаштування</sl-menu-item>
+                    <sl-menu-item value="recomendations">
+                        Мої Рекомендації
+                    </sl-menu-item>
+                    <sl-menu-item value="about">Про проект</sl-menu-item>
+                    <sl-menu-item value="help">Допомога</sl-menu-item>
+                    <sl-divider></sl-divider>
+                    <sl-menu-item>
+                        Вийти
+                        <br />
+                        <small>
+                            <%= user.username %>
+                        </small>
+                    </sl-menu-item>
+                </sl-menu>
+            </sl-dropdown>
+            <% } %>
         </div>
     </div>
 </header>

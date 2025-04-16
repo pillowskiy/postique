@@ -41,7 +41,7 @@ export class AuthMiddlewares {
             }
 
             const start = Date.now();
-            const token = this.#tokenFromCookie(req);
+            const token = req.token ?? this.#tokenFromCookie(req);
             if (!token) {
                 res.locals.user = null;
                 return;
@@ -58,7 +58,7 @@ export class AuthMiddlewares {
             );
             res.locals.user = user;
         } finally {
-            return void next();
+            void next();
         }
     }
 

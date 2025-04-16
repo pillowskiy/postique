@@ -19,19 +19,14 @@ export function AppRoutes(
     appRouter.use(authMiddlewares.withGlobalAuthLocals.bind(authMiddlewares));
     appRouter.use(middlewares.responseResult.bind(middlewares));
 
+    appRouter.get('/', async (_, res) => render(res).template('index', {}));
     appRouter.get(
-        '/ping',
+        '/new-story',
         authMiddlewares.withAuth.bind(authMiddlewares),
-        (_, res) => {
-            res.send('pong');
-        },
-    );
-
-    appRouter.get('/', async (req, res) => render(res).template('index', {}));
-    appRouter.get('/workbench', async (req, res) =>
-        render(res)
-            .template('workbench/workbench-page', {})
-            .layout('workbench/workbench-layout'),
+        async (_, res) =>
+            render(res)
+                .template('workbench/workbench-page', {})
+                .layout('workbench/workbench-layout'),
     );
 
     appRouter.use(authRouter);
