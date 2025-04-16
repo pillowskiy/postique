@@ -14,10 +14,10 @@ import { Command } from '@/app/commands/common';
 import { PostEntity, PostVisibility } from '@/domain/post';
 import { Inject } from '@nestjs/common';
 import { CommandHandler, EventBus } from '@nestjs/cqrs';
-import slugify from 'slugify';
 import { CreatePostCommand } from './create.command';
 import { PostAccessControlList } from '@/app/boundaries/acl';
 import { PostCreatedEvent } from '@/app/events/post/post-created';
+import { slugify } from '@/libs/slugify';
 
 @CommandHandler(CreatePostCommand)
 export class CreatePostCommandHandler extends Command<
@@ -55,7 +55,7 @@ export class CreatePostCommandHandler extends Command<
       owner: initiatedBy,
       authors: [initiatedBy],
       title,
-      slug: slugify(title, { lower: true, strict: true }),
+      slug: slugify(title),
       visibility: visibility ?? PostVisibility.Public.toString(),
       ...restPost,
     });

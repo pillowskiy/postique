@@ -1,13 +1,13 @@
-import { Inject } from '@nestjs/common';
-import { CommandHandler } from '@nestjs/cqrs';
+import { SeriesAccessControlList } from '@/app/boundaries/acl';
 import { CreateSeriesOutput } from '@/app/boundaries/dto/output';
-import { Command } from '../../common';
-import { CreateSeriesCommand } from './create-series.command';
+import { ConflictException, ForbiddenException } from '@/app/boundaries/errors';
 import { SeriesRepository } from '@/app/boundaries/repository';
 import { PostSeriesEntity } from '@/domain/series';
-import slugify from 'slugify';
-import { ConflictException, ForbiddenException } from '@/app/boundaries/errors';
-import { SeriesAccessControlList } from '@/app/boundaries/acl';
+import { slugify } from '@/libs/slugify';
+import { Inject } from '@nestjs/common';
+import { CommandHandler } from '@nestjs/cqrs';
+import { Command } from '../../common';
+import { CreateSeriesCommand } from './create-series.command';
 
 @CommandHandler(CreateSeriesCommand)
 export class CreateSeriesCommandHandler extends Command<
@@ -27,8 +27,7 @@ export class CreateSeriesCommandHandler extends Command<
       title: input.series.title,
       description: input.series.description,
       posts: input.posts,
-      // TEMP: It is the responsibility of the infrastructure layer.
-      slug: slugify(input.series.title ?? '', { lower: true, strict: true }),
+      slug: slugify(input.series.title),
       owner: input.initiatedBy,
     });
 

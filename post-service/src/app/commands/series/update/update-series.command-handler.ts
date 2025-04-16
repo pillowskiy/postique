@@ -1,12 +1,12 @@
+import { SeriesAccessControlList } from '@/app/boundaries/acl';
+import { UpdateSeriesOutput } from '@/app/boundaries/dto/output';
+import { ForbiddenException } from '@/app/boundaries/errors';
+import { SeriesRepository } from '@/app/boundaries/repository';
+import { slugify } from '@/libs/slugify';
+import { Inject } from '@nestjs/common';
 import { CommandHandler } from '@nestjs/cqrs';
 import { Command } from '../../common';
 import { UpdateSeriesCommand } from './update-series.command';
-import { Inject } from '@nestjs/common';
-import { SeriesRepository } from '@/app/boundaries/repository';
-import { UpdateSeriesOutput } from '@/app/boundaries/dto/output';
-import slugify from 'slugify';
-import { SeriesAccessControlList } from '@/app/boundaries/acl';
-import { ForbiddenException } from '@/app/boundaries/errors';
 
 @CommandHandler(UpdateSeriesCommand)
 export class UpdateSeriesCommandHandler extends Command<
@@ -40,11 +40,7 @@ export class UpdateSeriesCommandHandler extends Command<
     if (input.series.title) {
       // TEMP: This probably violates SRP and/or could be an issue for SEO purposes.
       // In the future, we might store old slugs for redirection.
-      series.updateTitle(
-        input.series.title,
-        // TEMP: It is the responsibility of the infrastructure layer.
-        slugify(input.series.title, { lower: true, strict: true }),
-      );
+      series.updateTitle(input.series.title, slugify(input.series.title));
     }
 
     if (input.series.description) {
