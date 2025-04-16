@@ -5,7 +5,7 @@ import { ContentRepository } from '@/app/boundaries/repository';
 import { ParagraphAggregate, IParagraph } from '@/domain/content';
 import { InjectModel, models, Schemas } from '@/infrastructure/database/mongo';
 import { MongoTransactional } from '@/infrastructure/database/mongo/mongo.transactional';
-import { Content, Paragraph } from '@/infrastructure/database/mongo/schemas';
+import { Paragraph } from '@/infrastructure/database/mongo/schemas';
 
 @Injectable()
 export class MongoContentRepository extends ContentRepository {
@@ -33,34 +33,47 @@ export class MongoContentRepository extends ContentRepository {
   async getContentParagraphs(
     contentId: string,
   ): Promise<ParagraphAggregate[] | null> {
-    const [content] = await this._contentModel
-      .aggregate<{ paragraphs: Paragraph[] }>([
-        {
-          $match: {
-            _id: contentId,
-          },
-        },
+    const [contentDoc] = await this._contentModel
+      .aggregate<{
+        paragraphs: string[];
+        paragraphsData: Paragraph[];
+      }>([
+        { $match: { _id: contentId } },
         {
           $lookup: {
             from: Schemas.Paragraph,
             localField: 'paragraphs',
             foreignField: '_id',
-            as: 'paragraphs',
+            as: 'paragraphsData',
           },
         },
         {
           $project: {
             paragraphs: 1,
+            paragraphsData: 1,
           },
         },
       ])
       .session(this._transactional.getSession(null));
 
-    if (!content) {
-      return null;
+    if (!contentDoc) return null;
+
+    const map = Object.create(null) as Record<string, Paragraph>;
+    for (let i = 0; i < contentDoc.paragraphsData.length; i++) {
+      const p = contentDoc.paragraphsData[i];
+      map[p._id] = p;
     }
 
-    return content.paragraphs.map((p) => this.#getContentParagraph(p));
+    const result = new Array<ParagraphAggregate>(contentDoc.paragraphs.length);
+    for (let i = 0; i < contentDoc.paragraphs.length; i++) {
+      const id = contentDoc.paragraphs[i];
+      const paragraph = map[id];
+      if (paragraph) {
+        result[i] = this.#getContentParagraph(paragraph);
+      }
+    }
+
+    return result;
   }
 
   async getPlainParagraphs(contentId: string): Promise<string[]> {

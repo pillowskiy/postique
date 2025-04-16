@@ -1,5 +1,4 @@
 import { BulkOperation, BulkOperationType } from '@/domain/common/bulk';
-import { DomainBusinessRuleViolation } from '@/domain/common/error';
 import { DeltaEntity, DeltaGroup } from '../delta/delta.entity';
 import { DeltaType } from '../delta/delta.interface';
 import { ParagraphAggregate } from '../paragraph';
@@ -52,7 +51,14 @@ export class ContentChangeStrategy {
   }
 
   public deleteDelta(delta: DeltaEntity) {
-    const paragraph = this._getParagraph(delta.index);
+    if (delta.index < 0 || delta.index >= this._paragraphs.length) {
+      return;
+    }
+
+    const paragraph = this._paragraphs[delta.index];
+    if (!paragraph) {
+      return;
+    }
     this._paragraphs.splice(delta.index, 1);
     this._changeList.push(
       new BulkOperation(BulkOperationType.Delete, paragraph),
@@ -82,15 +88,5 @@ export class ContentChangeStrategy {
 
   public changes(): BulkOperation<any, ParagraphAggregate>[] {
     return this._changeList;
-  }
-
-  private _getParagraph(index: number): string {
-    const paragraph = this._paragraphs[index];
-    if (!paragraph) {
-      throw new DomainBusinessRuleViolation(
-        `Paragraph with position ${index} does not exist`,
-      );
-    }
-    return paragraph;
   }
 }
