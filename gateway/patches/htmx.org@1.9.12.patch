@@ -1,0 +1,12 @@
+diff --git a/dist/htmx.js b/dist/htmx.js
+index 597c9b3b54c8b2b5fcc65a58dc7809b895a8d959..ed9ab69bb8d277e3033144952f23ca52ed7d08d5 100644
+--- a/dist/htmx.js
++++ b/dist/htmx.js
+@@ -46,6 +46,7 @@ return (function () {
+             logAll : logAll,
+             logNone : logNone,
+             logger : null,
++            handleAjaxResponse : handleAjaxResponse,
+             config : {
+                 historyEnabled:true,
+                 historyCacheSize:10,

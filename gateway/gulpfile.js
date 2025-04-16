@@ -100,6 +100,31 @@ function assets() {
         .pipe(gulp.dest(paths.assets.dest));
 }
 
+async function bundleHTMX() {
+    const res = await rollup({
+        input: 'public/js/htmx/index.js',
+        plugins: [
+            resolve(),
+            cjs({ nested: true }),
+            terser(),
+            alias({
+                entries: [
+                    { find: 'htmx.org', replacement: 'htmx.org/dist/htmx.js' },
+                ],
+            }),
+        ],
+        treeshake: true,
+    });
+
+    return res.write({
+        file: `_static/js/htmx.min.js`,
+        format: 'iife',
+        name: 'htmx',
+        sourcemap: true,
+        compact: true,
+    });
+}
+
 async function bundle() {
     const res = await rollup({
         input: 'public/js/quill/index.js',
@@ -124,6 +149,6 @@ async function bundle() {
     });
 }
 
-const build = gulp.parallel(styles, assets, scripts, bundle);
+const build = gulp.parallel(styles, assets, scripts, bundleHTMX, bundle);
 
 export default gulp.series(clean, build);

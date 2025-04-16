@@ -67,6 +67,8 @@ export class GeneralMiddlewares {
             'Exception has been catched',
         );
 
+        res.setHeader('X-Error-Message', exception.message);
+        res.setHeader('X-Error-Code', exception.details);
         switch (req.method) {
             case 'GET':
                 return render(res).template('shared/error', {

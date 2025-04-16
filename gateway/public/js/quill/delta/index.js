@@ -138,7 +138,12 @@ export class DeltaApplier {
                     );
 
                     paragraphs.push(
-                        new Paragraph('image', '[image]', [], imageMetadata),
+                        new Paragraph(
+                            ParagraphType.Figure,
+                            '',
+                            [],
+                            imageMetadata,
+                        ),
                     );
 
                     paragraphIndex++;
