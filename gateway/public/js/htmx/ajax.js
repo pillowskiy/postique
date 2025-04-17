@@ -59,5 +59,3 @@ export async function ajax(method, url, opts = {}) {
         });
     });
 }
-
-document.addEventListener('hey', console.log);

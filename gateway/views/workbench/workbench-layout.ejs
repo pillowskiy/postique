@@ -12,7 +12,7 @@
         <script src="/js/quill.min.js" onload="editor.quill('#editor')" defer></script>
     </head>
 
-    <body>
+    <body hx-ext="json-enc-custom">
         <%- await include('./components/workbench-header.ejs') %>
         <%- await include(__renderTarget) %>
         <%- await include('../partials/toasts.ejs') %>

@@ -78,7 +78,7 @@
     "express-validator": "^7.2.1",
     "gulp-purgecss": "^7.0.2",
     "helmet": "^8.0.0",
-    "htmx.org": "2.0.4",
+    "htmx.org": "1.9.12",
     "ky": "^1.8.1",
     "nanoid": "^5.1.5",
     "pino": "^9.6.0",
@@ -86,6 +86,6 @@
     "quill": "^2.0.3"
   },
   "patchedDependencies": {
-    "htmx.org@1.9.12": "patches/htmx.org@1.9.12.patch"
+    "htmx.org@2.0.4": "patches/htmx.org@2.0.4.patch"
   }
 }

@@ -111,7 +111,7 @@ async function bundleHTMX() {
                 entries: [
                     {
                         find: 'htmx.org',
-                        replacement: 'htmx.org/dist/htmx.esm.js',
+                        replacement: 'htmx.org/dist/htmx.js',
                     },
                 ],
             }),
