@@ -30,6 +30,12 @@ export class MongoContentRepository extends ContentRepository {
     );
   }
 
+  getContentDraftParagraphs(
+    contentId: string,
+  ): Promise<ParagraphAggregate[] | null> {
+    return this.getContentParagraphs(contentId);
+  }
+
   async getContentParagraphs(
     contentId: string,
   ): Promise<ParagraphAggregate[] | null> {

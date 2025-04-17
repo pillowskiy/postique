@@ -115,6 +115,20 @@ export class PostsController {
     return this._postsService.getPost(slug);
   }
 
+  @Get('/:id/info')
+  async getPostInfo(
+    @Param('id', ParseUUIDPipe) id: string,
+  ): Promise<output.PostOutput> {
+    return this._postsService.getPostInfo(id);
+  }
+
+  @Get('/:id/draft')
+  async getPostDraft(
+    @Param('id', ParseUUIDPipe) id: string,
+  ): Promise<output.PostParagraphOutput[]> {
+    return this._postsService.getPostDraft(id);
+  }
+
   @Get('/status/:status')
   async getPostsByStatus(
     @Param('status') status: string,

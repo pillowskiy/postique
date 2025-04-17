@@ -9,6 +9,7 @@ import {
   CreatePostOutput,
   DeltaSaveOutput,
   CursorOutput,
+  PostParagraphOutput,
 } from '@/app/boundaries/dto/output';
 import { CreatePostInput, Delta } from '@/app/boundaries/dto/input';
 
@@ -23,6 +24,8 @@ import { GetDetailedPostQuery } from '@/app/queries/post/get-detailed';
 import { GetMyPostsQuery } from '@/app/queries/post/get-my-posts';
 import { PostStatus } from '@/domain/post';
 import { GetPostListQuery } from '@/app/queries/post/get-post-list';
+import { GetPostInfoQuery } from '@/app/queries/post/get-info';
+import { GetPostDraftQuery } from '@/app/queries/post/get-draft';
 
 @Injectable()
 export class PostsService {
@@ -97,6 +100,18 @@ export class PostsService {
   public async getPost(slug: string): Promise<DetailedPostOutput> {
     return this._queryBus.execute<GetDetailedPostQuery, DetailedPostOutput>(
       new GetDetailedPostQuery(slug),
+    );
+  }
+
+  public async getPostInfo(id: string): Promise<PostOutput> {
+    return this._queryBus.execute<GetPostInfoQuery, PostOutput>(
+      new GetPostInfoQuery(id),
+    );
+  }
+
+  public async getPostDraft(id: string): Promise<PostParagraphOutput[]> {
+    return this._queryBus.execute<GetPostDraftQuery, PostParagraphOutput[]>(
+      new GetPostDraftQuery(id),
     );
   }
 
