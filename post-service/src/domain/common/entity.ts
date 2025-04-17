@@ -13,6 +13,12 @@ export class EntityFactory {
     E = I extends IncomingEntity<infer T, any> ? T : never,
   >(schema: new () => E extends object ? E : never, input: I): E {
     const instance = plainToInstance(schema, input);
+    if (typeof instance !== 'object') {
+      throw new DomainInvariantViolation('Failed to create entity', {
+        default: 'Instance is not an object',
+      });
+    }
+
     const errors = validateSync(instance, {
       whitelist: true,
       stopAtFirstError: true,
