@@ -1,9 +1,7 @@
 import { windowDynamicParam } from '../utils/router.js';
 import { createSignal } from '../utils/signal.js';
 
-export const postState = createSignal(
-    windowDynamicParam('postId', '/p/:postId/edit'),
-);
+export const postState = createSignal(null);
 export const statusState = createSignal('empty');
 export const statusTextState = createSignal('Робоча область активна');
 const initialPublishButtonState = {
@@ -51,7 +49,7 @@ statusState.subscribe((state) => {
 
     if (state === 'draft') {
         statusState.textContent = 'Збережено';
-        btnState.disabled = true;
+        btnState.disabled = false;
     } else if (state === 'saving') {
         statusState.textContent = 'Зберігаємо...';
         btnState.disabled = true;

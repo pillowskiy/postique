@@ -26,6 +26,8 @@
  * @property {(postId: string, deltas: Array<Object>, auth: string) => Promise<import("#app/models").PostIdentifier>} deltaSave
  * @property {(auth: string|null, take: number, cursor: string|null) => Promise<import("#app/models").PostCursor>} getPosts
  * @property {(slug: string) => Promise<import("#app/models").Post>} getPost
+ * @property {(id: string, auth: string) => Promise<import("#app/models").Post>} getPostInfo
+ * @property {(id: string, auth: string) => Promise<import("#app/models").PostParagraph[]>} getPostDraft
  * @property {(status: string, take: number, skip: number) => Promise<Array<import("#app/models").Post>>} getPostsByStatus
  */
 

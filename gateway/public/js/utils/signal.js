@@ -4,7 +4,7 @@ export function createSignal(initialValue) {
 
     return {
         get() {
-            return value;
+            return JSON.parse(JSON.stringify(value));
         },
         set(newValue) {
             if (newValue !== value) {

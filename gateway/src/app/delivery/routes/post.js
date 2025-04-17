@@ -35,9 +35,42 @@ export function PostRoutes(postController, authMiddlewares) {
     );
 
     postRouter.get(
+        '/:postId/edit',
+        authMiddlewares.withAuth.bind(authMiddlewares),
+        [param('postId').isString().withMessage('Should be a string')],
+        handler(postController, 'getNewStoryView'),
+    );
+
+    postRouter.get(
         '/:slug',
         [param('slug').isString().withMessage('Invalid slug format')],
         handler(postController, 'getPost'),
+    );
+
+    postRouter.get(
+        '/:id/info',
+        authMiddlewares.withAuth.bind(authMiddlewares),
+        [
+            param('id')
+                .isString()
+                .withMessage('Invalid id')
+                .isUUID()
+                .withMessage('Invalid id'),
+        ],
+        handler(postController, 'getPostInfo'),
+    );
+
+    postRouter.get(
+        '/:id/draft',
+        authMiddlewares.withAuth.bind(authMiddlewares),
+        [
+            param('id')
+                .isString()
+                .withMessage('Invalid id')
+                .isUUID()
+                .withMessage('Invalid id'),
+        ],
+        handler(postController, 'getPostDraft'),
     );
 
     postRouter.patch(

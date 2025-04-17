@@ -4,10 +4,14 @@
  * @param {string} pattern
  * @returns {string|null}
  */
-export function windowDynamicParam(paramName, pattern) {
+export function windowDynamicParam(
+    paramName,
+    pattern,
+    pathname = window.location.pathname,
+) {
     return (
         window.history.state?.[paramName] ??
-        matchPath(pattern, window.location.pathname)?.[paramName] ??
+        matchPath(pattern, pathname)?.[paramName] ??
         null
     );
 }

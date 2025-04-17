@@ -1,5 +1,6 @@
 import { ClientException } from '#app/common/error.js';
 import { CreatePostDTO } from '#app/dto/index.js';
+import { render } from '#lib/ejs/render.js';
 import { requestCookies } from '#lib/rest/cookie.js';
 import { validate } from '#lib/validator/validator.js';
 
@@ -17,6 +18,16 @@ export class PostController {
      */
     constructor(postService) {
         this.#postService = postService;
+    }
+
+    /**
+     * @param {Request} req
+     * @param {Response} res
+     */
+    async getNewStoryView(req, res) {
+        return render(res)
+            .template('workbench/workbench-page', {})
+            .layout('workbench/workbench-layout');
     }
 
     /**
@@ -177,6 +188,50 @@ export class PostController {
         const result = await this.#postService.transferPostOwnership(
             req.params.id,
             newOwner,
+            token,
+        );
+        return res.status(200).json(result);
+    }
+
+    /**
+     * @param {Request} req
+     * @param {Response} res
+     */
+    async getPostInfo(req, res) {
+        const token = this.#getAuthToken(req);
+        if (!token) {
+            throw new ClientException('Ви повинні бути авторизовані', 401);
+        }
+
+        const errors = validate(req);
+        if (!errors.isEmpty()) {
+            throw new ClientException(errors.mapped(), 400);
+        }
+
+        const result = await this.#postService.getPostInfo(
+            req.params.id,
+            token,
+        );
+        return res.status(200).json(result);
+    }
+
+    /**
+     * @param {Request} req
+     * @param {Response} res
+     */
+    async getPostDraft(req, res) {
+        const token = this.#getAuthToken(req);
+        if (!token) {
+            throw new ClientException('Ви повинні бути авторизовані', 401);
+        }
+
+        const errors = validate(req);
+        if (!errors.isEmpty()) {
+            throw new ClientException(errors.mapped(), 400);
+        }
+
+        const result = await this.#postService.getPostDraft(
+            req.params.id,
             token,
         );
         return res.status(200).json(result);

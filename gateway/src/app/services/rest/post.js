@@ -167,6 +167,32 @@ export class PostService {
     }
 
     /**
+     * @param {string} id
+     * @param {string} auth
+     * @returns {Promise<import("#app/models").Post>}
+     */
+    async getPostInfo(id, auth) {
+        const response = await this.#client
+            .get(`posts/${id}/info`, {
+                headers: this.#withAuth(auth),
+            })
+            .json();
+        return this.#postToModel(response);
+    }
+
+    /**
+     * @param {string} id
+     * @param {string} auth
+     * @returns {Promise<import("#app/models").PostParagraph[]>}
+     */
+    async getPostDraft(id, auth) {
+        const response = await this.#client
+            .get(`posts/${id}/draft`, { headers: this.#withAuth(auth) })
+            .json();
+        return response.map((p) => this.#paragraphToModel(p));
+    }
+
+    /**
      * @param {string} status
      * @param {number} take
      * @param {number} skip

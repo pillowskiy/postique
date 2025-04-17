@@ -23,7 +23,6 @@ export async function ajax(method, url, opts = {}) {
     return new Promise((resolve, reject) => {
         htmx.ajax(method, url, {
             ...opts,
-            event: 'hey',
             handler: function (elt, info) {
                 const { xhr } = info;
                 const contentType = xhr.getResponseHeader('Content-Type') || '';
@@ -34,11 +33,11 @@ export async function ajax(method, url, opts = {}) {
 
                 if (status || message) {
                     htmx.handleAjaxResponse(elt, info);
-                    reject(
-                        new Error(
-                            `${status || 500}: ${message || 'Unknown error ocurred'}`,
-                        ),
-                    );
+                    const statusDec = status ? atob(status) : 500;
+                    const messageDec = message
+                        ? atob(message)
+                        : 'Unknown error ocurred';
+                    reject(new Error(`${statusDec}: ${messageDec}`));
                     return false;
                 }
 
