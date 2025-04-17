@@ -109,7 +109,10 @@ async function bundleHTMX() {
             terser(),
             alias({
                 entries: [
-                    { find: 'htmx.org', replacement: 'htmx.org/dist/htmx.js' },
+                    {
+                        find: 'htmx.org',
+                        replacement: 'htmx.org/dist/htmx.esm.js',
+                    },
                 ],
             }),
         ],
