@@ -1,6 +1,6 @@
-<div x-data="{ showDialog: false }">
+<div x-data="{ showDialog: false, meta: {} }">
     <sl-button
-        @click="showDialog = true"
+        @click="showDialog = true; meta = editor.state.getSafePostMetadata()"
         id="publish-button"
         size="small"
         variant="primary"
@@ -36,6 +36,7 @@
                 type="text"
                 x-model="text"
                 :maxlength="max"
+                :value="meta.title"
                 name="title"
                 placeholder="Заголовок"
             />
@@ -54,6 +55,7 @@
                 x-model="text"
                 :maxlength="max"
                 name="description"
+                :value="meta.description"
                 placeholder="Опис"
             />
 

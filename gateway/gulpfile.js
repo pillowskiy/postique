@@ -147,6 +147,7 @@ async function bundle() {
     return res.write({
         file: `_static/js/quill.min.js`,
         format: 'iife',
+        name: 'editor',
         sourcemap: true,
         compact: true,
     });

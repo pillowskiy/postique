@@ -1,3 +1,9 @@
+.publish-dialog::part(body) {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
 .ql-container {
     box-sizing: border-box;
     height: 100%;
