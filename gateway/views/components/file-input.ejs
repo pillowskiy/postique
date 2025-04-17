@@ -1,0 +1,77 @@
+<div
+    class="upload-container"
+    x-data="imageUploader({
+        dragText: 'Перетягніть зображення сюди',
+        buttonText: 'Обрати файл',
+        changeText: 'Змінити обкладинку',
+        overlayText: 'Перетягніть нове зображення сюди',
+        aspectRatio: '4-3' 
+    })"
+>
+    <div
+        class="upload-container__upload-area"
+        :class="{ 
+        'upload-container__upload-area--drag-over': isDragging, 
+        'upload-container__upload-area--has-image': imagePreview, 
+        'upload-container__upload-area--fixed-ratio': aspectRatio,
+        'upload-container__upload-area--ratio-1-1': aspectRatio === '1-1',
+        'upload-container__upload-area--ratio-4-3': aspectRatio === '4-3',
+        'upload-container__upload-area--ratio-21-9': aspectRatio === '21-9'
+      }"
+        @dragover.prevent="isDragging = true"
+        @dragleave.prevent="isDragging = false"
+        @drop.prevent="handleDrop($event)"
+    >
+        <template x-if="imagePreview">
+            <img
+                :src="imagePreview"
+                alt="Uploaded image preview"
+                class="upload-container__upload-area__img"
+            />
+        </template>
+
+        <div class="upload-container__overlay" x-show="imagePreview">
+            <span
+                x-text="overlayText"
+                class="upload-container__overlay__text"
+            ></span>
+            <sl-button
+                @click="$refs.fileInput.click()"
+                x-text="buttonText"
+                variant="primary"
+                pill
+            ></sl-button>
+        </div>
+
+        <div :class="aspectRatio ? 'upload-container__content-wrapper' : ''">
+            <div class="upload-container__upload-prompt" x-show="!imagePreview">
+                <p
+                    x-text="dragText"
+                    class="upload-container__upload-prompt__text"
+                ></p>
+                <sl-button
+                    @click="$refs.fileInput.click()"
+                    x-text="buttonText"
+                    variant="primary"
+                    pill
+                ></sl-button>
+            </div>
+
+            <span
+                class="upload-container__change-text"
+                x-show="imagePreview"
+                x-text="changeText"
+            ></span>
+        </div>
+
+        <input
+            type="file"
+            name="coverImage"
+            :id="inputId"
+            x-ref="fileInput"
+            class="upload-container__file-input"
+            accept="image/*"
+            @change="handleFileSelect($event)"
+        />
+    </div>
+</div>

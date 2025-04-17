@@ -11,9 +11,7 @@
         </div>
 
         <div class="workbench-header__block">
-            <sl-button id="publish-button" size="small" variant="primary" pill>
-                Publish
-            </sl-button>
+            <%- await include('./workbench-publish-dialog.ejs') %>
 
             <sl-tooltip content="Actions">
                 <sl-icon-button

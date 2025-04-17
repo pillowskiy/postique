@@ -1,0 +1,75 @@
+<div x-data="{ showDialog: false }">
+    <sl-button
+        @click="showDialog = true"
+        id="publish-button"
+        size="small"
+        variant="primary"
+        pill
+    >
+        Публікувати
+    </sl-button>
+
+    <sl-dialog
+        class="publish-dialog"
+        :open="showDialog"
+        @sl-after-hide="showDialog = false"
+        id="publish-dialog"
+        label="Передогляд Публікації"
+    >
+        <sl-alert variant="primary" open>
+            <sl-icon slot="icon" name="info-circle"></sl-icon>
+            Зміни тут вплинуть на те, як ваша публікація відображатиметься в
+            публічних місцях, таких як домашня сторінка, а не на зміст самої
+            історії.
+        </sl-alert>
+
+        <%- await include('../../components/file-input.ejs') %>
+
+        <div
+            class="ranged-input"
+            x-data="{ text: '', max: 128 }"
+            class="space-y-1"
+        >
+            <input
+                style="font-size: var(--sl-font-size-large); font-weight: 500"
+                class="ranged-input__input"
+                type="text"
+                x-model="text"
+                :maxlength="max"
+                name="title"
+                placeholder="Заголовок"
+            />
+
+            <p class="ranged-input__text">
+                <span x-text="text.length"></span>/<span x-text="max"></span>
+            </p>
+
+            <hr class="ranged-input__hr" />
+        </div>
+
+        <div class="ranged-input" x-data="{ text: '', max: 256 }">
+            <input
+                class="ranged-input__input"
+                type="text"
+                x-model="text"
+                :maxlength="max"
+                name="description"
+                placeholder="Опис"
+            />
+
+            <p class="ranged-input__text">
+                <span x-text="text.length"></span>/<span x-text="max"></span>
+            </p>
+            <hr class="ranged-input__hr" />
+        </div>
+
+        <div slot="footer">
+            <sl-button class="ghost" variant="text">
+                Запланувати на потім
+            </sl-button>
+            <sl-button style="margin-left: 16px" variant="primary">
+                Опублікувати
+            </sl-button>
+        </div>
+    </sl-dialog>
+</div>

@@ -3,18 +3,18 @@
     <head>
         <%- await include('../partials/head.ejs') %>
         <title>Workbench</title>
-        <script src="https://cdn.jsdelivr.net/gh/Emtyloc/json-enc-custom@main/json-enc-custom.js"></script>
         <script src="/js/quill.min.js" defer></script>
         <link rel="stylesheet" href="/styles/editor.min.css"></link>
-
         <link rel="preconnect" href="https://fonts.googleapis.com"></link>
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link>
         <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500&display=swap" rel="stylesheet"></link>
+        <script src="/js/alpine.globals.js"></script>
     </head>
 
     <body hx-ext="json-enc-custom">
         <%- await include('./components/workbench-header.ejs') %>
         <%- await include(__renderTarget) %>
         <%- await include('../partials/toasts.ejs') %>
+
     </body>
 </html>
