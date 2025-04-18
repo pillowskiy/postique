@@ -13,6 +13,7 @@ import { DeltaGroup } from '@/domain/content/delta/delta.entity';
 import { ContentChangeStrategy } from '@/domain/content/strategy/delta-update.strategy';
 import { Logger } from '@/app/boundaries/common';
 import { PostAccessControlList } from '@/app/boundaries/acl';
+import { PostStatus } from '@/domain/post';
 
 @CommandHandler(DeltaSaveCommand)
 export class DeltaSaveCommandHandler extends Command<
@@ -77,7 +78,20 @@ export class DeltaSaveCommandHandler extends Command<
     const paragraphs = await this.applyChanges(changeStrategy);
     this._logger.debug?.('Paragraphs applied');
 
-    await this._contentRepository.save(post.content, paragraphs);
+    const promises: Promise<any>[] = [
+      this._contentRepository.save(post.content, paragraphs),
+    ];
+
+    // TEMP: This should be responsibility of the content entity
+    if (post.status !== PostStatus.Draft) {
+      this._logger.assign({ post: { id: post.id, status: post.status } });
+      this._logger.debug?.('Post is not in draft state');
+      post.draft();
+      promises.push(this._postRepository.save(post));
+    }
+    this._logger.debug?.('Post saved %d', promises.length);
+
+    await Promise.all(promises);
 
     return new DeltaSaveOutput(post.id);
   }

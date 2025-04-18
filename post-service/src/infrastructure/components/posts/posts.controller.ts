@@ -62,9 +62,10 @@ export class PostsController {
   @UseGuards(AuthGuard)
   async publishPost(
     @Param('id', ParseUUIDPipe) postId: string,
+    @Body() meta: input.UpdatePostMetadataInput,
     @InitiatedBy() initiatedBy: string,
   ): Promise<output.PostOutput> {
-    return this._postsService.publishPost(postId, initiatedBy);
+    return this._postsService.publishPost(postId, meta, initiatedBy);
   }
 
   @Delete(':id')

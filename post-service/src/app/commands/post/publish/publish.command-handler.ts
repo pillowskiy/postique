@@ -22,6 +22,8 @@ export class PublishPostCommandHandler extends Command<
     }
 
     post.publish();
+    post.updateMetadata(input.meta);
+
     await this._postRepository.save(post);
 
     return PostMapper.toDto(post);

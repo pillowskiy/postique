@@ -11,7 +11,11 @@ import {
   CursorOutput,
   PostParagraphOutput,
 } from '@/app/boundaries/dto/output';
-import { CreatePostInput, Delta } from '@/app/boundaries/dto/input';
+import {
+  CreatePostInput,
+  Delta,
+  UpdatePostMetadataInput,
+} from '@/app/boundaries/dto/input';
 
 import { CreatePostCommand } from '@/app/commands/post/create';
 import { ChangePostVisibilityCommand } from '@/app/commands/post/change-visibility';
@@ -36,10 +40,10 @@ export class PostsService {
 
   public async createPost(
     owner: string,
-    { title, visibility, description }: CreatePostInput,
+    input: CreatePostInput,
   ): Promise<CreatePostOutput> {
     return this._commandBus.execute<CreatePostCommand, CreatePostOutput>(
-      new CreatePostCommand(title, description, visibility, owner),
+      new CreatePostCommand(input, owner),
     );
   }
 
@@ -64,10 +68,11 @@ export class PostsService {
 
   public async publishPost(
     postId: string,
+    meta: UpdatePostMetadataInput,
     initiatedBy: string,
   ): Promise<PostOutput> {
     return this._commandBus.execute<PublishPostCommand, PostOutput>(
-      new PublishPostCommand(postId, initiatedBy),
+      new PublishPostCommand(postId, meta, initiatedBy),
     );
   }
 

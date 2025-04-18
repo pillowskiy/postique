@@ -13,12 +13,7 @@ import { type IPost, PostStatus, PostVisibility } from './post.interface';
 import { Type } from 'class-transformer';
 import { randomUUID } from 'crypto';
 
-export class PostSchema implements IPost {
-  @IsString({ message: 'ID must be a string' })
-  @IsNotEmpty({ message: 'ID cannot be empty' })
-  @IsUUID(4, { message: 'ID has incorrect format' })
-  id: string = randomUUID();
-
+export class PostMetadataSchema {
   @IsString({ message: 'Title must be a string' })
   @IsNotEmpty({ message: 'Title cannot be empty' })
   @MaxLength(128, { message: 'Title must be at most 128 characters' })
@@ -28,6 +23,18 @@ export class PostSchema implements IPost {
   @IsOptional()
   @MaxLength(512, { message: 'Description must be at most 256 characters' })
   description: string;
+
+  @IsString({ message: 'CoverImage must be a string' })
+  @IsOptional()
+  @MaxLength(2048, { message: 'CoverImage must be at most 2048 characters' })
+  coverImage: string;
+}
+
+export class PostSchema extends PostMetadataSchema implements IPost {
+  @IsString({ message: 'ID must be a string' })
+  @IsNotEmpty({ message: 'ID cannot be empty' })
+  @IsUUID(4, { message: 'ID has incorrect format' })
+  id: string = randomUUID();
 
   @IsString({ message: 'Owner must be a string' })
   @IsNotEmpty({ message: 'Owner cannot be empty' })

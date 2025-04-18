@@ -44,20 +44,19 @@ export class CreatePostCommandHandler extends Command<
 
   protected async invoke({
     initiatedBy,
-    visibility,
-    title,
-    ...restPost
+    data,
   }: CreatePostCommand): Promise<CreatePostOutput> {
-    this._logger.assign({ input: { ...restPost, initiatedBy } });
+    this._logger.assign({ input: { ...data, initiatedBy } });
     this._logger.debug?.('Creating post');
 
     const post = PostEntity.create({
       owner: initiatedBy,
       authors: [initiatedBy],
-      title,
-      slug: slugify(title),
-      visibility: visibility ?? PostVisibility.Public.toString(),
-      ...restPost,
+      title: data.title,
+      description: data.description,
+      coverImage: data.coverImage,
+      slug: slugify(data.title),
+      visibility: data.visibility ?? PostVisibility.Public.toString(),
     });
 
     const hasPermission = await this._postACL.canCreate(initiatedBy, post);
@@ -89,7 +88,7 @@ export class CreatePostCommandHandler extends Command<
         post.id,
         post.title,
         post.description,
-        null,
+        post.coverImage,
         post.visibility,
         post.status,
       ),

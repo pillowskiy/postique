@@ -29,10 +29,14 @@ export type IncomingPost = IncomingEntity<
   { status: string; visibility: string }
 >;
 
-export interface IPost {
-  id: string;
+export interface IPostMetadata {
   title: string;
   description: string;
+  coverImage: string;
+}
+
+export interface IPost extends IPostMetadata {
+  id: string;
   owner: string;
   authors: Readonly<string[]>;
   slug: string;

@@ -207,6 +207,7 @@ export class MongoPostRepository extends PostRepository {
       id: post._id.toString(),
       title: post.title,
       description: post.description,
+      coverImage: post.coverImage ?? '',
       owner: post.owner,
       content: post.content,
       slug: post.slug,

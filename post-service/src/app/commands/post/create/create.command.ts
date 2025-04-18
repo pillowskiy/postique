@@ -1,8 +1,8 @@
+import { CreatePostInput } from '@/app/boundaries/dto/input';
+
 export class CreatePostCommand {
   constructor(
-    public readonly title: string,
-    public readonly description: string,
-    public readonly visibility: string,
+    public readonly data: CreatePostInput,
     public readonly initiatedBy: string,
   ) {}
 }

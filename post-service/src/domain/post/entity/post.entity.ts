@@ -3,11 +3,13 @@ import { EntityFactory } from '../../common/entity';
 import {
   IncomingPost,
   IPost,
+  IPostMetadata,
   PostStatus,
   PostVisibility,
 } from './post.interface';
 
-import { PostSchema } from './post.schema';
+import { slugify } from '@/libs/slugify';
+import { PostMetadataSchema, PostSchema } from './post.schema';
 
 export class PostEntity implements IPost {
   static create(post: IncomingPost): PostEntity {
@@ -30,6 +32,7 @@ export class PostEntity implements IPost {
   protected _visibility: PostVisibility;
   protected _publishedAt: Date | null;
   protected _content: string;
+  protected _coverImage: string;
 
   protected constructor(post: IPost) {
     this.id = post.id;
@@ -42,6 +45,7 @@ export class PostEntity implements IPost {
     this._visibility = post.visibility;
     this._title = post.title;
     this._description = post.description;
+    this._coverImage = post.coverImage;
 
     this._publishedAt = post.publishedAt;
     this.updatedAt = post.updatedAt;
@@ -80,6 +84,10 @@ export class PostEntity implements IPost {
     return this._visibility;
   }
 
+  get coverImage(): string {
+    return this._coverImage;
+  }
+
   get publishedAt(): Date | null {
     return this._publishedAt;
   }
@@ -108,6 +116,28 @@ export class PostEntity implements IPost {
     this._visibility = visibility;
   }
 
+  updateMetadata({ title, description, coverImage }: Partial<IPostMetadata>) {
+    if (this.status === PostStatus.Archived) {
+      throw new DomainBusinessRuleViolation(
+        'You cannot change metadata of an archived post',
+      );
+    }
+
+    const incomingMeta: IPostMetadata = {
+      title: title ?? this.title,
+      description: description ?? this.description,
+      coverImage: coverImage ?? this.coverImage,
+    };
+
+    const validMeta = EntityFactory.create(PostMetadataSchema, incomingMeta);
+    this._title = validMeta.title;
+    if (this.isFresh()) {
+      this._slug = slugify(this.title);
+    }
+    this._description = validMeta.description;
+    this._coverImage = validMeta.coverImage;
+  }
+
   changeContent(content: string) {
     this._content = content;
   }
@@ -121,12 +151,6 @@ export class PostEntity implements IPost {
       throw new DomainBusinessRuleViolation('Post is not in draft state');
     }
 
-    if (this.description.length < 64) {
-      throw new DomainBusinessRuleViolation(
-        'Post description must have at least 64 characters',
-      );
-    }
-
     this._status = PostStatus.Published;
     this._publishedAt = new Date();
   }
@@ -138,5 +162,22 @@ export class PostEntity implements IPost {
 
     this._status = PostStatus.Archived;
     this._publishedAt = null;
+  }
+
+  draft() {
+    if (this.status === PostStatus.Archived) {
+      throw new DomainBusinessRuleViolation(
+        'You cannot change status of an archived post',
+      );
+    }
+
+    this._status = PostStatus.Draft;
+  }
+
+  isFresh(): boolean {
+    const isNew =
+      this.createdAt.getTime() > Date.now() - 1000 * 60 * 60 * 24 * 7;
+    const isDraft = this.status === PostStatus.Draft;
+    return isDraft || isNew;
   }
 }
