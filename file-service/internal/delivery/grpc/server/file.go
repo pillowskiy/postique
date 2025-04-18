@@ -49,6 +49,20 @@ func (s *fileServer) Upload(ctx context.Context, req *pb.UploadRequest) (*pb.Upl
 	return &pb.UploadResponse{}, nil
 }
 
+func (s *fileServer) Delete(ctx context.Context, req *pb.DeleteRequest) (*pb.DeleteResponse, error) {
+	app, err := interceptor.AppFromContext(ctx)
+	if err != nil {
+		return nil, status.Error(codes.Internal, "failed to get user from execution context")
+	}
+
+	err = s.fileUC.Delete(ctx, req.Path, app.Bucket)
+	if err != nil {
+		return nil, s.parseUseCaseErr(err)
+	}
+
+	return &pb.DeleteResponse{}, nil
+}
+
 func (s *fileServer) parseUseCaseErr(err error) error {
 	switch {
 	case errors.Is(err, usecase.ErrInvalidInput):
