@@ -1,5 +1,9 @@
 import { ClientException } from '#app/common/error.js';
-import { CreatePostDTO } from '#app/dto/index.js';
+import {
+    CreatePostDTO,
+    DeleteFileDTO,
+    UpdatePostMetadataDTO,
+} from '#app/dto/index.js';
 import { render } from '#lib/ejs/render.js';
 import { requestCookies } from '#lib/rest/cookie.js';
 import { validate } from '#lib/validator/validator.js';
@@ -13,11 +17,16 @@ export class PostController {
     /** @type {import("#app/services").PostService} */
     #postService;
 
+    /** @type {import("#app/services").FileService} */
+    #fileService;
+
     /**
      * @param {import("#app/services").PostService} postService
+     * @param {import("#app/services").FileService} fileService
      */
-    constructor(postService) {
+    constructor(postService, fileService) {
         this.#postService = postService;
+        this.#fileService = fileService;
     }
 
     /**
@@ -49,7 +58,7 @@ export class PostController {
             req.body.title,
             req.body.description,
             req.body.content,
-            req.body.visibility || 'private',
+            req.body.visibility,
         );
 
         const result = await this.#postService.createPost(token, dto);
@@ -93,8 +102,37 @@ export class PostController {
             throw new ClientException(errors.mapped(), 400);
         }
 
-        const post = await this.#postService.publishPost(req.params.id, token);
-        return res.status(200).json(post);
+        const dto = new UpdatePostMetadataDTO({
+            title: req.body.title,
+            description: req.body.description,
+            coverImage: req.file?.filename,
+        });
+
+        /** @type {Promise<any>[]} */
+        const promises = [
+            this.#postService
+                .publishPost(req.params.id, dto, token)
+                .catch((e) => {
+                    if (req.file) {
+                        this.#fileService
+                            .delete(new DeleteFileDTO(req.file.filename))
+                            .catch(() => null);
+                    }
+                    throw e;
+                }),
+        ];
+
+        if (req.file) {
+            promises.push(this.#fileService.upload(req.file));
+        }
+
+        await Promise.all(promises);
+
+        return render(res).template('components/toast.oob', {
+            initiator: 'Редакція',
+            message: 'Публікація вашого посту завершена успішно',
+            variant: 'success',
+        });
     }
 
     /**

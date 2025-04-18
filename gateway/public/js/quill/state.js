@@ -13,6 +13,7 @@ export const publishButtonState = createSignal(initialPublishButtonState);
 export function getSafePostMetadata() {
     const post = postState.get();
     return {
+        id: post.id ?? '',
         title: post?.title || '',
         description: post?.description || '',
         coverImage: null,

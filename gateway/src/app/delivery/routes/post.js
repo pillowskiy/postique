@@ -6,8 +6,9 @@ import handler from '../common/handler.js';
 /**
  * @param {import("#app/delivery/controllers").PostController} postController
  * @param {import("#app/delivery/middlewares").AuthMiddlewares} authMiddlewares
+ * @param {import("#app/delivery/middlewares").GeneralMiddlewares} middlewares
  */
-export function PostRoutes(postController, authMiddlewares) {
+export function PostRoutes(postController, authMiddlewares, middlewares) {
     const postRouter = express.Router();
 
     postRouter.post(
@@ -96,7 +97,20 @@ export function PostRoutes(postController, authMiddlewares) {
     postRouter.patch(
         '/:id/publish',
         authMiddlewares.withAuth.bind(authMiddlewares),
-        [param('id').isUUID().withMessage('Invalid post ID')],
+        middlewares.singleFile({ optional: true }).bind(middlewares),
+        [
+            param('id').isUUID().withMessage('Invalid post ID'),
+            body('title')
+                .isString()
+                .optional()
+                .isLength({ max: 256 })
+                .withMessage('Title must be at most 256 characters'),
+            body('description')
+                .isString()
+                .optional()
+                .isLength({ max: 512 })
+                .withMessage('Description must be at most 512 characters'),
+        ],
         handler(postController, 'publishPost'),
     );
 

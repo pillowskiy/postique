@@ -1,5 +1,9 @@
 import { ClientException } from '#app/common/error.js';
+import { UploadFileDTO } from '#app/dto/index.js';
 import { render } from '#lib/ejs/render.js';
+
+import multer from 'multer';
+import { extname } from 'path';
 
 export class GeneralMiddlewares {
     /** @type {import('#shared/logger').Logger} */
@@ -80,7 +84,82 @@ export class GeneralMiddlewares {
                 return render(res).template('components/toast.oob', {
                     initiator: 'Postique',
                     message: exception.message,
+                    variant: 'danger',
                 });
         }
+    }
+
+    /**
+     * @param {Object} [options]
+     * @property {boolean} [allowEmpty]
+     * @property {number} [maxFileSize]
+     * @property {boolean} [optional]
+     */
+    singleFile(options = {}) {
+        const { maxFileSize = 1024 * 1024 * 20, optional = false } = options;
+
+        const storage = multer.memoryStorage();
+        const upload = multer({
+            storage,
+            limits: { fileSize: maxFileSize },
+        }).single('file');
+
+        /**
+         * @param {import('express').Request} req
+         * @param {import('express').Response} res
+         * @param {import('express').NextFunction} next
+         */
+        return (req, res, next) => {
+            this.#logger.debug?.('Parsing form');
+
+            upload(req, res, (err) => {
+                if (err) {
+                    this.#logger.error(err, 'Error while parsing form');
+                    return next(
+                        new ClientException('Помилка обробки файлу', 500),
+                    );
+                }
+
+                const file = req.file;
+                if (!file) {
+                    if (optional) {
+                        return next();
+                    }
+
+                    return next(
+                        new ClientException(
+                            'Файлу для завантаження не було вказано',
+                            400,
+                        ),
+                    );
+                }
+
+                if (!file.mimetype) {
+                    return next(
+                        new ClientException(
+                            'Не вдалося отримати тип файлу',
+                            400,
+                        ),
+                    );
+                }
+
+                req.file = new UploadFileDTO(
+                    `${crypto.randomUUID()}${extname(file.originalname)}`,
+                    file.buffer,
+                    file.mimetype,
+                );
+                this.#logger.debug?.(
+                    {
+                        uploadedFile: {
+                            contentType: req.file.contentType,
+                            filename: req.file.filename,
+                        },
+                    },
+                    'Uploaded file',
+                );
+
+                return next();
+            });
+        };
     }
 }

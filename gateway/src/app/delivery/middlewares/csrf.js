@@ -63,6 +63,7 @@ export class CSRFMiddlewares {
                 .template('components/toast.oob', {
                     initiator: 'Security',
                     message: 'CSRF token mismatch',
+                    variant: 'danger',
                 })
                 .exec();
         }

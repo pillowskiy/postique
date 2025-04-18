@@ -2,14 +2,28 @@ export class CreatePostDTO {
     /**
      * @param {string} title
      * @param {string} description
-     * @param {string} content
+     * @param {string} coverImage
      * @param {string} visibility
      */
-    constructor(title, description, content, visibility) {
+    constructor(title, description, coverImage, visibility) {
         this.title = title;
         this.description = description;
-        this.content = content;
+        this.coverImage = coverImage;
         this.visibility = visibility;
+    }
+}
+
+export class UpdatePostMetadataDTO {
+    /**
+     * @param {Object} data
+     * @param {string} [data.title]
+     * @param {string} [data.description]
+     * @param {string} [data.coverImage]
+     */
+    constructor(data) {
+        this.title = data.title;
+        this.description = data.description;
+        this.coverImage = data.coverImage;
     }
 }
 

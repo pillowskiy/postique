@@ -23,6 +23,8 @@ export async function ajax(method, url, opts = {}) {
     return new Promise((resolve, reject) => {
         htmx.ajax(method, url, {
             ...opts,
+            target: document.body,
+            swap: 'none',
             handler: function (elt, info) {
                 const { xhr } = info;
                 const contentType = xhr.getResponseHeader('Content-Type') || '';

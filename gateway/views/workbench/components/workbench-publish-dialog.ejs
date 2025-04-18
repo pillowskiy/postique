@@ -1,4 +1,4 @@
-<div x-data="{ showDialog: false, meta: {} }">
+<div id="publish-wrapper" x-data="{ showDialog: false, meta: {} }">
     <sl-button
         @click="showDialog = true; meta = editor.state.getSafePostMetadata()"
         id="publish-button"
@@ -10,66 +10,83 @@
     </sl-button>
 
     <sl-dialog
-        class="publish-dialog"
         :open="showDialog"
         @sl-after-hide="showDialog = false"
         id="publish-dialog"
         label="Передогляд Публікації"
     >
-        <sl-alert variant="primary" open>
-            <sl-icon slot="icon" name="info-circle"></sl-icon>
-            Зміни тут вплинуть на те, як ваша публікація відображатиметься в
-            публічних місцях, таких як домашня сторінка, а не на зміст самої
-            історії.
-        </sl-alert>
-
-        <%- await include('../../components/file-input.ejs') %>
-
-        <div
-            class="ranged-input"
-            x-data="{ text: '', max: 128 }"
-            class="space-y-1"
+        <form
+            x-effect="meta.id;htmx.process($el)"
+            :hx-patch="`/p/${meta.id}/publish`"
+            enctype="multipart/form-data"
+            hx-swap="none"
+            hx-ext="ignore:json-enc-custom"
+            class="publish-form"
+            id="publish-form"
         >
-            <input
-                style="font-size: var(--sl-font-size-large); font-weight: 500"
-                class="ranged-input__input"
-                type="text"
-                x-model="text"
-                :maxlength="max"
-                :value="meta.title"
-                name="title"
-                placeholder="Заголовок"
-            />
+            <sl-alert variant="primary" open>
+                <sl-icon slot="icon" name="info-circle"></sl-icon>
+                Зміни тут вплинуть на те, як ваша публікація відображатиметься в
+                публічних місцях, таких як домашня сторінка, а не на зміст самої
+                історії.
+            </sl-alert>
 
-            <p class="ranged-input__text">
-                <span x-text="text.length"></span>/<span x-text="max"></span>
-            </p>
+            <%- await include('../../components/file-input.ejs') %>
 
-            <hr class="ranged-input__hr" />
-        </div>
+            <div class="ranged-input" x-data="{ max: 128 }" class="space-y-1">
+                <input
+                    name="title"
+                    style="
+                        font-size: var(--sl-font-size-large);
+                        font-weight: 500;
+                    "
+                    class="ranged-input__input"
+                    type="text"
+                    x-model="meta.title"
+                    :maxlength="max"
+                    :value="meta.title"
+                    name="title"
+                    placeholder="Заголовок"
+                />
 
-        <div class="ranged-input" x-data="{ text: '', max: 256 }">
-            <input
-                class="ranged-input__input"
-                type="text"
-                x-model="text"
-                :maxlength="max"
-                name="description"
-                :value="meta.description"
-                placeholder="Опис"
-            />
+                <p class="ranged-input__text">
+                    <span x-text="meta.title.length"></span>
+                    /<span x-text="max"></span>
+                </p>
+                <hr class="ranged-input__hr" />
+            </div>
 
-            <p class="ranged-input__text">
-                <span x-text="text.length"></span>/<span x-text="max"></span>
-            </p>
-            <hr class="ranged-input__hr" />
-        </div>
+            <div class="ranged-input" x-data="{ max: 256 }">
+                <input
+                    name="description"
+                    class="ranged-input__input"
+                    type="text"
+                    x-model="meta.description"
+                    :maxlength="max"
+                    name="description"
+                    :value="meta.description"
+                    placeholder="Опис"
+                />
+
+                <p class="ranged-input__text">
+                    <span x-text="meta.description.length"></span>
+                    /<span x-text="max"></span>
+                </p>
+
+                <hr class="ranged-input__hr" />
+            </div>
+        </form>
 
         <div slot="footer">
             <sl-button class="ghost" variant="text">
                 Запланувати на потім
             </sl-button>
-            <sl-button style="margin-left: 16px" variant="primary">
+            <sl-button
+                @click="htmx.trigger(htmx.find('#publish-form'), 'submit')"
+                style="margin-left: 16px"
+                variant="primary"
+                type="submit"
+            >
                 Опублікувати
             </sl-button>
         </div>

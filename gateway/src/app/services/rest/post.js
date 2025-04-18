@@ -1,24 +1,15 @@
-import ky from 'ky';
+import { RestClient } from './common/client.js';
 
 /**
  * @typedef {import('#shared/config').PostServiceConfig} PostServiceConfig
  */
 
-export class PostService {
-    /** @type {import('ky').KyInstance} */
-    #client;
-
+export class PostService extends RestClient {
     /**
      * @param {PostServiceConfig} config
      */
     constructor(config) {
-        this.#client = ky.create({
-            prefixUrl: config.postService.address,
-            timeout: config.postService.timeout || 5000,
-            headers: {
-                'Content-Type': 'application/json',
-            },
-        });
+        super(config.postService.address, config.postService.timeout || 5000);
     }
 
     /**
@@ -27,7 +18,7 @@ export class PostService {
      * @returns {Promise<import("#app/models").PostIdentifier>}
      */
     async createPost(auth, input) {
-        const response = await this.#client
+        const response = await this._client
             .post('posts', {
                 json: input,
                 headers: this.#withAuth(auth),
@@ -44,7 +35,7 @@ export class PostService {
      * @returns {Promise<import("#app/models").Post>}
      */
     async changePostVisibility(postId, visibility, auth) {
-        const response = await this.#client
+        const response = await this._client
             .patch(`posts/${postId}/visibility`, {
                 json: { visibility },
                 headers: this.#withAuth(auth),
@@ -60,7 +51,7 @@ export class PostService {
      * @returns {Promise<import("#app/models").PostIdentifier>}
      */
     async archivePost(postId, auth) {
-        const response = await this.#client
+        const response = await this._client
             .patch(`posts/${postId}/archive`, {
                 headers: this.#withAuth(auth),
             })
@@ -71,13 +62,15 @@ export class PostService {
 
     /**
      * @param {string} postId
+     * @param {import('#app/dto').UpdatePostMetadataDTO} meta
      * @param {string} auth
      * @returns {Promise<import("#app/models").Post>}
      */
-    async publishPost(postId, auth) {
-        const response = await this.#client
+    async publishPost(postId, meta, auth) {
+        const response = await this._client
             .patch(`posts/${postId}/publish`, {
                 headers: this.#withAuth(auth),
+                json: meta,
             })
             .json();
 
@@ -90,7 +83,7 @@ export class PostService {
      * @returns {Promise<import("#app/models").PostIdentifier>}
      */
     async deletePost(postId, auth) {
-        const response = await this.#client
+        const response = await this._client
             .delete(`posts/${postId}`, {
                 headers: this.#withAuth(auth),
             })
@@ -106,7 +99,7 @@ export class PostService {
      * @returns {Promise<import("#app/models").PostIdentifier>}
      */
     async transferPostOwnership(postId, newOwner, auth) {
-        const response = await this.#client
+        const response = await this._client
             .patch(`posts/${postId}/transfer`, {
                 json: { newOwner },
                 headers: this.#withAuth(auth),
@@ -123,7 +116,7 @@ export class PostService {
      * @returns {Promise<import("#app/models").PostIdentifier>}
      */
     async deltaSave(postId, deltas, auth) {
-        const response = await this.#client
+        const response = await this._client
             .patch(`posts/${postId}/delta`, {
                 json: { deltas },
                 headers: this.#withAuth(auth),
@@ -148,7 +141,7 @@ export class PostService {
         if (take) params.set('take', take.toString());
         if (cursor) params.set('cursor', cursor);
 
-        const response = await this.#client
+        const response = await this._client
             .get(`posts/cursor?${params}`, {
                 headers: this.#withAuth(auth),
             })
@@ -162,7 +155,7 @@ export class PostService {
      * @returns {Promise<import("#app/models").Post>}
      */
     async getPost(slug) {
-        const response = await this.#client.get(`posts/${slug}`).json();
+        const response = await this._client.get(`posts/${slug}`).json();
         return this.#postToModel(response);
     }
 
@@ -172,7 +165,7 @@ export class PostService {
      * @returns {Promise<import("#app/models").Post>}
      */
     async getPostInfo(id, auth) {
-        const response = await this.#client
+        const response = await this._client
             .get(`posts/${id}/info`, {
                 headers: this.#withAuth(auth),
             })
@@ -186,7 +179,7 @@ export class PostService {
      * @returns {Promise<import("#app/models").PostParagraph[]>}
      */
     async getPostDraft(id, auth) {
-        const response = await this.#client
+        const response = await this._client
             .get(`posts/${id}/draft`, { headers: this.#withAuth(auth) })
             .json();
         return response.map((p) => this.#paragraphToModel(p));
@@ -203,7 +196,7 @@ export class PostService {
         if (take) params.set('take', take.toString());
         if (skip) params.set('skip', skip.toString());
 
-        const response = await this.#client
+        const response = await this._client
             .get(`posts/status/${status}?${params}`)
             .json();
         return response.map((post) => this.#postToModel(post));

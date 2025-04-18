@@ -20,7 +20,7 @@
  * @property {(auth: string, dto: import("#app/dto").CreatePostDTO) => Promise<import("#app/models").PostIdentifier>} createPost
  * @property {(postId: string, visibility: string, auth: string) => Promise<import("#app/models").Post>} changePostVisibility
  * @property {(postId: string, auth: string) => Promise<import("#app/models").PostIdentifier>} archivePost
- * @property {(postId: string, auth: string) => Promise<import("#app/models").Post>} publishPost
+ * @property {(postId: string, meta: import("#app/dto").UpdatePostMetadataDTO, auth: string) => Promise<import("#app/models").Post>} publishPost
  * @property {(postId: string, auth: string) => Promise<import("#app/models").PostIdentifier>} deletePost
  * @property {(postId: string, newOwner: string, auth: string) => Promise<import("#app/models").PostIdentifier>} transferPostOwnership
  * @property {(postId: string, deltas: Array<Object>, auth: string) => Promise<import("#app/models").PostIdentifier>} deltaSave
