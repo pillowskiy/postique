@@ -5,12 +5,14 @@ import express from 'express';
 /**
  * @param {express.Router} authRouter
  * @param {express.Router} postRouter
+ * @param {express.Router} meRouter
  * @param {import("#app/delivery/middlewares").AuthMiddlewares} authMiddlewares
  * @param {import("#app/delivery/middlewares").GeneralMiddlewares} middlewares
  */
 export function AppRoutes(
     authRouter,
     postRouter,
+    meRouter,
     authMiddlewares,
     middlewares,
 ) {
@@ -31,6 +33,7 @@ export function AppRoutes(
 
     appRouter.use(authRouter);
     appRouter.use('/p', postRouter);
+    appRouter.use('/me', meRouter);
     appRouter.use(middlewares.exception.bind(middlewares));
 
     return appRouter;

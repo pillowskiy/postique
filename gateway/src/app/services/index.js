@@ -28,7 +28,7 @@
  * @property {(slug: string) => Promise<import("#app/models").Post>} getPost
  * @property {(id: string, auth: string) => Promise<import("#app/models").Post>} getPostInfo
  * @property {(id: string, auth: string) => Promise<import("#app/models").PostParagraph[]>} getPostDraft
- * @property {(status: string, take: number, skip: number) => Promise<Array<import("#app/models").Post>>} getPostsByStatus
+ * @property {(auth: string, status: string, take: number, skip: number) => Promise<Array<import("#app/models").Post>>} getPostsByStatus
  */
 
 export * as grpc from './grpc/index.js';

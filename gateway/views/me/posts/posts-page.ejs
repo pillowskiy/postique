@@ -1,0 +1,93 @@
+<div class="container">
+    <header class="header">
+        <h1>Ваші історії</h1>
+        <div class="actions">
+            <sl-button variant="primary" size="medium" href="/posts/new" pill>
+                Написати історію
+            </sl-button>
+            <sl-button
+                variant="default"
+                size="medium"
+                href="/posts/import"
+                pill
+            >
+                Імпортувати історію
+            </sl-button>
+        </div>
+    </header>
+
+    <sl-tab-group class="tabs-container" id="status-tabs" hx-boost="true">
+        <sl-tab
+            slot="nav"
+            panel="drafts"
+            hx-get="/me/posts/draft"
+            hx-trigger="click"
+            hx-target="#posts-container"
+            hx-swap="innerHTML"
+            hx-push-url="true"
+        >
+            Чернетки (<%= draftCount || 0 %>)
+        </sl-tab>
+        <sl-tab
+            slot="nav"
+            panel="published"
+            hx-get="/me/posts/published"
+            hx-trigger="click"
+            hx-target="#posts-container"
+            hx-swap="innerHTML"
+            hx-push-url="true"
+        >
+            Опубліковані
+        </sl-tab>
+        <sl-tab
+            slot="nav"
+            panel="archived"
+            hx-get="/me/posts/archived"
+            hx-trigger="click"
+            hx-target="#posts-container"
+            hx-swap="innerHTML"
+            hx-push-url="true"
+        >
+            Архівовані
+        </sl-tab>
+    </sl-tab-group>
+
+    <div
+        x-data="{ take: 10, skip: <%= posts.length %> }"
+        id="posts-container"
+        class="posts-container"
+        hx-ext="intersection-observer"
+        hx-trigger="revealed"
+        hx-swap="beforeend"
+    >
+        <%- await include('posts-list.partial.ejs', { posts }) %>
+    </div>
+</div>
+
+<script>
+    const postContainer = document.querySelector('#posts-container');
+
+    function afterPostsLoad(el, loadedCount) {
+        const data = Alpine.$data(postContainer);
+        data.skip += loadedCount;
+        el.remove();
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const path = window.location.pathname;
+        const tabs = document.querySelector('sl-tab-group');
+        const data = Alpine.$data(postContainer);
+
+        if (path.includes('/draft')) {
+            tabs.show('drafts');
+        } else if (path.includes('/published')) {
+            tabs.show('published');
+        } else if (path.includes('/responses')) {
+            tabs.show('responses');
+        } else {
+            throw new Error('Invalid path');
+        }
+
+        data.skip = 0;
+    });
+</script>

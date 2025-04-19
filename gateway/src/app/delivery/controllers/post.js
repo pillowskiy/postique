@@ -5,8 +5,9 @@ import {
     UpdatePostMetadataDTO,
 } from '#app/dto/index.js';
 import { render } from '#lib/ejs/render.js';
-import { requestCookies } from '#lib/rest/cookie.js';
 import { validate } from '#lib/validator/validator.js';
+
+import { getAuthToken } from '../common/session.js';
 
 /**
  * @typedef {import('express').Request} Request
@@ -44,7 +45,7 @@ export class PostController {
      * @param {Response} res
      */
     async createPost(req, res) {
-        const token = this.#getAuthToken(req);
+        const token = getAuthToken(req);
         if (!token) {
             throw new ClientException('Ви повинні бути авторизовані', 401);
         }
@@ -70,7 +71,7 @@ export class PostController {
      * @param {Response} res
      */
     async archivePost(req, res) {
-        const token = this.#getAuthToken(req);
+        const token = getAuthToken(req);
         if (!token) {
             throw new ClientException('Ви повинні бути авторизовані', 401);
         }
@@ -92,7 +93,7 @@ export class PostController {
      * @param {Response} res
      */
     async publishPost(req, res) {
-        const token = this.#getAuthToken(req);
+        const token = getAuthToken(req);
         if (!token) {
             throw new ClientException('Ви повинні бути авторизовані', 401);
         }
@@ -140,7 +141,7 @@ export class PostController {
      * @param {Response} res
      */
     async deletePost(req, res) {
-        const token = this.#getAuthToken(req);
+        const token = getAuthToken(req);
         if (!token) {
             throw new ClientException('Ви повинні бути авторизовані', 401);
         }
@@ -159,7 +160,7 @@ export class PostController {
      * @param {Response} res
      */
     async changeVisibility(req, res) {
-        const token = this.#getAuthToken(req);
+        const token = getAuthToken(req);
         if (!token) {
             throw new ClientException('Ви повинні бути авторизовані', 401);
         }
@@ -182,7 +183,7 @@ export class PostController {
      * @param {Response} res
      */
     async saveDelta(req, res) {
-        const token = this.#getAuthToken(req);
+        const token = getAuthToken(req);
         if (!token) {
             throw new ClientException('Ви повинні бути авторизовані', 401);
         }
@@ -205,7 +206,7 @@ export class PostController {
      * @param {Response} res
      */
     async transferOwnership(req, res) {
-        const token = this.#getAuthToken(req);
+        const token = getAuthToken(req);
         if (!token) {
             throw new ClientException('Ви повинні бути авторизовані', 401);
         }
@@ -236,7 +237,7 @@ export class PostController {
      * @param {Response} res
      */
     async getPostInfo(req, res) {
-        const token = this.#getAuthToken(req);
+        const token = getAuthToken(req);
         if (!token) {
             throw new ClientException('Ви повинні бути авторизовані', 401);
         }
@@ -258,7 +259,7 @@ export class PostController {
      * @param {Response} res
      */
     async getPostDraft(req, res) {
-        const token = this.#getAuthToken(req);
+        const token = getAuthToken(req);
         if (!token) {
             throw new ClientException('Ви повинні бути авторизовані', 401);
         }
@@ -273,18 +274,5 @@ export class PostController {
             token,
         );
         return res.status(200).json(result);
-    }
-
-    /**
-     * @param {Request} req
-     * @returns {string|null}
-     */
-    #getAuthToken(req) {
-        if (req.token) {
-            return req.token;
-        }
-
-        const cookies = requestCookies(req);
-        return cookies['access_token'] ?? null;
     }
 }

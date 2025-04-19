@@ -1,0 +1,24 @@
+<% if (posts && posts.length > 0) { %> 
+
+<%- await include(__postList, { posts }) %>
+
+<% if (posts.length > 0) { %>
+<div
+    class="load-more"
+    :hx-get="`/me/posts/<%= status %>?skip=${skip}&take=${take}`"
+    hx-trigger="revealed"
+    hx-swap="beforeend"
+    hx-target="#posts-container"
+    hx-on::after-request="afterPostsLoad(this, <%= posts.length %>)"
+>
+    <sl-spinner style="font-size: 2rem;"></sl-spinner>
+</div>
+<% } %>
+<% } else { %>
+<template x-if="skip === 0">
+    <div class="no-posts">
+        <sl-icon name="journal-x" size="large"></sl-icon>
+        <p>Немає історій з цим статусом</p>
+    </div>
+</template
+<% } %>

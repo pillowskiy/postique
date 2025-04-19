@@ -186,18 +186,21 @@ export class PostService extends RestClient {
     }
 
     /**
+     * @param {string} auth
      * @param {string} status
      * @param {number} take
      * @param {number} skip
      * @returns {Promise<Array<import("#app/models").Post>>}
      */
-    async getPostsByStatus(status, take, skip) {
+    async getPostsByStatus(auth, status, take, skip) {
         const params = new URLSearchParams();
         if (take) params.set('take', take.toString());
         if (skip) params.set('skip', skip.toString());
 
         const response = await this._client
-            .get(`posts/status/${status}?${params}`)
+            .get(`posts/status/${status}?${params}`, {
+                headers: this.#withAuth(auth),
+            })
             .json();
         return response.map((post) => this.#postToModel(post));
     }

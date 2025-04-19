@@ -1,5 +1,5 @@
 import ejs from 'ejs';
-import path, { dirname, relative } from 'path';
+import { dirname, relative } from 'path';
 
 /**
  * @param {string} path

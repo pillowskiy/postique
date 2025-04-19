@@ -1,0 +1,44 @@
+<% posts.forEach(post => { %>
+<div class="post-card">
+    <div class="post-meta">
+        <h2 class="post-title">
+            <a href="/p/<%= post.id %>/edit"><%= post.title %></a>
+        </h2>
+        <p class="post-description">
+            <a href="/p/<%= post.id %>/edit"><%= post.description %></a>
+        </p>
+    </div>
+
+    <div class="post-details">
+        <% if (post.updatedAt) { %>
+        <div class="last-edited">
+            Останнє редагування
+            <sl-relative-time
+                date="<%= post.updatedAt %>"
+                lang="uk-UA"
+            ></sl-relative-time>
+        </div>
+        <% } %>
+        <div class="post-status <%= post.status %>">
+            <sl-dropdown distance="6" placement="bottom-end">
+                <sl-icon-button
+                    name="three-dots"
+                    label="Actions"
+                    slot="trigger"
+                ></sl-icon-button>
+
+                <sl-menu style="width: 180px">
+                    <sl-menu-item value="edit">
+                        <sl-icon name="pencil-square" slot="prefix"></sl-icon>
+                        Редагувати
+                    </sl-menu-item>
+                    <sl-menu-item value="archive">
+                        <sl-icon name="archive" slot="prefix"></sl-icon>
+                        Архівувати
+                    </sl-menu-item>
+                </sl-menu>
+            </sl-dropdown>
+        </div>
+    </div>
+</div>
+<% }); %>
