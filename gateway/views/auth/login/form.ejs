@@ -9,6 +9,7 @@
         hx-post="/login"
         hx-target="this"
         hx-swap="none"
+        hx-ext="ignore:json-enc-custom"
         class="login-form"
     >
         <input type="hidden" name="csrfToken" value="<%= csrfToken %>" />
@@ -58,37 +59,32 @@
 
         <div class="divider">або продовжити з</div>
 
-        <div>
+        <div x-data="{ value: '' }">
             <sl-input
                 id="email"
+                @input="value = $event.target.value"
                 name="email"
-                label="Ел. Пошта*"
+                label="Електронна пошта*"
                 placeholder="user@gmail.com"
             >
-                <sl-icon
-                    class="font-size: 1.3rem;"
-                    name="envelope"
-                    slot="prefix"
-                ></sl-icon>
+                <sl-icon name="envelope" slot="prefix"></sl-icon>
             </sl-input>
-            <small id="error-email" class="form-error" hidden></small>
+            <input name="email" :value="value" type="hidden" />
+            <small id="error-email" hidden></small>
         </div>
 
-        <div>
+        <div x-data="{ value: '' }">
             <sl-input
                 id="password"
-                name="password"
+                @input="value = $event.target.value"
                 label="Пароль*"
                 type="password"
                 placeholder="Введіть ваш пароль"
                 password-toggle
             >
-                <sl-icon
-                    class="font-size: 1.3rem;"
-                    name="key"
-                    slot="prefix"
-                ></sl-icon>
+                <sl-icon name="key" slot="prefix"></sl-icon>
             </sl-input>
+            <input name="password" :value="value" type="hidden" />
             <small id="error-password" class="form-error" hidden></small>
         </div>
 

@@ -9,74 +9,64 @@
         hx-post="/register"
         hx-target="this"
         hx-swap="none"
+        hx-ext="ignore:json-enc-custom"
         class="login-form"
     >
         <input type="hidden" name="csrfToken" value="<%= csrfToken %>" />
 
-        <div>
+        <div x-data="{ value: '' }">
             <sl-input
                 id="username"
+                @input="value = $event.target.value"
                 name="username"
                 label="Ім'я користувача*"
                 placeholder="Введіть бажане ім'я"
             >
-                <sl-icon
-                    class="font-size: 1.3rem;"
-                    name="person-bounding-box"
-                    slot="prefix"
-                ></sl-icon>
+                <sl-icon name="person-bounding-box" slot="prefix"></sl-icon>
             </sl-input>
+            <input name="username" :value="value" type="hidden" />
             <small id="error-username" hidden></small>
         </div>
 
-        <div>
+        <div x-data="{ value: '' }">
             <sl-input
                 id="email"
-                name="email"
+                @input="value = $event.target.value"
                 label="Ел. Пошта*"
                 placeholder="user@gmail.com"
             >
-                <sl-icon
-                    class="font-size: 1.3rem;"
-                    name="envelope"
-                    slot="prefix"
-                ></sl-icon>
+                <sl-icon name="envelope" slot="prefix"></sl-icon>
             </sl-input>
+            <input name="email" :value="value" type="hidden" />
             <small id="error-email" hidden></small>
         </div>
 
-        <div>
+        <div x-data="{ value: '' }">
             <sl-input
                 id="password"
-                name="password"
+                @input="value = $event.target.value"
                 label="Пароль*"
                 type="password"
                 placeholder="Введіть ваш пароль"
                 password-toggle
             >
-                <sl-icon
-                    class="font-size: 1.3rem;"
-                    name="key"
-                    slot="prefix"
-                ></sl-icon>
+                <sl-icon name="key" slot="prefix"></sl-icon>
             </sl-input>
+            <input name="password" :value="value" type="hidden" />
             <small id="error-password" hidden></small>
         </div>
 
-        <div>
+        <div x-data="{ value: '' }">
             <sl-input
                 id="password-confirm"
-                name="passwordConfirm"
+                @input="value = $event.target.value"
                 label="Повторіть пароль*"
                 type="password"
                 placeholder="Повторіть пароль"
             >
-                <sl-icon
-                    class="font-size: 1.3rem;"
-                    name="key"
-                    slot="prefix"
-                ></sl-icon>
+                <sl-icon name="key" slot="prefix"></sl-icon>
             </sl-input>
+            <input name="passwordConfirm" :value="value" type="hidden" />
             <small id="error-password-confirm" hidden></small>
         </div>
 
