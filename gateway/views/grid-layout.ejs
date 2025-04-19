@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <%- await include('./partials/head.ejs') %>
+        <title><%= title %></title>
+    </head>
+
+    <body>
+        <%- await include('./components/header.ejs') %>
+        <div id="root" class="grid-container">
+            <main class="grid-container__content">
+                <%- await include(__renderTarget) %>
+            </main>
+            <aside class="grid-container__sidebar">
+                <div class="faq-container">
+                    <h3 class="faq-container__title">
+                        Публікування на Postique
+                    </h3>
+                    <ul class="faq-container__list">
+                        <li>FAQ для початківців</li>
+                        <li>Поради від експертів</li>
+                        <li>Підвищуйте охоплення</li>
+                    </ul>
+                    <sl-button
+                        class="faq-container_button"
+                        href="/new-story"
+                        size="small"
+                        variant="neutral"
+                        pill
+                    >
+                        Публікувати
+                    </sl-button>
+                </div>
+
+                <div class="topics-container">
+                    <h3 class="topics-container__title">Рекомендовані теми</h3>
+                    <ul class="topics-container__list">
+                        <li>
+                            <sl-button size="medium" variant="default" pill>
+                                Бізнес
+                            </sl-button>
+                        </li>
+                        <li>
+                            <sl-button size="medium" variant="default" pill>
+                                Фінанси
+                            </sl-button>
+                        </li>
+                        <li>
+                            <sl-button size="medium" variant="default" pill>
+                                Інформація
+                            </sl-button>
+                        </li>
+                        <li>
+                            <sl-button size="medium" variant="default" pill>
+                                Комп'ютерні технології
+                            </sl-button>
+                        </li>
+                        <li>
+                            <sl-button size="medium" variant="default" pill>
+                                Маркетинг
+                            </sl-button>
+                        </li>
+                        <li>
+                            <sl-button size="medium" variant="default" pill>
+                                Програмування
+                            </sl-button>
+                        </li>
+                        <li>
+                            <sl-button size="medium" variant="default" pill>
+                                Саморозвиток
+                            </sl-button>
+                        </li>
+                    </ul>
+                    <a href="/new-story" class="link"> Дивитись всі </a>
+                </div>
+            </aside>
+        </div>
+        <%- await include('./partials/toasts.ejs') %>
+    </body>
+</html>

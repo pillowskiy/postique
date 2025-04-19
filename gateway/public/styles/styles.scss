@@ -1,4 +1,5 @@
-@import 'variables.scss';
+@use 'variables.scss';
+@use 'me.scss';
 
 :not(:defined) {
     visibility: hidden;
@@ -16,7 +17,7 @@ body {
     --title-font: 'Playfair Display';
     --plain-font: system-ui;
 
-    --background-color: var(--sl-color-neutral-50);
+    --background-color: rgba(255, 255, 255, 0.9);
     --foreground-color: var(--sl-color-neutral-900);
 
     padding: 0;
@@ -133,21 +134,91 @@ sl-alert::part(message) {
     }
 }
 
+.grid-container {
+    max-width: 1280px;
+    width: 100%;
+    margin: 0 auto;
+    display: grid;
+    padding: 0 20px;
+    gap: 20px;
+    grid-template-columns: minmax(0, 1fr) 360px;
+
+    &__content {
+        width: 100%;
+        padding-left: 40px 40px 40px 0;
+    }
+
+    &__sidebar {
+        border-left: 1px solid var(--sl-input-border-color);
+        position: sticky;
+        top: 64px;
+        width: 100%;
+        max-width: 360px;
+        padding: 40px 0 40px 40px;
+        height: calc(100vh - 64px);
+    }
+}
+
 .global-container {
     max-width: 1080px;
     width: 100%;
     margin: 0 auto;
 }
 
-.mw-md {
-    max-width: 360px;
+.topics-container {
+    margin-top: 32px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    color: var(--sl-color-neutral-1000);
+
+    &__title {
+        font-size: var(--sl-font-size-medium);
+        font-weight: 700;
+    }
+
+    &__list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+
+        li {
+            font-weight: 500;
+        }
+    }
 }
 
-.mw-lg {
-    max-width: 100%;
+.faq-container {
+    padding: 24px;
+    background-color: var(--sl-color-primary-300);
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    color: var(--sl-color-neutral-1000);
+    font-size: var(--sl-font-size-medium);
+    border-radius: var(--sl-border-radius-large);
 
-    @media (min-width: 576px) {
-        max-width: 416px;
+    &__title {
+        font-size: var(--sl-font-size-medium);
+        font-weight: 700;
+    }
+
+    &__list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+
+        li {
+            font-weight: 500;
+            margin-top: 8px;
+        }
+    }
+
+    &_button {
+        width: fit-content;
     }
 }
 
@@ -260,6 +331,7 @@ sl-alert::part(message) {
         background: var(--background-color);
         z-index: 20;
         padding: 0 20px;
+        border-bottom: 1px solid var(--sl-input-border-color);
     }
 
     &__container {
@@ -469,6 +541,7 @@ sl-alert::part(message) {
 
 .link {
     color: var(--sl-color-primary-600);
+    font-size: var(--sl-font-size-small);
     text-decoration: none;
     font-weight: 500;
     transition: color 256ms ease;
