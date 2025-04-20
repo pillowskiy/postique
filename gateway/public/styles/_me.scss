@@ -15,12 +15,6 @@ body {
     color: $text-color;
 }
 
-.container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 20px;
-}
-
 .header {
     display: flex;
     justify-content: space-between;
@@ -41,6 +35,12 @@ body {
 
 .tabs-container {
     margin-bottom: 40px;
+}
+
+.last-edited {
+    display: flex;
+    gap: 8px;
+    align-items: center;
 }
 
 .posts-container {

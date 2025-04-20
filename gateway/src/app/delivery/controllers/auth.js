@@ -72,6 +72,6 @@ export class AuthController {
         const dto = new LoginDTO(req.body.email, req.body.password);
         const session = await this.#authService.login(dto);
         storeSession(res, session);
-        res.set('HX-Redirect', '/ping').status(200).send('OK');
+        res.set('HX-Redirect', '/').status(200).send('OK');
     }
 }

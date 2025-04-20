@@ -29,7 +29,7 @@ export class MeController {
             throw new ClientException('Ви повинні бути авторизовані', 401);
         }
 
-        const status = 'draft';
+        const status = req.params.status ?? 'draft';
         const take = 30;
         const skip = 0;
 
@@ -39,7 +39,7 @@ export class MeController {
             take,
             skip,
         );
-        const draftCount = posts.length;
+        const draftCount = `99+`;
 
         return render(res)
             .template('me/posts/posts-page', {

@@ -7,6 +7,7 @@
 
 * {
     box-sizing: border-box;
+    outline-color: var(--sl-color-primary-500);
     margin: 0;
     padding: 0;
 }
@@ -37,6 +38,14 @@ body {
     min-height: 100svh;
 }
 
+.slot {
+    text-decoration: none;
+    color: inherit;
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
 .truncate {
     overflow: hidden;
     text-overflow: ellipsis;
@@ -53,6 +62,10 @@ sl-menu {
 
 sl-divider {
     margin: 12px 0;
+
+    &.tight {
+        margin: 6px 0;
+    }
 }
 
 sl-menu-item::part(base) {
@@ -140,12 +153,12 @@ sl-alert::part(message) {
     margin: 0 auto;
     display: grid;
     padding: 0 20px;
-    gap: 20px;
     grid-template-columns: minmax(0, 1fr) 360px;
 
     &__content {
         width: 100%;
-        padding-left: 40px 40px 40px 0;
+        padding: 40px 0;
+        padding-right: clamp(20px, 920px, 40px);
     }
 
     &__sidebar {
@@ -154,7 +167,8 @@ sl-alert::part(message) {
         top: 64px;
         width: 100%;
         max-width: 360px;
-        padding: 40px 0 40px 40px;
+        padding: 40px 0;
+        padding-left: clamp(20px, 360px, 40px);
         height: calc(100vh - 64px);
     }
 }

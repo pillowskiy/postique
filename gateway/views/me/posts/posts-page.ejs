@@ -64,6 +64,39 @@
     </div>
 </div>
 
+<sl-dialog
+    x-data="{isOpen: false, postId: null }"
+    id="transfer-dialog"
+    label="Передача власності"
+    :open="isOpen"
+>
+    <form
+        id="transfer-form"
+        hx-patch="`/p/${postId}/transfer`"
+        hx-headers='{"Content-Type": "application/json"}'
+        hx-swap="none"
+    >
+        <div style="margin-bottom: 1rem">
+            <sl-input
+                name="newOwner"
+                label="Ім'я або email нового власника"
+                required
+                placeholder="Введіть ім'я або email користувача"
+            ></sl-input>
+        </div>
+        <div slot="footer" class="dialog-footer">
+            <sl-button
+                type="button"
+                variant="neutral"
+                @click="isOpen = false; postId = null"
+            >
+                Скасувати
+            </sl-button>
+            <sl-button type="submit" variant="primary"> Передати </sl-button>
+        </div>
+    </form>
+</sl-dialog>
+
 <script>
     const postContainer = document.querySelector('#posts-container');
 
@@ -73,21 +106,124 @@
         el.remove();
     }
 
-    document.addEventListener('DOMContentLoaded', function () {
+    function isTabActive(tab) {
+        const path = window.location.pathname;
+        const parts = path.split('/');
+        const activePart = parts[parts.length - 1];
+        return activePart === tab;
+    }
+
+    (async () => {
+        await customElements.whenDefined('sl-tab-group');
+
+        const registeredTabs = ['draft', 'published', 'archived'];
         const path = window.location.pathname;
         const tabs = document.querySelector('sl-tab-group');
-        const data = Alpine.$data(postContainer);
 
-        if (path.includes('/draft')) {
-            tabs.show('drafts');
-        } else if (path.includes('/published')) {
-            tabs.show('published');
-        } else if (path.includes('/responses')) {
-            tabs.show('responses');
-        } else {
-            throw new Error('Invalid path');
+        if (!tabs) {
+            throw new Error('Cannot find tab group');
         }
 
+        const data = Alpine.$data(postContainer);
+        const parts = path.split('/');
+        const activeTab = parts[parts.length - 1];
+
+        const tabNode = tabs.querySelector(`[panel="${activeTab}"]`);
+        if (tabNode) {
+            tabNode.setAttribute('active', '');
+        }
         data.skip = 0;
+    })();
+
+    function showTransferDialog(postId) {
+        const dialog = document.querySelector('#transfer-dialog');
+        const data = Alpine.$data(dialog);
+        data.isOpen = true;
+        data.postId = postId;
+    }
+
+    function updateVisibilityBadge(event, postId, visibilityText) {
+        if (event.detail.successful) {
+            const badge = document.getElementById(`visibility-badge-${postId}`);
+            if (badge) {
+                badge.textContent = visibilityText;
+                showActionToast(
+                    `Видимість успішно змінено на "${visibilityText}"`,
+                );
+            }
+
+            const dropdown = document.getElementById(`dropdown-${postId}`);
+            if (dropdown) {
+                dropdown.hide();
+            }
+        } else {
+            showActionToast('Помилка при зміні видимості', 'danger');
+        }
+    }
+
+    const visibilityDisplay = {
+        private: { text: 'Приватний', variant: 'neutral' },
+        unlisted: { text: 'Обмежений', variant: 'neutral' },
+        public: { text: 'Публічний', variant: 'success' },
+        subscription: { text: 'Підписка', variant: 'warning' },
+    };
+</script>
+
+<script>
+    document.addEventListener('htmx:confirm', function (e) {
+        if (!e.detail.elt.hasAttribute('hx-confirm')) {
+            return;
+        }
+
+        e.preventDefault();
+
+        confirm(e.detail.question, function () {
+            e.detail.issueRequest(true);
+        });
     });
+
+    function escapeHtml(html) {
+        const div = document.createElement('div');
+        div.textContent = html;
+        return div.innerHTML;
+    }
+
+    function confirm(message, onConfirm) {
+        const dialog = document.createElement('sl-dialog');
+
+        dialog.label = 'Підтвердження дії';
+        dialog.innerHTML = `
+            ${escapeHtml(message)}
+            <div slot="footer">
+                <sl-button variant="default" @click="this.hide()">Скасувати</sl-button>
+                <sl-button id="confirm" variant="primary">Підтвердити</sl-button>
+            </div>
+        `;
+
+        dialog.addEventListener('sl-request-close', (event) => {
+            if (event.detail.source === 'overlay') {
+                event.preventDefault();
+            }
+        });
+
+        dialog.addEventListener(
+            'sl-after-hide',
+            () => {
+                dialog.remove();
+            },
+            true,
+        );
+
+        dialog.querySelector('#confirm').addEventListener(
+            'click',
+            () => {
+                dialog.hide();
+                onConfirm();
+            },
+            true,
+        );
+
+        document.body.append(dialog);
+        return dialog.show();
+    }
 </script>

@@ -81,11 +81,13 @@ export class PostController {
             throw new ClientException(errors.mapped(), 400);
         }
 
-        const result = await this.#postService.archivePost(
-            req.params.id,
-            token,
-        );
-        return res.status(200).json(result);
+        await this.#postService.archivePost(req.params.id, token);
+
+        return render(res).template('components/toast.oob', {
+            initiator: 'Публікатор',
+            message: 'Вашу публікацію архівовано успішно',
+            variant: 'success',
+        });
     }
 
     /**
@@ -151,8 +153,12 @@ export class PostController {
             throw new ClientException(errors.mapped(), 400);
         }
 
-        const result = await this.#postService.deletePost(req.params.id, token);
-        return res.status(200).json(result);
+        await this.#postService.deletePost(req.params.id, token);
+        return render(res).template('components/toast.oob', {
+            initiator: 'Публікатор',
+            message: 'Ваша публікація видалена успішно',
+            variant: 'success',
+        });
     }
 
     /**
@@ -170,12 +176,17 @@ export class PostController {
             throw new ClientException(errors.mapped(), 400);
         }
 
-        const post = await this.#postService.changePostVisibility(
+        await this.#postService.changePostVisibility(
             req.params.id,
             req.body.visibility,
             token,
         );
-        return res.status(200).json(post);
+
+        return render(res).template('components/toast.oob', {
+            initiator: 'Публікатор',
+            message: 'Зміна видимості посту завершена успішно',
+            variant: 'success',
+        });
     }
 
     /**

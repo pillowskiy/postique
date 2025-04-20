@@ -1,5 +1,10 @@
 <% posts.forEach(post => { %>
-<div class="post-card">
+<% let nodeId = `post-${post.id}`; %>
+<div
+    id="<%= nodeId %>"
+    x-data="{ visibility: '<%= post.visibility %>' }"
+    class="post-card"
+>
     <div class="post-meta">
         <h2 class="post-title">
             <a href="/p/<%= post.id %>/edit"><%= post.title %></a>
@@ -12,14 +17,35 @@
     <div class="post-details">
         <% if (post.updatedAt) { %>
         <div class="last-edited">
-            Останнє редагування
-            <sl-relative-time
-                date="<%= post.updatedAt %>"
-                lang="uk-UA"
-            ></sl-relative-time>
+            <sl-badge
+                :variant="visibilityDisplay[visibility].variant"
+                x-text="visibilityDisplay[visibility].text"
+            >
+            </sl-badge>
+
+            <span class="truncate">
+                <% if (post.status === 'archived') { %> Архівовано
+                <sl-relative-time
+                    date="<%= post.updatedAt %>"
+                    lang="uk-UA"
+                ></sl-relative-time>
+                <% } else if (post.status === 'draft') { %>
+                Останнє редагування
+                <sl-relative-time
+                    date="<%= post.updatedAt %>"
+                    lang="uk-UA"
+                ></sl-relative-time>
+                <% } else if (post.status === 'published') { %>
+                Опубліковано
+                <sl-relative-time
+                    date="<%= post.updatedAt %>"
+                    lang="uk-UA"
+                ></sl-relative-time>
+                <% } %>
+            </span>
         </div>
         <% } %>
-        <div class="post-status <%= post.status %>">
+        <div class="post-status">
             <sl-dropdown distance="6" placement="bottom-end">
                 <sl-icon-button
                     name="three-dots"
@@ -27,14 +53,74 @@
                     slot="trigger"
                 ></sl-icon-button>
 
-                <sl-menu style="width: 180px">
-                    <sl-menu-item value="edit">
-                        <sl-icon name="pencil-square" slot="prefix"></sl-icon>
-                        Редагувати
-                    </sl-menu-item>
-                    <sl-menu-item value="archive">
+                <sl-menu style="width: 220px">
+                    <% if (post.status !== 'archived') { %>
+                    <a href="/p/<%= post.id %>/edit" class="action-link">
+                        <sl-menu-item value="edit">
+                            <sl-icon
+                                name="pencil-square"
+                                slot="prefix"
+                            ></sl-icon>
+                            Редагувати
+                        </sl-menu-item>
+                    </a>
+                    <% } %>
+
+                    <% if (post.status !== 'archived') { %>
+                    <sl-menu-item
+                        value="archive"
+                        hx-patch="/p/<%= post.id %>/archive"
+                        hx-swap="none"
+                        hx-vals='{"postId": "<%= post.id %>"}'
+                        hx-target="#<%= nodeId %>"
+                        hx-on::after-request="htmx.find('#<%= nodeId %>').remove()"
+                        hx-confirm="Ви впевнені, що хочете архівувати цей пост?"
+                    >
                         <sl-icon name="archive" slot="prefix"></sl-icon>
                         Архівувати
+                    </sl-menu-item>
+                    <% } %>
+
+                    <% if (post.status === 'archived') { %>
+                    <sl-menu-item value="unarchive">
+                        <sl-icon name="archive" slot="prefix"></sl-icon>
+                        Розархівувати
+                    </sl-menu-item>
+                    <% } %>
+
+                    <sl-menu-item>
+                        <sl-icon name="eye" slot="prefix"></sl-icon>
+                        Видимість
+                        <sl-menu
+                            slot="submenu"
+                            style="transform: translateX(6px)"
+                        >
+                            <% for (const visibility of ['private', 'unlisted',
+                            'public', 'subscription']) { %>
+                            <sl-menu-item
+                                value="<%= visibility %>"
+                                x-text="visibilityDisplay['<%= visibility %>'].text"
+                                x-show="visibility !== '<%= visibility %>'"
+                                hx-patch="/p/<%= post.id %>/visibility"
+                                hx-headers='{"Content-Type": "application/json"}'
+                                hx-swap="none"
+                                hx-vals='{"visibility": "<%= visibility %>"}'
+                                hx-on::after-request="Alpine.$data(this).visibility = '<%= visibility %>'"
+                            >
+                                >
+                            </sl-menu-item>
+                            <% } %>
+                        </sl-menu>
+                    </sl-menu-item>
+
+                    <sl-divider class="tight"></sl-divider>
+
+                    <sl-menu-item
+                        value="transfer"
+                        @click="showTransferDialog('<%= post.id %>')"
+                    >
+                        <sl-icon name="person-add" slot="prefix"></sl-icon>
+                        Передати власність
                     </sl-menu-item>
                 </sl-menu>
             </sl-dropdown>

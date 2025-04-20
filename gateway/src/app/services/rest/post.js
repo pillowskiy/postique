@@ -53,6 +53,7 @@ export class PostService extends RestClient {
     async archivePost(postId, auth) {
         const response = await this._client
             .patch(`posts/${postId}/archive`, {
+                json: {},
                 headers: this.#withAuth(auth),
             })
             .json();

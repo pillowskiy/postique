@@ -22,14 +22,13 @@
                 pill
             ></sl-icon-button>
             <sl-dropdown distance="12">
-                <sl-avatar
-                    type="button"
-                    role="button"
-                    slot="trigger"
-                    initials="<%= user.username.substring(0,2) %>"
-                    style="--size: 2.5rem"
-                    label="User avatar"
-                ></sl-avatar>
+                <button class="slot" slot="trigger">
+                    <sl-avatar
+                        initials="<%= user.username.substring(0,2) %>"
+                        style="--size: 2.5rem"
+                        label="User avatar"
+                    ></sl-avatar>
+                </button>
 
                 <sl-menu style="width: 240px">
                     <sl-menu-item class="accent" value="profile">
