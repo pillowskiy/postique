@@ -124,7 +124,7 @@ function paragraphTypeToQuillAttributes(paragraph) {
             attributes.list = 'ordered';
             break;
         case ParagraphType.Heading:
-            attributes.header = metadata?.level || 1;
+            attributes.header = metadata?.level || 3;
             break;
         case ParagraphType.Title:
             attributes.postTitle = { placeholder: 'Tell your story' };

@@ -31,9 +31,8 @@ function quill(id = '#editor') {
     listenEvents(quill);
     registerOverhead(quill);
 
-    const imageTooltip = new ImageTooltip({ container: toolbarRoot }, quill);
-
-    quill.modules.delta = new DeltaApplier(quill);
+    new ImageTooltip({ container: toolbarRoot }, quill);
+    new DeltaApplier(quill);
 }
 
 export default {

@@ -7,10 +7,6 @@
         place-items: center;
     }
 
-    .ql-editor > * {
-        cursor: text;
-    }
-
     .ql-editor p,
     .ql-editor ol,
     .ql-editor ul,
@@ -41,12 +37,12 @@
 
     .ql-editor ul {
         margin-bottom: 32px;
-        list-style-type: disc;
+        list-style-type: none;
     }
 
     .ql-editor ol {
         margin-bottom: 32px;
-        list-style-type: decimal;
+        list-style-type: none;
     }
 
     .ql-editor blockquote {
@@ -84,7 +80,7 @@
     li,
     blockquote {
         font-family: var(--plain-font);
-        font-size: var(--sl-font-size-large);
+        font-size: 18px;
     }
 
     .ql-editor h1 {
@@ -105,7 +101,7 @@
         letter-spacing: 0;
         font-family: var(--plain-font);
         font-size: var(--sl-font-size-x-large) !important;
-        margin-bottom: 0.5em;
+        margin-bottom: 24px;
     }
 
     .ql-editor *[ql-v-visible]::after {

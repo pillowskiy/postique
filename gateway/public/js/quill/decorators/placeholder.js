@@ -3,10 +3,6 @@ export function WithPlaceholder(blot) {
         static withPlaceholder = true;
         static defaultPlaceholder = 'Enter text here';
 
-        constructor(...args) {
-            super(...args);
-        }
-
         static create(input) {
             const isValueHolder = input instanceof Object && 'value' in input;
             const value = isValueHolder ? input.value : input;
@@ -19,8 +15,17 @@ export function WithPlaceholder(blot) {
 
             const node = super.create(value);
             node.setAttribute('ql-v-text', placeholder);
-            node.setAttribute('ql-v-visible', !node.textContent.length);
+
             return node;
+        }
+
+        constructor(...args) {
+            super(...args);
+
+            // TEMP: workaround for placeholder visibility
+            setTimeout(() => {
+                this.handlePlaceholder();
+            }, 0);
         }
 
         handlePlaceholder() {

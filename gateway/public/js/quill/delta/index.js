@@ -45,161 +45,163 @@ export class DeltaApplier {
 
     getParagraphs() {
         const paragraphs = [];
-        const contents = this.quill.getContents();
+        const lines = this.quill.getLines(0, this.quill.getLength());
+        let lineIndex = 0;
 
-        let currentParagraphText = '';
-        let currentParagraphFormats = {};
-        let currentMarkups = [];
-        let currentPosition = 0;
-        let paragraphIndex = 0;
-
-        for (const op of contents.ops) {
-            if (typeof op.insert === 'string') {
-                const textParts = op.insert.split('\n');
-
-                for (let i = 0; i < textParts.length; i++) {
-                    const text = textParts[i];
-                    currentParagraphText += text;
-
-                    if (op.attributes) {
-                        const inlineFormatKeys = Object.keys(
-                            op.attributes,
-                        ).filter((k) => !this.lineFormatKeysSet.has(k));
-
-                        if (text.length > 0 && inlineFormatKeys.length > 0) {
-                            const startPos = currentPosition;
-                            const endPos = startPos + text.length;
-
-                            for (const formatKey of inlineFormatKeys) {
-                                const formatType =
-                                    this.determineMarkupType(formatKey);
-                                currentMarkups.push(
-                                    new Markup(formatType, startPos, endPos),
-                                );
-                            }
-                        }
-                    }
-
-                    currentPosition += text.length;
-
-                    if (i < textParts.length - 1) {
-                        let paragraphType = ParagraphType.Text;
-                        let codeMetadata;
-
-                        if (op.attributes) {
-                            for (const [key, value] of Object.entries(
-                                op.attributes,
-                            )) {
-                                if (this.lineFormatKeysSet.has(key)) {
-                                    currentParagraphFormats[key] = value;
-                                }
-                            }
-
-                            paragraphType = this.determineParagraphType(
-                                currentParagraphFormats,
-                            );
-
-                            if (
-                                currentParagraphFormats['code-block'] ||
-                                currentParagraphFormats.code
-                            ) {
-                                codeMetadata = new CodeMetadata(
-                                    currentParagraphFormats.language || 'plain',
-                                    true,
-                                );
-                            }
-                        }
-
-                        paragraphs.push(
-                            new Paragraph(
-                                paragraphType,
-                                currentParagraphText,
-                                [...currentMarkups],
-                                undefined,
-                                codeMetadata,
-                            ),
-                        );
-
-                        paragraphIndex++;
-                        currentParagraphText = '';
-                        currentParagraphFormats = {};
-                        currentMarkups = [];
-                        currentPosition = 0;
-                    }
-                }
-            } else if (op.insert && typeof op.insert === 'object') {
-                const embedType = Object.keys(op.insert)[0];
-                const embedValue = op.insert[embedType];
-
-                if (embedType === 'image') {
-                    const imageMetadata = new ImageMetadata(
-                        embedValue,
-                        op.attributes?.width || 0,
-                        op.attributes?.height || 0,
-                    );
-
-                    paragraphs.push(
-                        new Paragraph(
-                            ParagraphType.Figure,
-                            '',
-                            [],
-                            imageMetadata,
-                        ),
-                    );
-
-                    paragraphIndex++;
-                    currentParagraphText = '';
-                    currentParagraphFormats = {};
-                    currentMarkups = [];
-                    currentPosition = 0;
-                }
-            }
-        }
-
-        if (currentParagraphText || currentMarkups.length > 0) {
-            const paragraphType = this.determineParagraphType(
-                currentParagraphFormats,
-            );
+        for (const line of lines) {
+            const lineFormats = line.formats() || {};
+            let paragraphType = this.determineParagraphType(lineFormats);
             let codeMetadata;
+            let imageMetadata;
 
-            if (
-                currentParagraphFormats['code-block'] ||
-                currentParagraphFormats.code
-            ) {
+            if (lineFormats['code-block'] || lineFormats.code) {
                 codeMetadata = new CodeMetadata(
-                    currentParagraphFormats.language || 'plain',
+                    lineFormats.language || 'plain',
                     true,
                 );
+            }
+
+            const blot = line.domNode?.querySelector('.ql-image');
+            if (blot) {
+                imageMetadata = new ImageMetadata(
+                    blot.getAttribute('src'),
+                    blot.width || 0,
+                    blot.height || 0,
+                );
+                paragraphType = ParagraphType.Figure;
+            }
+
+            const lineLength = line.length();
+            const lineStartIndex = this.quill.getIndex(line);
+            const lineText =
+                lineLength > 0
+                    ? this.quill.getText(lineStartIndex, lineLength - 1)
+                    : '';
+
+            const markups = [];
+
+            if (lineLength > 0) {
+                const formattedSegments = this.getFormattedSegments(
+                    lineStartIndex,
+                    lineLength - 1,
+                );
+
+                for (const segment of formattedSegments) {
+                    for (const formatName of Object.keys(segment.formats)) {
+                        if (this.lineFormatKeysSet.has(formatName)) {
+                            continue;
+                        }
+
+                        const formatType = this.determineMarkupType(formatName);
+                        const segmentStart = segment.start - lineStartIndex;
+                        const segmentEnd = segment.end - lineStartIndex;
+
+                        if (formatType == null) continue;
+
+                        if (
+                            segmentStart >= 0 &&
+                            segmentEnd <= lineText.length
+                        ) {
+                            markups.push(
+                                new Markup(
+                                    formatType,
+                                    segmentStart,
+                                    segmentEnd,
+                                ),
+                            );
+                        }
+                    }
+                }
             }
 
             paragraphs.push(
                 new Paragraph(
                     paragraphType,
-                    currentParagraphText,
-                    currentMarkups,
-                    undefined,
+                    lineText,
+                    markups,
+                    imageMetadata,
                     codeMetadata,
                 ),
             );
+
+            lineIndex++;
         }
 
         return paragraphs;
     }
 
-    determineMarkupType(format) {
-        if (format.link) return MarkupType.Link;
-        if (format.anchor) return MarkupType.Anchor;
-        if (format.image) return MarkupType.Image;
-        if (format.video) return MarkupType.Video;
-        if (format.quote) return MarkupType.Quote;
-        if (format.strike) return MarkupType.Strike;
-        if (format.newLine) return MarkupType.NewLine;
-        if (format.bold) return MarkupType.Bold;
-        if (format.code) return MarkupType.Code;
-        if (format.italic) return MarkupType.Italic;
-        if (format.underline) return MarkupType.Underline;
+    getFormattedSegments(startIndex, length) {
+        const segments = [];
+        let index = startIndex;
+        const endIndex = startIndex + length;
 
-        return MarkupType.Bold;
+        while (index < endIndex) {
+            const formats = this.quill.getFormat(index, 1);
+            let curLength = 1;
+            let nextIndex = index + 1;
+
+            while (nextIndex < endIndex) {
+                const nextFormats = this.quill.getFormat(nextIndex, 1);
+                const formatEqual = this.areFormatsEqual(formats, nextFormats);
+
+                if (!formatEqual) break;
+
+                curLength++;
+                nextIndex++;
+            }
+
+            segments.push({
+                start: index,
+                end: index + curLength,
+                formats: formats,
+            });
+
+            index = nextIndex;
+        }
+
+        return segments;
+    }
+
+    areFormatsEqual(formats1, formats2) {
+        const keys1 = Object.keys(formats1);
+        const keys2 = Object.keys(formats2);
+
+        if (keys1.length !== keys2.length) return false;
+
+        for (const key of keys1) {
+            if (formats1[key] !== formats2[key]) return false;
+        }
+
+        return true;
+    }
+
+    determineMarkupType(format) {
+        switch (format) {
+            case 'bold':
+                return MarkupType.Bold;
+            case 'italic':
+                return MarkupType.Italic;
+            case 'underline':
+                return MarkupType.Underline;
+            case 'strike':
+                return MarkupType.Strike;
+            case 'code':
+                return MarkupType.Code;
+            case 'link':
+                return MarkupType.Link;
+            case 'anchor':
+                return MarkupType.Anchor;
+            case 'quote':
+                return MarkupType.Quote;
+            case 'image':
+                return MarkupType.Image;
+            case 'video':
+                return MarkupType.Video;
+            case 'newLine':
+                return MarkupType.NewLine;
+            default:
+                return null;
+        }
     }
 
     determineParagraphType(formats) {
@@ -388,7 +390,7 @@ export class DeltaApplier {
             }
 
             for (let i = newStart; i < newEnd; i++) {
-                deltas.push(new Delta(newParagraphs[i], i, DeltaType.Update));
+                deltas.push(new Delta(newParagraphs[i], i, DeltaType.Create));
             }
         }
 
@@ -414,7 +416,7 @@ export class DeltaApplier {
         const byPosition = (a, b) => {
             if (a.start !== b.start) return a.start - b.start;
             if (a.end !== b.end) return a.end - b.end;
-            return a.type.localeCompare(b.type);
+            return a.type - b.type;
         };
 
         const sortedMarkups1 = [...p1.markups].sort(byPosition);
@@ -468,7 +470,6 @@ export class DeltaApplier {
         if (maxLen === 0) return 1.0;
 
         if (maxLen > 100) {
-            // For longer strings, use approximate matching
             return this.approximateSimilarity(str1, str2);
         }
 

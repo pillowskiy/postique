@@ -10,12 +10,25 @@ export const deltaChangeEvent = {
             const postId = windowDynamicParam('postId', '/p/:postId/edit');
 
             if (!postId) {
-                const title =
-                    quill.root.querySelector('[data-title]')?.textContent ||
-                    'Untitled story';
+                const titleNode = quill.root.querySelector('[data-title]');
+                let title = 'Нова публікація';
+                let description = '';
+                const coverImage = quill.root.querySelector('img')?.src ?? '';
+
+                if (titleNode) {
+                    title = titleNode.textContent;
+                    description = titleNode.nextElementSibling?.textContent;
+                }
 
                 const data = await htmx.__.ajax('POST', '/p', {
-                    values: { title },
+                    values: {
+                        title,
+                        description:
+                            description.length > 256
+                                ? description.slice(0, 256) + '...'
+                                : description,
+                        coverImage,
+                    },
                 });
 
                 if (!data?.postId) {

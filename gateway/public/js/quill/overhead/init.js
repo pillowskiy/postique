@@ -3,25 +3,27 @@ import { deltaToQuillContents } from '../delta/parser.js';
 import { postState, statusState, updateStatusText } from '../state.js';
 
 export function Init(quill) {
-    onPathChange(async () => {
+    async function handleQuill() {
         const postId = windowDynamicParam('postId', '/p/:postId/edit');
-        if (!postId || postId === postState.get()?.id) {
+        if (postId === postState.get()?.id) {
             return;
         }
-
-        console.log('Post id:', postId);
-        const post = await getPostInfo(postId);
-        console.log(post);
-        postState.set(post);
 
         const contents = await getQuillContents(postId);
         console.log('Contents', contents);
         console.log('Done');
-
         quill.setContents(contents, 'silent');
         updateStatusText();
+
+        if (postId) {
+            const post = await getPostInfo(postId);
+            postState.set(post);
+        }
+
         statusState.set('draft');
-    });
+    }
+
+    onPathChange(handleQuill);
 }
 
 async function getPostInfo(postId) {
@@ -79,7 +81,6 @@ function onPathChange(callback) {
     };
 
     window.addEventListener('popstate', triggerCallback);
-
     triggerCallback();
 
     return () => {
