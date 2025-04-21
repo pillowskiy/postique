@@ -1,5 +1,5 @@
 import express from 'express';
-import { body, param } from 'express-validator';
+import { body, param, query } from 'express-validator';
 
 import handler from '../common/handler.js';
 
@@ -40,6 +40,15 @@ export function PostRoutes(postController, authMiddlewares, middlewares) {
         authMiddlewares.withAuth.bind(authMiddlewares),
         [param('postId').isString().withMessage('Should be a string')],
         handler(postController, 'getNewStoryView'),
+    );
+
+    postRouter.get(
+        '/popular',
+        [
+            query('cursor').isString().optional(),
+            query('take').isInt().optional(),
+        ],
+        handler(postController, 'getPopularPartialPostsView'),
     );
 
     postRouter.get(

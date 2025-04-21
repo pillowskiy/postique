@@ -21,7 +21,9 @@ export function AppRoutes(
     appRouter.use(authMiddlewares.withGlobalAuthLocals.bind(authMiddlewares));
     appRouter.use(middlewares.responseResult.bind(middlewares));
 
-    appRouter.get('/', async (_, res) => render(res).template('index', {}));
+    appRouter.get('/', async (_, res) =>
+        render(res).template('index', {}).layout('grid-layout'),
+    );
     appRouter.get(
         '/new-story',
         authMiddlewares.withAuth.bind(authMiddlewares),

@@ -63,6 +63,9 @@ declare namespace render {
         'pages/login': {};
         'partials/head': {};
         'partials/toasts': {};
+        'post/post-aside-card-list.swap': {
+            posts: Array;
+        };
         'shared/error': {
             status: Variable;
             message: Variable;

@@ -12,7 +12,53 @@
                 <%- await include(__renderTarget) %>
             </main>
             <aside class="grid-container__sidebar">
-                <div class="faq-container">
+                <div class="aside-section">
+                    <h3 class="aside-section__title">Популярні публікації</h3>
+
+                    <ul
+                        id="popular-posts"
+                        hx-get="/p/popular"
+                        hx-trigger="load"
+                        hx-target="#popular-posts"
+                        hx-swap="innerHTML"
+                        class="aside-section__list popular-stories-list"
+                    >
+                        <% for (let i = 0; i < 3; i++) { %>
+                        <li>
+                            <div class="post-card__header skeleton-flex-line">
+                                <sl-skeleton
+                                    class="skeleton-avatar"
+                                    effect="sheen"
+                                ></sl-skeleton>
+                                <sl-skeleton
+                                    class="skeleton-md-line"
+                                    effect="sheen"
+                                ></sl-skeleton>
+                            </div>
+                            <div class="post-card__content">
+                                <div class="skeleton-multiline-text">
+                                    <sl-skeleton
+                                        class="skeleton-line"
+                                        effect="sheen"
+                                    ></sl-skeleton>
+                                    <sl-skeleton
+                                        class="skeleton-line"
+                                        effect="sheen"
+                                    ></sl-skeleton>
+                                </div>
+                                <sl-skeleton
+                                    class="skeleton-sm-line"
+                                    effect="sheen"
+                                ></sl-skeleton>
+                            </div>
+                        </li>
+                        <% } %>
+                    </ul>
+
+                    <a href="/new-story" class="link">Дивитись всі</a>
+                </div>
+
+                <div class="faq-container aside-section">
                     <h3 class="faq-container__title">
                         Публікування на Postique
                     </h3>
@@ -32,9 +78,9 @@
                     </sl-button>
                 </div>
 
-                <div class="topics-container">
-                    <h3 class="topics-container__title">Рекомендовані теми</h3>
-                    <ul class="topics-container__list">
+                <div class="aside-section">
+                    <h3 class="aside-section__title">Рекомендовані теми</h3>
+                    <ul class="aside-section__list topics-list">
                         <li>
                             <sl-button size="medium" variant="default" pill>
                                 Бізнес
@@ -72,6 +118,45 @@
                         </li>
                     </ul>
                     <a href="/new-story" class="link"> Дивитись всі </a>
+                </div>
+
+                <div class="aside-section">
+                    <h3 class="aside-section__title">Недавно збережені</h3>
+
+                    <ul class="aside-section__list saved-stories-list">
+                        <% for (let i = 0; i < 3; i++) { %>
+                        <li>
+                            <div class="post-card__header skeleton-flex-line">
+                                <sl-skeleton
+                                    class="skeleton-avatar"
+                                    effect="sheen"
+                                ></sl-skeleton>
+                                <sl-skeleton
+                                    class="skeleton-md-line"
+                                    effect="sheen"
+                                ></sl-skeleton>
+                            </div>
+                            <div class="post-card__content">
+                                <div class="skeleton-multiline-text">
+                                    <sl-skeleton
+                                        class="skeleton-line"
+                                        effect="sheen"
+                                    ></sl-skeleton>
+                                    <sl-skeleton
+                                        class="skeleton-line"
+                                        effect="sheen"
+                                    ></sl-skeleton>
+                                </div>
+                                <sl-skeleton
+                                    class="skeleton-sm-line"
+                                    effect="sheen"
+                                ></sl-skeleton>
+                            </div>
+                        </li>
+                        <% } %>
+                    </ul>
+
+                    <a href="/new-story" class="link">Мій список збереження</a>
                 </div>
             </aside>
         </div>
