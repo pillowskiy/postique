@@ -1,4 +1,4 @@
-import { CommandHandler } from '@nestjs/cqrs';
+import { CommandHandler, EventBus } from '@nestjs/cqrs';
 import { Inject } from '@nestjs/common';
 import { Command } from '../../common';
 import { DeleteCommentCommand } from './delete-comment.command';
@@ -6,6 +6,7 @@ import { CommentRepository } from '@/app/boundaries/repository';
 import { DeleteCommentOutput } from '@/app/boundaries/dto/output';
 import { CommentAccessControlList } from '@/app/boundaries/acl';
 import { ForbiddenException, NotFoundException } from '@/app/boundaries/errors';
+import { ReactedEvent, ReactionType } from '@/app/events/interaction/reacted';
 
 @CommandHandler(DeleteCommentCommand)
 export class DeleteCommentCommandHandler extends Command<
@@ -17,6 +18,9 @@ export class DeleteCommentCommandHandler extends Command<
 
   @Inject(CommentRepository)
   private readonly _commentRepository: CommentRepository;
+
+  @Inject(EventBus)
+  private readonly _eventBus: EventBus;
 
   protected async invoke(
     input: DeleteCommentCommand,
@@ -39,6 +43,10 @@ export class DeleteCommentCommandHandler extends Command<
     }
 
     await this._commentRepository.delete(comment.id);
+
+    this._eventBus.publish(
+      new ReactedEvent(comment.postId, ReactionType.Comment, false),
+    );
 
     return new DeleteCommentOutput(comment.id);
   }

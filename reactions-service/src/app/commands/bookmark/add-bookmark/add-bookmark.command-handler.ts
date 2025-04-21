@@ -1,4 +1,4 @@
-import { CommandHandler } from '@nestjs/cqrs';
+import { CommandHandler, EventBus } from '@nestjs/cqrs';
 import { Inject } from '@nestjs/common';
 import { Command } from '../../common';
 import { AddBookmarkCommand } from './add-bookmark.command';
@@ -7,6 +7,7 @@ import { BookmarkEntity } from '@/domain/bookmark';
 import { AddBookmarkOutput } from '@/app/boundaries/dto/output';
 import { BookmarkAccessControlList } from '@/app/boundaries/acl';
 import { ForbiddenException } from '@/app/boundaries/errors';
+import { ReactedEvent, ReactionType } from '@/app/events/interaction/reacted';
 
 @CommandHandler(AddBookmarkCommand)
 export class AddBookmarkCommandHandler extends Command<
@@ -18,6 +19,9 @@ export class AddBookmarkCommandHandler extends Command<
 
   @Inject(BookmarkRepository)
   private readonly _bookmarkRepository: BookmarkRepository;
+
+  @Inject(EventBus)
+  private readonly _eventBus: EventBus;
 
   protected async invoke(
     input: AddBookmarkCommand,
@@ -40,6 +44,10 @@ export class AddBookmarkCommandHandler extends Command<
     });
 
     await this._bookmarkRepository.save(bookmark);
+
+    this._eventBus.publish(
+      new ReactedEvent(bookmark.targetId, ReactionType.Bookmark, true),
+    );
 
     return new AddBookmarkOutput(bookmark.id);
   }

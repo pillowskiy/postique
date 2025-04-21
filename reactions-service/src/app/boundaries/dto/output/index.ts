@@ -6,3 +6,4 @@ export * from './view.dto';
 export * from './user.dto';
 export * from './cursor.dto';
 export * from './post.dto';
+export * from './stats.dto';

@@ -1,4 +1,4 @@
-import { CommandHandler } from '@nestjs/cqrs';
+import { CommandHandler, EventBus } from '@nestjs/cqrs';
 import { Inject } from '@nestjs/common';
 import { Command } from '../../common';
 import { DeleteBookmarkCommand } from './delete-bookmark.command';
@@ -6,6 +6,7 @@ import { BookmarkRepository } from '@/app/boundaries/repository';
 import { DeleteBookmarkOutput } from '@/app/boundaries/dto/output';
 import { BookmarkAccessControlList } from '@/app/boundaries/acl';
 import { ForbiddenException, NotFoundException } from '@/app/boundaries/errors';
+import { ReactedEvent, ReactionType } from '@/app/events/interaction/reacted';
 
 @CommandHandler(DeleteBookmarkCommand)
 export class DeleteBookmarkCommandHandler extends Command<
@@ -17,6 +18,9 @@ export class DeleteBookmarkCommandHandler extends Command<
 
   @Inject(BookmarkRepository)
   private readonly _bookmarkRepository: BookmarkRepository;
+
+  @Inject(EventBus)
+  private readonly _eventBus: EventBus;
 
   protected async invoke(
     input: DeleteBookmarkCommand,
@@ -42,6 +46,10 @@ export class DeleteBookmarkCommandHandler extends Command<
     }
 
     await this._bookmarkRepository.delete(bookmark.id);
+
+    this._eventBus.publish(
+      new ReactedEvent(bookmark.targetId, ReactionType.Bookmark, false),
+    );
 
     return new DeleteBookmarkOutput(bookmark.id);
   }

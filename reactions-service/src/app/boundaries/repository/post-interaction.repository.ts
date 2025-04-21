@@ -3,6 +3,7 @@ import { PostInteractionCounts } from '@/domain/post';
 export abstract class PostInteractionRepository {
   abstract findByPostId(postId: string): Promise<PostInteractionCounts | null>;
   abstract save(interaction: PostInteractionCounts): Promise<void>;
+  abstract findBatch(postIds: string[]): Promise<PostInteractionCounts[]>;
   abstract updateLikeCount(postId: string, increment: boolean): Promise<void>;
   abstract updateBookmarkCount(
     postId: string,

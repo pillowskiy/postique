@@ -5,3 +5,4 @@ export * from './like.dto';
 export * from './view.dto';
 export * from './user.dto';
 export * from './post.dto';
+export * from './stats.dto';

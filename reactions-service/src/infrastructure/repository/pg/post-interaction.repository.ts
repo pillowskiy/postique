@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { eq, InferSelectModel, sql } from 'drizzle-orm';
+import { eq, inArray, InferSelectModel, sql } from 'drizzle-orm';
 import { PostInteractionRepository } from '@/app/boundaries/repository';
 import { PostInteractionCounts } from '@/domain/post';
 import { Transactional } from '@/app/boundaries/common';
@@ -42,6 +42,15 @@ export class PostgresPostInteractionRepository extends PostInteractionRepository
           viewsCount: interaction.viewsCount,
         },
       });
+  }
+
+  async findBatch(postIds: string[]): Promise<PostInteractionCounts[]> {
+    const results = await this._txHost.exec
+      .select()
+      .from(postsStatistic)
+      .where(inArray(postsStatistic.postId, postIds));
+
+    return results.map((res) => this.#toEntity(res));
   }
 
   async updateLikeCount(postId: string, increment: boolean): Promise<void> {

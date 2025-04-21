@@ -6,6 +6,7 @@ import { CommentsModule } from './comments';
 import { LikesModule } from './likes';
 import { ViewsModule } from './views';
 import { PostsModule } from './posts';
+import { InteractionsModule } from './interactions';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { PostsModule } from './posts';
     LikesModule,
     UsersModule,
     ViewsModule,
+    InteractionsModule,
   ],
 })
 export class ComponentsModule {}

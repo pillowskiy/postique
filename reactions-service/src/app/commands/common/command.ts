@@ -21,7 +21,6 @@ export abstract class Command<I extends ICommand = any, O = any>
     try {
       const result = await this.invoke(input);
       await this._transactional.commit();
-      //this._dispatcher.dispatch();
       return result;
     } catch (error) {
       await this._transactional.rollback();

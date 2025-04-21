@@ -2,6 +2,10 @@ import { EntityFactory } from '../common/entity';
 import { PostInteractionSchema } from './post-interaction.schema';
 
 export class PostInteractionCounts {
+  static empty(postId: string): PostInteractionCounts {
+    return PostInteractionCounts.create({ postId });
+  }
+
   static create(input: Partial<PostInteractionCounts>): PostInteractionCounts {
     const validPost = EntityFactory.create(PostInteractionSchema, input);
 

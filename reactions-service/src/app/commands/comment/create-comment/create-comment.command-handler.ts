@@ -1,4 +1,4 @@
-import { CommandHandler } from '@nestjs/cqrs';
+import { CommandHandler, EventBus } from '@nestjs/cqrs';
 import { Inject } from '@nestjs/common';
 import { Command } from '../../common';
 import { CommentRepository } from '@/app/boundaries/repository';
@@ -7,6 +7,7 @@ import { CreateCommentOutput } from '@/app/boundaries/dto/output';
 import { CommentAccessControlList } from '@/app/boundaries/acl';
 import { ForbiddenException } from '@/app/boundaries/errors';
 import { CreateCommentCommand } from './create-comment.command';
+import { ReactedEvent, ReactionType } from '@/app/events/interaction/reacted';
 
 @CommandHandler(CreateCommentCommand)
 export class CreateCommentCommandHandler extends Command<
@@ -18,6 +19,9 @@ export class CreateCommentCommandHandler extends Command<
 
   @Inject(CommentRepository)
   private readonly _commentRepository: CommentRepository;
+
+  @Inject(EventBus)
+  private readonly _eventBus: EventBus;
 
   protected async invoke(
     input: CreateCommentCommand,
@@ -40,6 +44,10 @@ export class CreateCommentCommandHandler extends Command<
     });
 
     await this._commentRepository.save(comment);
+
+    this._eventBus.publish(
+      new ReactedEvent(comment.postId, ReactionType.Comment, true),
+    );
 
     return new CreateCommentOutput(comment.id);
   }

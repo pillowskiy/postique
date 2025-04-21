@@ -29,6 +29,7 @@ export const postsStatistic = pgTable('posts_statistic', (t) => ({
   postId: t
     .uuid('post_id')
     .notNull()
+    .unique()
     .references(() => posts.id, { onDelete: 'cascade' }),
   viewsCount: t.integer('views_count').notNull().default(0),
   likesCount: t.integer('likes_count').notNull().default(0),
