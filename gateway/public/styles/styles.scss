@@ -37,6 +37,11 @@ sl-skeleton {
     width: clamp(60px, 25%, 100%);
 }
 
+.skeleton-sm-text-icon-line {
+    height: 24px;
+    width: 50px;
+}
+
 .skeleton-md-line {
     height: 14px;
     width: clamp(90px, 50%, 100%);
@@ -873,12 +878,24 @@ sl-alert::part(message) {
     z-index: 2;
 }
 
+.post-list {
+    list-style: none;
+
+    & > :not(:last-child) {
+        margin-bottom: 32px;
+    }
+}
+
 .post-card {
+    &.detailed {
+        padding-bottom: 12px;
+    }
+
     &__header {
         display: flex;
         align-items: center;
         gap: 8px;
-        margin-bottom: 8px;
+        margin-bottom: 12px;
     }
 
     &__owner {
@@ -893,6 +910,11 @@ sl-alert::part(message) {
     }
 
     &__content {
+        &.grid {
+            display: grid;
+            grid-template-columns: 1fr auto;
+        }
+
         display: flex;
         flex-direction: column;
         gap: 12px;
@@ -901,15 +923,57 @@ sl-alert::part(message) {
         color: var(--sl-color-neutral-900);
     }
 
+    &__cover {
+        width: 160px;
+        margin-left: 32px;
+        grid-row: span 2 / span 2;
+    }
+
     &__title {
+        &.large {
+            font-size: var(--sl-font-size-x-large);
+        }
+
         font-weight: 700;
         font-size: var(--sl-font-size-medium);
-        line-height: 1.25;
+        line-height: 1.1;
         letter-spacing: 0;
+    }
+
+    &__description {
+        text-wrap: pretty;
+        font-size: var(--sl-font-size-medium);
+        line-height: 1.25;
+        color: var(--sl-color-neutral-600);
+
+        // TEMP: To scss util
+        overflow: hidden;
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 2;
+        line-clamp: 2;
     }
 
     &__details {
         font-size: var(--sl-font-size-small);
         color: var(--sl-color-neutral-600);
+    }
+
+    &__reactions {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 8px;
+
+        &-actions,
+        &-count {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        &-count {
+            gap: 12px;
+        }
     }
 }

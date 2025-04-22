@@ -1,0 +1,53 @@
+<% posts.forEach((post) => { %>
+<li class="post-card detailed" id="post-<%= post.id %>">
+    <a href="#" class="post-card__header post-card__owner">
+        <sl-avatar style="--size: 2rem" label="User avatar"></sl-avatar>
+        <span class="truncate"><%= post.owner %></span>
+    </a>
+
+    <div class="post-card__content grid">
+        <a href="/p/<%=post.slug%>" class="post-card__content">
+            <h3 class="post-card__title large"><%= post.title %></h3>
+            <p class="post-card__description"><%= post.description %></p>
+        </a>
+
+        <div class="post-card__cover"></div>
+
+        <div class="post-card__reactions">
+            <div class="post-card__reactions-count">
+                <% if (post.publishedAt) { %>
+                <p class="post-card__details">
+                    <sl-relative-time
+                        format="narrow"
+                        date="<%= post.publishedAt %>"
+                        lang="uk-UA"
+                    ></sl-relative-time>
+                </p>
+                <% } %>
+                <div id="reactions-<%= post.id %>" class="skeleton-flex-line">
+                    <sl-skeleton
+                        class="skeleton-sm-text-icon-line"
+                        effect="sheen"
+                    ></sl-skeleton>
+                    <sl-skeleton
+                        class="skeleton-sm-text-icon-line"
+                        effect="sheen"
+                    ></sl-skeleton>
+                </div>
+            </div>
+
+            <div id="stats-<%= post.id %>" class="post-card__reactions-actions">
+                <sl-tooltip content="Показувати менше">
+                    <sl-icon-button name="dash-circle"></sl-icon-button>
+                </sl-tooltip>
+                <sl-tooltip content="Зберегти">
+                    <sl-icon-button name="bookmark-dash"></sl-icon-button>
+                </sl-tooltip>
+                <sl-tooltip content="Більше">
+                    <sl-icon-button name="three-dots"></sl-icon-button>
+                </sl-tooltip>
+            </div>
+        </div>
+    </div>
+</li>
+<% }) %>

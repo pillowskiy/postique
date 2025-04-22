@@ -1,0 +1,12 @@
+<div style="padding-right: 80px">
+    <sl-tab-group style="margin-bottom: 32px">
+        <sl-tab slot="nav" panel="forYou" active>Для вас</sl-tab>
+        <sl-tab slot="nav" panel="subs">Підписки</sl-tab>
+        <sl-tab slot="nav" panel="programming">Програмування</sl-tab>
+        <sl-tab slot="nav" panel="business">Бізнес</sl-tab>
+    </sl-tab-group>
+
+    <ul class="post-list">
+        <%- await include('../post/post-detailed-list.ejs', { posts }) %>
+    </ul>
+</div>

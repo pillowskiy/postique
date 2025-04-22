@@ -17,7 +17,7 @@
 
                     <ul
                         id="popular-posts"
-                        hx-get="/p/popular"
+                        hx-get="/p/popular?take=3"
                         hx-trigger="load"
                         hx-target="#popular-posts"
                         hx-swap="innerHTML"
@@ -55,7 +55,9 @@
                         <% } %>
                     </ul>
 
-                    <a href="/new-story" class="link">Дивитись всі</a>
+                    <a href="/u/Postique/list/staff-picks" class="link">
+                        Дивитись всі
+                    </a>
                 </div>
 
                 <div class="faq-container aside-section">
@@ -120,6 +122,7 @@
                     <a href="/new-story" class="link"> Дивитись всі </a>
                 </div>
 
+                <% if (locals.user) { %>
                 <div class="aside-section">
                     <h3 class="aside-section__title">Недавно збережені</h3>
 
@@ -158,6 +161,7 @@
 
                     <a href="/new-story" class="link">Мій список збереження</a>
                 </div>
+                <% } %>
             </aside>
         </div>
         <%- await include('./partials/toasts.ejs') %>

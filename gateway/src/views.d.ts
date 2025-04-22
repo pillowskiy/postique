@@ -37,8 +37,9 @@ declare namespace render {
         'grid-layout': {
             title: Variable;
             __renderTarget: Variable;
+            locals: { user: Variable };
         };
-        index: {};
+        'home/home-page': {};
         layout: {
             title: Variable;
             __renderTarget: Variable;
@@ -64,6 +65,9 @@ declare namespace render {
         'partials/head': {};
         'partials/toasts': {};
         'post/post-aside-card-list.swap': {
+            posts: Array;
+        };
+        'post/post-detailed-list': {
             posts: Array;
         };
         'shared/error': {
