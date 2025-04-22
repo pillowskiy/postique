@@ -1,3 +1,6 @@
+/* eslint-disable no-continue */
+/* eslint-disable eqeqeq */
+/* eslint-disable no-restricted-syntax */
 import {
     CodeMetadata,
     Delta,
@@ -8,9 +11,16 @@ import {
     Paragraph,
     ParagraphType,
 } from './models.js';
+import { DeltaParser } from './parser.js';
 
 export class DeltaApplier {
+    static moduleName = 'deltaApplier';
+
+    static parser = new DeltaParser();
+
     constructor(quill) {
+        quill.deltaApplier = this;
+
         this.quill = quill;
         this.batchDeltas = [];
         this.timeoutId = null;
@@ -23,12 +33,13 @@ export class DeltaApplier {
             'postTitle',
             'title',
             'code',
+            'image',
             'blockquote',
             'code-block',
             'codeblock',
         ]);
 
-        this.previousParagraphs = this.getParagraphs();
+        this.updatePreviousParagraphs();
         console.log('Initial paragraphs:', this.previousParagraphs);
 
         quill.on('text-change', (delta) => {
@@ -43,11 +54,15 @@ export class DeltaApplier {
         });
     }
 
+    updatePreviousParagraphs() {
+        this.previousParagraphs = this.getParagraphs();
+    }
+
     getParagraphs() {
         const paragraphs = [];
         const lines = this.quill.getLines(0, this.quill.getLength());
-        let lineIndex = 0;
 
+        // eslint-disable-next-line no-restricted-syntax
         for (const line of lines) {
             const lineFormats = line.formats() || {};
             let paragraphType = this.determineParagraphType(lineFormats);
@@ -59,14 +74,19 @@ export class DeltaApplier {
                     lineFormats.language || 'plain',
                     true,
                 );
+                paragraphType = ParagraphType.Code;
             }
 
-            const blot = line.domNode?.querySelector('.ql-image');
-            if (blot) {
+            if (line.constructor.blotName === 'image' || lineFormats.image) {
+                let image = line.domNode;
+                if (!(image instanceof HTMLImageElement)) {
+                    image = image.querySelector('img');
+                }
+
                 imageMetadata = new ImageMetadata(
-                    blot.getAttribute('src'),
-                    blot.width || 0,
-                    blot.height || 0,
+                    image.getAttribute('src'),
+                    image.width || 0,
+                    image.height || 0,
                 );
                 paragraphType = ParagraphType.Figure;
             }
@@ -96,7 +116,7 @@ export class DeltaApplier {
                         const segmentStart = segment.start - lineStartIndex;
                         const segmentEnd = segment.end - lineStartIndex;
 
-                        if (formatType == null) continue;
+                        if (formatType === null) continue;
 
                         if (
                             segmentStart >= 0 &&
@@ -123,8 +143,6 @@ export class DeltaApplier {
                     codeMetadata,
                 ),
             );
-
-            lineIndex++;
         }
 
         return paragraphs;
@@ -205,7 +223,12 @@ export class DeltaApplier {
     }
 
     determineParagraphType(formats) {
-        if (formats.postTitle) return ParagraphType.Title;
+        if (formats.postTitle) {
+            if (formats.postTitle === 1) {
+                return ParagraphType.Title;
+            }
+            return ParagraphType.Heading;
+        }
         if (formats.header) return ParagraphType.Heading;
         if (formats.list === 'ordered') return ParagraphType.OrderedList;
         if (formats.list === 'bullet') return ParagraphType.UnorderedList;

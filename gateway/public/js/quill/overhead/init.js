@@ -1,5 +1,5 @@
 import { windowDynamicParam } from '../../utils/router.js';
-import { deltaToQuillContents } from '../delta/parser.js';
+import { DeltaApplier } from '../modules/index.js';
 import { postState, statusState, updateStatusText } from '../state.js';
 
 export function Init(quill) {
@@ -10,9 +10,8 @@ export function Init(quill) {
         }
 
         const contents = await getQuillContents(postId);
-        console.log('Contents', contents);
-        console.log('Done');
         quill.setContents(contents, 'silent');
+        quill.deltaApplier.updatePreviousParagraphs();
         updateStatusText();
 
         if (postId) {
@@ -44,7 +43,7 @@ async function getQuillContents(postId) {
         return emptyQuillContents();
     }
 
-    return deltaToQuillContents(paragraphs);
+    return DeltaApplier.parser.parse(paragraphs);
 }
 
 function emptyQuillContents() {

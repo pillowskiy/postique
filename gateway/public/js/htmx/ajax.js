@@ -39,7 +39,11 @@ export async function ajax(method, url, opts = {}) {
                     const messageDec = message
                         ? atob(message)
                         : 'Unknown error ocurred';
-                    reject(new Error(`${statusDec}: ${messageDec}`));
+                    reject(
+                        new Error(
+                            `${statusDec}: ${JSON.stringify(messageDec, null, 2)}`,
+                        ),
+                    );
                     return false;
                 }
 

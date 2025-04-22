@@ -1,1 +1,3 @@
 export * from './clipboard.js';
+export * from './delta/index.js';
+export * from './image-tooltip.js';

@@ -8,6 +8,8 @@ const isScrollable = (el) => {
 };
 
 export class ImageTooltip {
+    static moduleName = 'imageTooltip';
+
     static TEMPLATE = [
         '<span class="ql-tooltip-arrow"></span>',
         '<div class="ql-tooltip-editor">',
@@ -17,7 +19,7 @@ export class ImageTooltip {
         '</div>',
     ].join('');
 
-    constructor(toolbar, quill) {
+    constructor(quill, { toolbar }) {
         this.root = quill.addContainer('ql-tooltip');
         this.root.innerHTML = this.constructor.TEMPLATE;
         this.root.classList.add('ql-flip');
@@ -25,16 +27,10 @@ export class ImageTooltip {
         this.boundsContainer = document.body;
         this.quill = quill;
 
-        if (toolbar.container != null) {
-            this.root.appendChild(toolbar.container);
-            quill.theme.buildButtons(
-                toolbar.container.querySelectorAll('button'),
-                icons,
-            );
-            quill.theme.buildPickers(
-                toolbar.container.querySelectorAll('select'),
-                icons,
-            );
+        if (toolbar !== null) {
+            this.root.appendChild(toolbar);
+            quill.theme.buildButtons(toolbar.querySelectorAll('button'), icons);
+            quill.theme.buildPickers(toolbar.querySelectorAll('select'), icons);
         }
 
         if (isScrollable(this.quill.root)) {
@@ -52,6 +48,7 @@ export class ImageTooltip {
             if (target instanceof HTMLImageElement) {
                 e.preventDefault();
                 this.show();
+                target.setAttribute('data-selected', '');
                 this.root.style.left = '0px';
                 this.root.style.width = `240px`;
                 const bounds = target.getBoundingClientRect();
@@ -71,6 +68,7 @@ export class ImageTooltip {
                     return;
                 }
             } else if (!target.classList.contains('ql-hidden')) {
+                target.removeAttribute('data-selected', '');
                 this.hide();
             }
         });

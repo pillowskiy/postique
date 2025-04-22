@@ -1,8 +1,6 @@
 import Quill from 'quill';
 
-import { DeltaApplier } from './delta/index.js';
 import { listenEvents } from './events.js';
-import { ImageTooltip } from './image-tooltip.js';
 import { registerOverhead } from './overhead.js';
 import './registry.js';
 import * as state from './state.js';
@@ -26,13 +24,15 @@ function quill(id = '#editor') {
 
     const quill = new Quill(id, {
         theme: 'bubble',
-        modules: { toolbar: true },
+        modules: {
+            toolbar: true,
+            imageTooltip: { toolbar: toolbarRoot },
+            deltaApplier: true,
+        },
     });
+    quill.addContainer(document.querySelector('#sidebar-controls'));
     listenEvents(quill);
     registerOverhead(quill);
-
-    new ImageTooltip({ container: toolbarRoot }, quill);
-    new DeltaApplier(quill);
 }
 
 export default {

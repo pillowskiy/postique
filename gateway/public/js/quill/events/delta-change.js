@@ -4,7 +4,7 @@ import { showStatusErrorState, statusState } from '../state.js';
 let deltaStore = [];
 export const deltaChangeEvent = {
     name: 'debounce-change',
-    handler: async function (quill, changes) {
+    async handler(quill, changes) {
         statusState.set('saving');
         try {
             const postId = windowDynamicParam('postId', '/p/:postId/edit');
