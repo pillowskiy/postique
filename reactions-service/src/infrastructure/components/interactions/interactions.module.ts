@@ -2,8 +2,14 @@ import { CqrsModule } from '@nestjs/cqrs';
 import { Module } from '@nestjs/common';
 import InteractionEventHandlers from '@/app/events/interaction';
 import InteractionQueryHandlers from '@/app/queries/interaction';
-import { PostInteractionRepository } from '@/app/boundaries/repository';
-import { PostgresPostInteractionRepository } from '@/infrastructure/repository/pg';
+import {
+  PostInteractionRepository,
+  PostStatisticRepository,
+} from '@/app/boundaries/repository';
+import {
+  PostgresPostInteractionRepository,
+  PostgresPostStatisticRepository,
+} from '@/infrastructure/repository/pg';
 import { DrizzleModule } from '@/infrastructure/drizzle';
 import { InteractionsService } from './interactions.service';
 import { InteractionsController } from './interactions.controller';
@@ -18,6 +24,10 @@ import { InteractionsController } from './interactions.controller';
     {
       provide: PostInteractionRepository,
       useClass: PostgresPostInteractionRepository,
+    },
+    {
+      provide: PostStatisticRepository,
+      useClass: PostgresPostStatisticRepository,
     },
   ],
 })

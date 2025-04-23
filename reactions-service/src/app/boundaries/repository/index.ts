@@ -5,4 +5,5 @@ export * from './view.repository';
 export * from './users.repository';
 export * from './post.repository';
 export * from './post-interaction.repository';
+export * from './post-statistic.repository';
 export * from './bookmark-collection.repository';

@@ -8,3 +8,7 @@ export class PostInput {
     public readonly status: string,
   ) {}
 }
+
+export class GetBatchStatsInput {
+  constructor(public readonly postIds: string[]) {}
+}
