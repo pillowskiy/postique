@@ -53,8 +53,9 @@ export function PostRoutes(postController, authMiddlewares, middlewares) {
 
     postRouter.get(
         '/:slug',
+        authMiddlewares.withAuth.bind(authMiddlewares),
         [param('slug').isString().withMessage('Invalid slug format')],
-        handler(postController, 'getPost'),
+        handler(postController, 'getPostView'),
     );
 
     postRouter.get(

@@ -1,0 +1,49 @@
+<link rel="stylesheet" href="/styles/editor.min.css" />
+
+<header>
+    <div class="post-header__meta">
+        <h1><%= post.title %></h1>
+        <p><%= post.description %></p>
+    </div>
+    <div class="post-header__owner">
+        <sl-avatar
+            style="--size: 2rem"
+            initials="<%= typeof post.owner === 'object' && post.owner ? post.owner.username.slice(0, 2) : '' %>"
+            label="User avatar"
+        ></sl-avatar>
+        <span class="truncate">
+            <%= typeof post.owner === 'object' && post.owner ?
+            post.owner.username : 'Невідомий автор' %>
+        </span>
+    </div>
+    <div class="post-header__states">
+        <sl-tooltip content="Показувати менше">
+            <sl-icon-button name="dash-circle"></sl-icon-button>
+        </sl-tooltip>
+        <sl-tooltip content="Зберегти">
+            <sl-icon-button name="bookmark-plus"></sl-icon-button>
+        </sl-tooltip>
+
+        <sl-dropdown>
+            <sl-icon-button slot="trigger" name="three-dots"></sl-icon-button>
+
+            <sl-menu style="width: 220px">
+                <sl-menu-item class="accent">
+                    <sl-icon name="plus-circle" slot="prefix"></sl-icon>
+                    Показувати більше
+                </sl-menu-item>
+                <sl-menu-item class="accent">
+                    <sl-icon name="dash-circle" slot="prefix"></sl-icon>
+                    Показувати менше
+                </sl-menu-item>
+                <sl-divider></sl-divider>
+                <sl-menu-item>Заблокувати автора</sl-menu-item>
+                <sl-menu-item>Поскаржитися</sl-menu-item>
+            </sl-menu>
+        </sl-dropdown>
+    </div>
+</header>
+
+<article class="post-content ql-container ql-editor">
+    <%- renderer.raw(paragraphs) %>
+</article>

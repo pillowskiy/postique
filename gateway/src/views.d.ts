@@ -39,7 +39,10 @@ declare namespace render {
             __renderTarget: Variable;
             locals: { user: Variable };
         };
-        'home/home-page': {};
+        'home/home-page': {
+            JSON: { stringify: Function };
+            user: Variable;
+        };
         layout: {
             title: Variable;
             __renderTarget: Variable;
@@ -64,11 +67,27 @@ declare namespace render {
         'pages/login': {};
         'partials/head': {};
         'partials/toasts': {};
+        'post/components/posts-interaction.oob': {
+            stats: Array;
+        };
+        'post/components/posts-states.oob': {
+            states: Array;
+        };
         'post/post-aside-card-list.swap': {
             posts: Array;
         };
         'post/post-detailed-list': {
             posts: Array;
+        };
+        'post/post-page': {
+            post: {
+                title: Variable;
+                description: Variable;
+                'post.owner': { username: Array };
+            };
+            'post.owner': { username: Array };
+            renderer: { raw: Function };
+            paragraphs: Variable;
         };
         'shared/error': {
             status: Variable;

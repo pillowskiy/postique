@@ -4,6 +4,7 @@ import {
     DeleteFileDTO,
     UpdatePostMetadataDTO,
 } from '#app/dto/index.js';
+import { ParagraphType, PostContentRenderer } from '#lib/ejs/post.js';
 import { render } from '#lib/ejs/render.js';
 import { validate } from '#lib/validator/validator.js';
 
@@ -38,6 +39,41 @@ export class PostController {
         return render(res)
             .template('workbench/workbench-page', {})
             .layout('workbench/workbench-layout');
+    }
+
+    /**
+     * @param {Request} req
+     * @param {Response} res
+     */
+    async getPostView(req, res) {
+        const token = getAuthToken(req);
+        if (!token) {
+            throw new ClientException('You should be logged in', 401);
+        }
+
+        console.log('Token', token);
+
+        const errors = validate(req);
+        if (!errors.isEmpty()) {
+            throw new ClientException(errors.mapped(), 400);
+        }
+
+        const { slug } = req.params;
+        const post = await this.#postService.getPost(slug);
+        const content = await this.#postService.getPostDraft(post.id, token);
+
+        const titleIndex = content.findIndex(
+            (p) => p.type === ParagraphType.Title,
+        );
+        if (titleIndex !== -1) {
+            content.splice(titleIndex, 1);
+        }
+
+        return render(res).template('post/post-page', {
+            post,
+            paragraphs: content,
+            renderer: new PostContentRenderer(),
+        });
     }
 
     /**

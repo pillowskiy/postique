@@ -21,7 +21,7 @@ export class PostService extends RestClient {
         const response = await this._client
             .post('posts', {
                 json: input,
-                headers: this.#withAuth(auth),
+                headers: this._withAuth(auth),
             })
             .json();
 
@@ -38,7 +38,7 @@ export class PostService extends RestClient {
         const response = await this._client
             .patch(`posts/${postId}/visibility`, {
                 json: { visibility },
-                headers: this.#withAuth(auth),
+                headers: this._withAuth(auth),
             })
             .json();
 
@@ -54,7 +54,7 @@ export class PostService extends RestClient {
         const response = await this._client
             .patch(`posts/${postId}/archive`, {
                 json: {},
-                headers: this.#withAuth(auth),
+                headers: this._withAuth(auth),
             })
             .json();
 
@@ -70,7 +70,7 @@ export class PostService extends RestClient {
     async publishPost(postId, meta, auth) {
         const response = await this._client
             .patch(`posts/${postId}/publish`, {
-                headers: this.#withAuth(auth),
+                headers: this._withAuth(auth),
                 json: meta,
             })
             .json();
@@ -86,7 +86,7 @@ export class PostService extends RestClient {
     async deletePost(postId, auth) {
         const response = await this._client
             .delete(`posts/${postId}`, {
-                headers: this.#withAuth(auth),
+                headers: this._withAuth(auth),
             })
             .json();
 
@@ -103,7 +103,7 @@ export class PostService extends RestClient {
         const response = await this._client
             .patch(`posts/${postId}/transfer`, {
                 json: { newOwner },
-                headers: this.#withAuth(auth),
+                headers: this._withAuth(auth),
             })
             .json();
 
@@ -120,7 +120,7 @@ export class PostService extends RestClient {
         const response = await this._client
             .patch(`posts/${postId}/delta`, {
                 json: { deltas },
-                headers: this.#withAuth(auth),
+                headers: this._withAuth(auth),
             })
             .json()
             .catch((err) => {
@@ -144,7 +144,10 @@ export class PostService extends RestClient {
 
         const response = await this._client
             .get(`posts/cursor?${params}`, {
-                headers: this.#withAuth(auth),
+                headers: {
+                    ...this._withAuth(auth),
+                    'Content-Type': null,
+                },
             })
             .json();
 
@@ -153,11 +156,11 @@ export class PostService extends RestClient {
 
     /**
      * @param {string} slug
-     * @returns {Promise<import("#app/models").Post>}
+     * @returns {Promise<import("#app/models").DetailedPost>}
      */
     async getPost(slug) {
         const response = await this._client.get(`posts/${slug}`).json();
-        return this.#postToModel(response);
+        return this.#detailedPostToModel(response);
     }
 
     /**
@@ -168,9 +171,10 @@ export class PostService extends RestClient {
     async getPostInfo(id, auth) {
         const response = await this._client
             .get(`posts/${id}/info`, {
-                headers: this.#withAuth(auth),
+                headers: this._withAuth(auth),
             })
             .json();
+
         return this.#postToModel(response);
     }
 
@@ -181,7 +185,7 @@ export class PostService extends RestClient {
      */
     async getPostDraft(id, auth) {
         const response = await this._client
-            .get(`posts/${id}/draft`, { headers: this.#withAuth(auth) })
+            .get(`posts/${id}/draft`, { headers: this._withAuth(auth) })
             .json();
         return response.map((p) => this.#paragraphToModel(p));
     }
@@ -191,7 +195,7 @@ export class PostService extends RestClient {
      * @param {string} status
      * @param {number} take
      * @param {number} skip
-     * @returns {Promise<Array<import("#app/models").Post>>}
+     * @returns {Promise<Array<import("#app/models").PostWithOwner>>}
      */
     async getPostsByStatus(auth, status, take, skip) {
         const params = new URLSearchParams();
@@ -200,10 +204,60 @@ export class PostService extends RestClient {
 
         const response = await this._client
             .get(`posts/status/${status}?${params}`, {
-                headers: this.#withAuth(auth),
+                headers: this._withAuth(auth),
             })
             .json();
-        return response.map((post) => this.#postToModel(post));
+        return response.map((post) => this.#postWithOwnerToModel(post));
+    }
+
+    /**
+     * @param {string|null} auth
+     * @param {string[]} ids
+     * @returns {Promise<Array<import("#app/models").PostWithOwner>>}
+     */
+    async findBatch(auth, ids) {
+        const response = await this._client
+            .post(`posts/batch`, {
+                json: { ids },
+                headers: this._withAuth(auth),
+            })
+            .json();
+
+        return response.map((post) => this.#postWithOwnerToModel(post));
+    }
+
+    /**
+     * @param {Object} post
+     * @returns {import("#app/models").DetailedPost}
+     */
+    #detailedPostToModel(post) {
+        return {
+            ...this.#postWithOwnerToModel(post),
+            paragraphs: post.paragraphs.map((p) => this.#paragraphToModel(p)),
+        };
+    }
+
+    /**
+     * @param {Object} post
+     * @returns {import("#app/models").PostWithOwner}
+     */
+    #postWithOwnerToModel(post) {
+        return {
+            ...this.#postToModel(post),
+            owner: this.#userToModel(post.owner),
+        };
+    }
+
+    /**
+     * @param {Object} user
+     * @returns {import("#app/models").User}
+     */
+    #userToModel(user) {
+        return {
+            id: user.id,
+            username: user.username,
+            avatarUrl: user.avatarPath,
+        };
     }
 
     /**
@@ -220,11 +274,10 @@ export class PostService extends RestClient {
             authors: post.authors,
             slug: post.slug,
             status: post.status,
+            coverImage: post.coverImage,
             publishedAt: post.publishedAt ? new Date(post.publishedAt) : null,
             createdAt: new Date(post.createdAt),
             updatedAt: new Date(post.updatedAt),
-            paragraphs:
-                post.paragraphs?.map((p) => this.#paragraphToModel(p)) || [],
         };
     }
 
@@ -290,7 +343,7 @@ export class PostService extends RestClient {
      */
     #postCursorToModel(data) {
         return {
-            items: data.items.map((post) => this.#postToModel(post)),
+            items: data.items.map((post) => this.#postWithOwnerToModel(post)),
             cursorField: data.cursorField,
             size: data.size,
         };
@@ -303,20 +356,6 @@ export class PostService extends RestClient {
     #postIdentifierToModel(data) {
         return {
             postId: data.postId,
-        };
-    }
-
-    /**
-     * @param {string | null} auth
-     * @param {Object} headers
-     * @returns {Object}
-     */
-    #withAuth(auth, headers = {}) {
-        if (!auth) return headers;
-
-        return {
-            ...headers,
-            Authorization: `Bearer ${auth}`,
         };
     }
 }
