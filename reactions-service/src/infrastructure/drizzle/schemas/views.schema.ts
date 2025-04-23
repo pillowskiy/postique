@@ -1,4 +1,4 @@
-import { pgTable, primaryKey, uniqueIndex } from 'drizzle-orm/pg-core';
+import { index, pgTable, primaryKey } from 'drizzle-orm/pg-core';
 import { users } from './users.schema';
 import { posts } from './posts.schema';
 
@@ -20,8 +20,7 @@ export const views = pgTable(
   }),
   (t) => {
     return {
-      createdAtIdx: uniqueIndex('views_created_at_idx').on(t.createdAt),
-      referrerIdx: uniqueIndex('views_referrer_idx').on(t.referrer),
+      createdAtIdx: index('views_created_at_idx').on(t.createdAt),
       compositeUniqueIdx: primaryKey({ columns: [t.targetId, t.userId] }),
     };
   },

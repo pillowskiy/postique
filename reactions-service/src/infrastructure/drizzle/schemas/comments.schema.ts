@@ -1,4 +1,4 @@
-import { pgTable, uniqueIndex } from 'drizzle-orm/pg-core';
+import { index, pgTable } from 'drizzle-orm/pg-core';
 import { users } from './users.schema';
 import { posts } from './posts.schema';
 
@@ -24,14 +24,8 @@ export const comments = pgTable(
   }),
   (t) => {
     return {
-      postIdIdx: uniqueIndex('comments_post_id_idx').on(t.postId),
-      parentIdIdx: uniqueIndex('comments_parent_id_idx').on(t.parentId),
-      userIdIdx: uniqueIndex('comments_user_id_idx').on(t.userId),
-      postTimeIdx: uniqueIndex('comments_post_time_idx').on(
-        t.postId,
-        t.createdAt,
-      ),
-      createdAtIdx: uniqueIndex('comments_created_at_idx').on(t.createdAt),
+      postTimeIdx: index('comments_post_time_idx').on(t.postId, t.createdAt),
+      createdAtIdx: index('comments_created_at_idx').on(t.createdAt),
     };
   },
 );

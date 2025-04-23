@@ -1,4 +1,4 @@
-import { pgTable, uniqueIndex } from 'drizzle-orm/pg-core';
+import { index, pgTable, uniqueIndex } from 'drizzle-orm/pg-core';
 import { users } from './users.schema';
 import { bookmarkCollections } from './bookmark-collections.schema';
 import { posts } from './posts.schema';
@@ -30,12 +30,8 @@ export const bookmarks = pgTable(
         t.userId,
         t.targetId,
       ),
-      userIdIdx: uniqueIndex('bookmarks_user_id_idx').on(t.userId),
-      collectionIdIdx: uniqueIndex('bookmarks_collection_id_idx').on(
-        t.collectionId,
-      ),
-      targetIdIdx: uniqueIndex('bookmarks_target_id_idx').on(t.targetId),
-      createdAtIdx: uniqueIndex('bookmarks_created_at_idx').on(t.createdAt),
+      collectionIdIdx: index('bookmarks_collection_id_idx').on(t.collectionId),
+      createdAtIdx: index('bookmarks_created_at_idx').on(t.createdAt),
     };
   },
 );
