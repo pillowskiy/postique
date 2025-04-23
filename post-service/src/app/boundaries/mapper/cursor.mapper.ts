@@ -12,4 +12,15 @@ export class CursorMapper {
       cursor.size,
     );
   }
+
+  static toDetailedDto<T extends Record<string, any>, K>(
+    cursor: CursorEntity<T>,
+    mapObj: { toDetailedDto(item: T): K },
+  ): CursorOutput<K> {
+    return new CursorOutput(
+      cursor.items.map((e) => mapObj.toDetailedDto(e)),
+      cursor.cursorField as string,
+      cursor.size,
+    );
+  }
 }

@@ -37,7 +37,7 @@ export class Post {
   @Prop({ type: String, enum: PostVisibility, required: true })
   visibility: PostVisibility;
 
-  @Prop({ type: Date, default: null })
+  @Prop({ type: Date, default: null, index: true })
   publishedAt: Date | null;
 
   @Prop({ type: Date, default: Date.now })

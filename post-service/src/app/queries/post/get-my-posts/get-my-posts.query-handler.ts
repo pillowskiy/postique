@@ -1,4 +1,4 @@
-import { PostOutput } from '@/app/boundaries/dto/output';
+import { DetailedPostOutput } from '@/app/boundaries/dto/output';
 import { Query } from '../../common';
 import { GetMyPostsQuery } from './get-my-posts.query';
 import { QueryHandler } from '@nestjs/cqrs';
@@ -9,12 +9,14 @@ import { PostMapper } from '@/app/boundaries/mapper';
 @QueryHandler(GetMyPostsQuery)
 export class GetMyPostsQueryHandler extends Query<
   GetMyPostsQuery,
-  PostOutput[]
+  DetailedPostOutput[]
 > {
   @Inject(PostRepository)
   private readonly _postRepository: PostRepository;
 
-  protected async invoke(input: GetMyPostsQuery): Promise<PostOutput[]> {
+  protected async invoke(
+    input: GetMyPostsQuery,
+  ): Promise<DetailedPostOutput[]> {
     const posts = await this._postRepository.getAllUserPosts(
       input.userId,
       input.status,
@@ -23,6 +25,6 @@ export class GetMyPostsQueryHandler extends Query<
       input.skip,
     );
 
-    return posts.map((post) => PostMapper.toDto(post));
+    return posts.map((post) => PostMapper.toDetailedDto(post));
   }
 }

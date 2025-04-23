@@ -1,3 +1,5 @@
+import { UserOutput } from './user.dto';
+
 export class PostOutput {
   constructor(
     public readonly id: string,
@@ -6,6 +8,7 @@ export class PostOutput {
     public readonly visibility: string,
     public readonly owner: string,
     public readonly authors: string[],
+    public readonly coverImage: string,
     public readonly slug: string,
     public readonly status: string,
     public readonly publishedAt: Date | null,
@@ -14,14 +17,15 @@ export class PostOutput {
   ) {}
 }
 
-export class DetailedPostOutput implements PostOutput {
+export class DetailedPostOutput implements Omit<PostOutput, 'owner'> {
   constructor(
     public readonly id: string,
     public readonly title: string,
     public readonly description: string,
     public readonly visibility: string,
-    public readonly owner: string,
+    public readonly owner: UserOutput,
     public readonly authors: string[],
+    public readonly coverImage: string,
     public readonly slug: string,
     public readonly status: string,
     public readonly publishedAt: Date | null,

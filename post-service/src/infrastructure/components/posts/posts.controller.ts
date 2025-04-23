@@ -11,7 +11,6 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
-import { randomUUID } from 'crypto';
 
 import * as input from '@/app/boundaries/dto/input';
 import * as output from '@/app/boundaries/dto/output';
@@ -107,12 +106,27 @@ export class PostsController {
     @Query('cursor') cursor: string,
     @Query('take') take: number,
     @OptionalInitiatedBy() initiatedBy: string,
-  ): Promise<output.CursorOutput<output.PostOutput>> {
+  ): Promise<output.CursorOutput<output.DetailedPostOutput>> {
     return this._postsService.getPosts(initiatedBy, take, cursor);
   }
 
+  @Post('/batch')
+  @UseGuards(OptionalAuthGuard)
+  async findBatch(
+    @Body('ids') ids: string[] = [],
+    @OptionalInitiatedBy() initiatedBy: string,
+  ): Promise<output.DetailedPostOutput[]> {
+    if (!Array.isArray(ids)) {
+      throw new BadRequestException('Invalid ids');
+    }
+
+    return this._postsService.findBatch(ids, initiatedBy);
+  }
+
   @Get('/:slug')
-  async getPost(@Param('slug') slug: string): Promise<output.PostOutput> {
+  async getPost(
+    @Param('slug') slug: string,
+  ): Promise<output.DetailedPostOutput> {
     return this._postsService.getPost(slug);
   }
 
@@ -131,18 +145,20 @@ export class PostsController {
   }
 
   @Get('/status/:status')
+  @UseGuards(AuthGuard)
   async getPostsByStatus(
     @Param('status') status: string,
     @Query('take') take: number,
     @Query('skip') skip: number,
-  ): Promise<output.PostOutput[]> {
+    @InitiatedBy() initiatedBy: string,
+  ): Promise<output.DetailedPostOutput[]> {
     switch (status) {
       case 'draft':
-        return this._postsService.getDrafts(randomUUID(), take, skip);
+        return this._postsService.getDrafts(initiatedBy, take, skip);
       case 'published':
-        return this._postsService.getPublished(randomUUID(), take, skip);
+        return this._postsService.getPublished(initiatedBy, take, skip);
       case 'archived':
-        return this._postsService.getArchived(randomUUID(), take, skip);
+        return this._postsService.getArchived(initiatedBy, take, skip);
       default:
         throw new BadRequestException('Invalid post status');
     }

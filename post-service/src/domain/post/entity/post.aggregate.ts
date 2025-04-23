@@ -1,14 +1,8 @@
-import { DomainBusinessRuleViolation } from '@/domain/common/error';
-import { ParagraphAggregate } from '@/domain/content';
 import { EntityFactory } from '../../common/entity';
 import { PostEntity } from './post.entity';
-import {
-  IDetailedPost,
-  IncomingPost,
-  IPost,
-  PostStatus,
-} from './post.interface';
+import { IDetailedPost, IncomingPost, IPost } from './post.interface';
 import { PostSchema } from './post.schema';
+import { UserEntity } from '@/domain/user';
 
 export class PostAggregate extends PostEntity implements IDetailedPost {
   static create(post: IncomingPost): PostAggregate {
@@ -16,21 +10,22 @@ export class PostAggregate extends PostEntity implements IDetailedPost {
     return new PostAggregate(validPost);
   }
 
-  static root(post: PostEntity): PostAggregate {
-    return new PostAggregate(post);
-  }
-
-  private _paragraphs: ParagraphAggregate[] = [];
+  private _ownerRef: UserEntity | null = null;
 
   private constructor(post: IPost) {
     super(post);
   }
 
-  get paragraphs(): ParagraphAggregate[] {
-    return this._paragraphs;
+  get ownerRef(): UserEntity {
+    if (!this._ownerRef) {
+      throw new Error('Post owner is not set');
+    }
+
+    return this._ownerRef;
   }
 
-  appendParagraph(paragraph: ParagraphAggregate) {
-    this._paragraphs.push(paragraph);
+  setOwner(owner: UserEntity) {
+    this._ownerRef = owner;
+    this._owner = owner.id;
   }
 }

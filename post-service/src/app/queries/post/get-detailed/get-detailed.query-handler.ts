@@ -21,7 +21,7 @@ export class GetDetailedPostQueryHandler extends Query<
   protected async invoke(
     input: GetDetailedPostQuery,
   ): Promise<DetailedPostOutput> {
-    const storedPost = await this._postRepository.getBySlug(input.slug);
+    const storedPost = await this._postRepository.loadBySlug(input.slug);
     if (!storedPost) {
       throw new NotFoundException('Post does not exist');
     }

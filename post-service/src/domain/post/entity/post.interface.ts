@@ -1,5 +1,5 @@
+import { IUser } from '@/domain/user';
 import type { IncomingEntity } from '../../common/entity';
-import { IParagraph } from '@/domain/content/paragraph/content-paragraph.interface';
 
 export enum PostStatus {
   Draft = 'draft',
@@ -21,7 +21,7 @@ export type IncomigDetailedPost = IncomingEntity<
 >;
 
 export interface IDetailedPost extends IPost {
-  paragraphs: Readonly<IParagraph[]>;
+  ownerRef: IUser;
 }
 
 export type IncomingPost = IncomingEntity<

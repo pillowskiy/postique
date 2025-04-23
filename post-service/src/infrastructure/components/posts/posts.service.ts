@@ -30,6 +30,7 @@ import { PostStatus } from '@/domain/post';
 import { GetPostListQuery } from '@/app/queries/post/get-post-list';
 import { GetPostInfoQuery } from '@/app/queries/post/get-info';
 import { GetPostDraftQuery } from '@/app/queries/post/get-draft';
+import { FindBatchQuery } from '@/app/queries/post/find-batch/find-batch.query';
 
 @Injectable()
 export class PostsService {
@@ -102,6 +103,15 @@ export class PostsService {
     >(new TransferPostOwnershipCommand(postId, newOwner, initiatedBy));
   }
 
+  public async findBatch(
+    ids: string[],
+    initiatedBy: string,
+  ): Promise<DetailedPostOutput[]> {
+    return this._queryBus.execute<FindBatchQuery, DetailedPostOutput[]>(
+      new FindBatchQuery(ids, initiatedBy),
+    );
+  }
+
   public async getPost(slug: string): Promise<DetailedPostOutput> {
     return this._queryBus.execute<GetDetailedPostQuery, DetailedPostOutput>(
       new GetDetailedPostQuery(slug),
@@ -124,17 +134,18 @@ export class PostsService {
     userId: string,
     take: number,
     cursor: string = new Date().toISOString(),
-  ): Promise<CursorOutput<PostOutput>> {
-    return this._queryBus.execute<GetPostListQuery, CursorOutput<PostOutput>>(
-      new GetPostListQuery(userId, take, cursor),
-    );
+  ): Promise<CursorOutput<DetailedPostOutput>> {
+    return this._queryBus.execute<
+      GetPostListQuery,
+      CursorOutput<DetailedPostOutput>
+    >(new GetPostListQuery(userId, take, cursor));
   }
 
   public async getDrafts(
     userId: string,
     take: number,
     skip: number,
-  ): Promise<PostOutput[]> {
+  ): Promise<DetailedPostOutput[]> {
     return this._getByStatus(PostStatus.Draft, userId, take, skip);
   }
 
@@ -142,7 +153,7 @@ export class PostsService {
     userId: string,
     take: number,
     skip: number,
-  ): Promise<PostOutput[]> {
+  ): Promise<DetailedPostOutput[]> {
     return this._getByStatus(PostStatus.Published, userId, take, skip);
   }
 
@@ -150,7 +161,7 @@ export class PostsService {
     userId: string,
     take: number,
     skip: number,
-  ): Promise<PostOutput[]> {
+  ): Promise<DetailedPostOutput[]> {
     return this._getByStatus(PostStatus.Archived, userId, take, skip);
   }
 
@@ -159,8 +170,8 @@ export class PostsService {
     userId: string,
     take: number,
     skip: number,
-  ): Promise<PostOutput[]> {
-    return this._queryBus.execute<GetMyPostsQuery, PostOutput[]>(
+  ): Promise<DetailedPostOutput[]> {
+    return this._queryBus.execute<GetMyPostsQuery, DetailedPostOutput[]>(
       new GetMyPostsQuery(status, userId, take, skip),
     );
   }

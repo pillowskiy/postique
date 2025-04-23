@@ -3,8 +3,9 @@ import {
   PreferencesRepository,
 } from '@/app/boundaries/repository';
 import { OrSpecification } from '@/domain/common/specification';
-import { CursorEntity } from '@/domain/cursor';
+import { CursorEntity, CursorSupportedField } from '@/domain/cursor';
 import { PostEntity } from '@/domain/post';
+import { PostPreferencesEntity } from '@/domain/preferences';
 import {
   IsBlacklistedPostSpecification,
   IsMutedPostSpecification,
@@ -16,14 +17,14 @@ export class PostPreferenceFilterService {
   @Inject(PreferencesRepository)
   private readonly _preferencesRepository: PreferencesRepository;
 
-  public async filterPosts(
-    iterator: AsyncIterable<PostEntity>,
+  public async filterPosts<E extends PostEntity = PostEntity>(
+    iterator: AsyncIterable<E>,
     field: CursorField,
-    userId: string,
+    userId: string | null,
     limit: number,
-  ): Promise<CursorEntity<PostEntity>> {
-    const pref = await this._preferencesRepository.preferences(userId);
-    const cursor = new CursorEntity<PostEntity>(field);
+  ): Promise<CursorEntity<E>> {
+    const pref = await this._getUserPreferences(userId);
+    const cursor = new CursorEntity<E>(field as CursorSupportedField<E>);
 
     const mutedSpec = new IsMutedPostSpecification(pref.authorBlacklist);
     const blacklistedSpec = new IsBlacklistedPostSpecification(
@@ -45,5 +46,15 @@ export class PostPreferenceFilterService {
     }
 
     return cursor;
+  }
+
+  private async _getUserPreferences(
+    userId: string | null,
+  ): Promise<PostPreferencesEntity> {
+    if (!userId) {
+      return PostPreferencesEntity.empty();
+    }
+
+    return this._preferencesRepository.preferences(userId);
   }
 }
