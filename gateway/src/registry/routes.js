@@ -8,6 +8,8 @@ const routeRegistries = /** @type {const} */ {
     postRouter: awilix.asFunction(routes.PostRoutes).singleton(),
     meRouter: awilix.asFunction(routes.MeRoutes).singleton(),
     homeRouter: awilix.asFunction(routes.HomeRoutes).singleton(),
+    reactionRouter: awilix.asFunction(routes.ReactionRoutes).singleton(),
+    interactionRouter: awilix.asFunction(routes.InteractionRoutes).singleton(),
 };
 
 export default routeRegistries;

@@ -1,3 +1,5 @@
+<% const postIds = JSON.stringify({ postIds: posts.map((p) => p.id) }); %>
+
 <div style="padding-right: 80px">
     <sl-tab-group style="margin-bottom: 32px">
         <sl-tab slot="nav" panel="forYou" active>Для вас</sl-tab>
@@ -6,7 +8,25 @@
         <sl-tab slot="nav" panel="business">Бізнес</sl-tab>
     </sl-tab-group>
 
-    <ul class="post-list">
+    <template
+        hx-post="/r/interactions/batch"
+        hx-vals="<%= postIds %>"
+        hx-trigger="load"
+        hx-target="#posts-list"
+        hx-swap="none"
+    ></template>
+
+    <% if (user) { %>
+    <template
+        hx-post="/r/interactions/states"
+        hx-vals="<%= postIds %>"
+        hx-trigger="load"
+        hx-target="#posts-list"
+        hx-swap="none"
+    ></template>
+    <% } %>
+
+    <ul id="posts-list" class="post-list">
         <%- await include('../post/post-detailed-list.ejs', { posts }) %>
     </ul>
 </div>

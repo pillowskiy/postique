@@ -1,9 +1,17 @@
 <% posts.forEach((post) => { %>
 <li class="post-card" id="post-<%= post.id %>">
     <a href="#" class="post-card__header post-card__owner">
-        <sl-avatar style="--size: 1.5rem" label="User avatar"></sl-avatar>
-        <span class="truncate"><%= post.owner %></span>
+        <sl-avatar
+            style="--size: 1.5rem"
+            initials="<%= typeof post.owner === 'object' && post.owner ? post.owner.username.slice(0, 2) : '' %>"
+            label="User avatar"
+        ></sl-avatar>
+        <span class="truncate"
+            ><%= typeof post.owner === 'object' && post.owner ?
+            post.owner.username : 'Невідомий автор' %></span
+        >
     </a>
+
     <a href="/p/<%=post.slug%>" class="post-card__content">
         <h3 class="post-card__title"><%= post.title %></h3>
 

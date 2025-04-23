@@ -25,10 +25,18 @@
  * @property {(postId: string, newOwner: string, auth: string) => Promise<import("#app/models").PostIdentifier>} transferPostOwnership
  * @property {(postId: string, deltas: Array<Object>, auth: string) => Promise<import("#app/models").PostIdentifier>} deltaSave
  * @property {(auth: string|null, take: number, cursor: string|null) => Promise<import("#app/models").PostCursor>} getPosts
- * @property {(slug: string) => Promise<import("#app/models").Post>} getPost
+ * @property {(slug: string) => Promise<import("#app/models").DetailedPost>} getPost
  * @property {(id: string, auth: string) => Promise<import("#app/models").Post>} getPostInfo
  * @property {(id: string, auth: string) => Promise<import("#app/models").PostParagraph[]>} getPostDraft
- * @property {(auth: string, status: string, take: number, skip: number) => Promise<Array<import("#app/models").Post>>} getPostsByStatus
+ * @property {(auth: string, status: string, take: number, skip: number) => Promise<Array<import("#app/models").PostWithOwner>>} getPostsByStatus
+ * @property {(auth: string|null, ids: string[]) => Promise<Array<import("#app/models").PostWithOwner>>} findBatch
+ */
+
+/**
+ * Reaction Service API - Interactions
+ * @typedef {Object} InteractionService
+ * @property {(postIds: string[]) => Promise<import("#app/models").BatchInteractions>} findBatch
+ * @property {(postIds: string[], auth: string) => Promise<import("#app/models").PostInteractionStates>} getBatchStates
  */
 
 export * as grpc from './grpc/index.js';

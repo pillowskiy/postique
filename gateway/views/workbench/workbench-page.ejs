@@ -1,9 +1,72 @@
+<div id="sidebar-controls">
+    <sl-icon-button id="show-controls" name="plus"></sl-icon-button>
+
+    <div class="controls">
+        <sl-icon-button
+            x-delay="0.2ms"
+            title="Додати зображення"
+            name="image"
+        ></sl-icon-button>
+        <sl-icon-button
+            x-delay="0.25ms"
+            title="Додати блок коду"
+            name="code-slash"
+        ></sl-icon-button>
+        <sl-icon-button
+            x-delay="0.3ms"
+            title="Розділити робочу панель"
+            name="hr"
+        ></sl-icon-button>
+    </div>
+</div>
+
 <div id="editor"></div>
+
+<style>
+    #sidebar-controls {
+        display: none;
+        position: absolute;
+        transform: translate(0, -6px);
+    }
+
+    #sidebar-controls #show-controls::part(base) {
+        border: 1px solid var(--sl-color-neutral-500);
+        transform: scale(1.1);
+        opacity: 1;
+        transition: transform 0.2s ease-in-out;
+    }
+
+    #sidebar-controls.active #show-controls::part(base) {
+        transform: rotate(45deg);
+    }
+
+    #sidebar-controls sl-icon-button::part(base) {
+        border: 1px solid var(--sl-color-primary-500);
+        padding: 6px;
+        font-size: 20px;
+        border-radius: 50%;
+    }
+
+    #sidebar-controls .controls {
+        display: none;
+        margin-left: 15px;
+    }
+
+    #sidebar-controls #show-controls i.fa::before {
+        content: '\f067';
+    }
+    #sidebar-controls.active .controls {
+        display: inline-block;
+    }
+    #sidebar-controls.active #show-controls i.fa::before {
+        content: '\f00d';
+    }
+</style>
 
 <style>
     .ql-editor {
         display: grid;
-        padding: 48px 16px;
+        padding: 48px 16px !important;
         place-items: center;
     }
 

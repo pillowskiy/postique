@@ -135,7 +135,13 @@ sl-menu-item sl-icon {
 
 sl-icon,
 sl-icon-button {
-    font-size: 1.3rem;
+    --size: 1.3rem;
+
+    &.sm {
+        --size: 0.9rem;
+    }
+
+    font-size: var(--size);
 }
 
 sl-button.ghost::part(base) {
@@ -925,8 +931,16 @@ sl-alert::part(message) {
 
     &__cover {
         width: 160px;
+        aspect-ratio: 16/10;
         margin-left: 32px;
+        overflow: hidden;
         grid-row: span 2 / span 2;
+        border-radius: var(--sl-border-radius-medium);
+
+        img {
+            width: 100%;
+            object-fit: contain;
+        }
     }
 
     &__title {
@@ -973,7 +987,11 @@ sl-alert::part(message) {
         }
 
         &-count {
-            gap: 12px;
+            gap: 16px;
+
+            & > .item {
+                font-size: var(--sl-font-size-small);
+            }
         }
     }
 }

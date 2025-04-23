@@ -11,10 +11,16 @@ const fileService = asClass(services.grpc.FileService).singleton();
 /** @type {ReturnType<typeof asClass<services.PostService>>} */
 const postService = asClass(services.rest.PostService).singleton();
 
+/** @type {ReturnType<typeof asClass<services.InteractionService>>} */
+const interactionService = asClass(
+    services.rest.InteractionService,
+).singleton();
+
 const providerRegistries = /** @type {const} */ {
     authService,
     fileService,
     postService,
+    interactionService,
 };
 
 export default providerRegistries;

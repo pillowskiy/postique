@@ -1,123 +1,103 @@
-export class Post {
-    /**
-     * @param {string} id
-     * @param {string} title
-     * @param {string} description
-     * @param {string} visibility
-     * @param {string} owner
-     * @param {Array<string>} authors
-     * @param {string} slug
-     * @param {string} status
-     * @param {Date|null} publishedAt
-     * @param {Date} createdAt
-     * @param {Date} updatedAt
-     * @param {Array<PostParagraph>} paragraphs
-     */
-    constructor(
-        id,
-        title,
-        description,
-        visibility,
-        owner,
-        authors,
-        slug,
-        status,
-        publishedAt,
-        createdAt,
-        updatedAt,
-        paragraphs = [],
-    ) {
-        this.id = id;
-        this.title = title;
-        this.description = description;
-        this.visibility = visibility;
-        this.owner = owner;
-        this.authors = authors;
-        this.slug = slug;
-        this.status = status;
-        this.publishedAt = publishedAt;
-        this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
-        this.paragraphs = paragraphs;
-    }
-}
+/**
+ * @typedef {Object} PostMarkup
+ * @property {number} type
+ * @property {number} start
+ * @property {number} end
+ * @property {string} [href]
+ */
 
-export class PostParagraph {
-    /**
-     * @param {string} name
-     * @param {number} type
-     * @param {string} text
-     * @param {Array<PostMarkup>} markups
-     * @param {ImageMetadata|undefined} metadata
-     * @param {CodeMetadata|undefined} codeMetadata
-     */
-    constructor(name, type, text, markups, metadata, codeMetadata) {
-        this.name = name;
-        this.type = type;
-        this.text = text;
-        this.markups = markups;
-        this.metadata = metadata;
-        this.codeMetadata = codeMetadata;
-    }
-}
+/**
+ * @typedef {Object} ImageMetadata
+ * @property {string} src
+ * @property {number} originalWidth
+ * @property {number} originalHeight
+ */
 
-export class PostMarkup {
-    /**
-     * @param {number} type
-     * @param {number} start
-     * @param {number} end
-     * @param {string|undefined} href
-     */
-    constructor(type, start, end, href) {
-        this.type = type;
-        this.start = start;
-        this.end = end;
-        this.href = href;
-    }
-}
+/**
+ * @typedef {Object} CodeMetadata
+ * @property {string} language
+ * @property {boolean} spellcheck
+ */
 
-export class ImageMetadata {
-    /**
-     * @param {string} src
-     * @param {number} originalWidth
-     * @param {number} originalHeight
-     */
-    constructor(src, originalWidth, originalHeight) {
-        this.src = src;
-        this.originalWidth = originalWidth;
-        this.originalHeight = originalHeight;
-    }
-}
+/**
+ * @typedef {Object} PostParagraph
+ * @property {string} name
+ * @property {number} type
+ * @property {string} text
+ * @property {PostMarkup[]} markups
+ * @property {ImageMetadata} [metadata]
+ * @property {CodeMetadata} [codeMetadata]
+ */
 
-export class CodeMetadata {
-    /**
-     * @param {string} language
-     * @param {boolean} spellcheck
-     */
-    constructor(language, spellcheck) {
-        this.language = language;
-        this.spellcheck = spellcheck;
-    }
-}
+/**
+ * @typedef {Object} Post
+ * @property {string} id
+ * @property {string} title
+ * @property {string} description
+ * @property {string} visibility
+ * @property {string} owner
+ * @property {string[]} authors
+ * @property {string|null} coverImage
+ * @property {string} slug
+ * @property {string} status
+ * @property {Date|null} publishedAt
+ * @property {Date} createdAt
+ * @property {Date} updatedAt
+ */
 
-export class PostIdentifier {
-    /**
-     * @param {string} postId
-     */
-    constructor(postId) {
-        this.postId = postId;
-    }
-}
+/**
+ * @typedef {Object} PostWithOwner
+ * @property {string} id
+ * @property {string} title
+ * @property {string} description
+ * @property {string} visibility
+ * @property {import('#app/models/user').User} owner
+ * @property {string[]} authors
+ * @property {string|null} coverImage
+ * @property {string} slug
+ * @property {string} status
+ * @property {Date|null} publishedAt
+ * @property {Date} createdAt
+ * @property {Date} updatedAt
+ */
 
-export class PostCursor {
-    /**
-     * @param {Array<Post>} items
-     * @param {string|Date|null} cursorField
-     * @param {number} size
-     */
-    constructor(items, cursorField, size) {
-        this.items = items;
-        this.cursorField = cursorField;
-        this.size = size;
-    }
-}
+/**
+ * TEMP: We don't have a detailed post, content is a separate entity
+ * Should be refactored in the future
+ * @typedef {Object} DetailedPost
+ * @property {string} id
+ * @property {string} title
+ * @property {string} description
+ * @property {string} visibility
+ * @property {import('#app/models/user').User} owner
+ * @property {string[]} authors
+ * @property {string|null} coverImage
+ * @property {string} slug
+ * @property {string} status
+ * @property {Date|null} publishedAt
+ * @property {Date} createdAt
+ * @property {Date} updatedAt
+ * @property {PostParagraph[]} paragraphs
+ */
+
+/**
+ * @typedef {Object} PostIdentifier
+ * @property {string} postId
+ */
+
+/**
+ * @typedef {Object} PostCursor
+ * @property {PostWithOwner[]} items
+ * @property {string|Date|null} cursorField
+ * @property {number} size
+ */
+
+/**
+ * @typedef {Object} PartialPost
+ * @property {string} id
+ * @property {string} title
+ * @property {string} description
+ * @property {string|null} coverImage
+ */
+
+export {};

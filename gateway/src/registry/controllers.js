@@ -1,6 +1,7 @@
 import {
     AuthController,
     HomeController,
+    InteractionController,
     MeController,
     PostController,
 } from '#app/delivery/controllers/index.js';
@@ -12,6 +13,7 @@ const controllerRegistries = /** @type {const} */ {
     postController: asClass(PostController).singleton(),
     meController: asClass(MeController).singleton(),
     homeController: asClass(HomeController).singleton(),
+    interactionController: asClass(InteractionController).singleton(),
 };
 
 export default controllerRegistries;

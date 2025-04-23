@@ -55,6 +55,7 @@ export class GeneralMiddlewares {
             this.#logger.error(
                 {
                     message: err.message,
+                    details: err,
                 },
                 'The following error has been catched',
             );
