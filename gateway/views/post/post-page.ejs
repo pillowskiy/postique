@@ -1,49 +1,173 @@
 <link rel="stylesheet" href="/styles/editor.min.css" />
 
-<header>
+<% function estimateTimeToRead(paragraphs, wordsPerMinute = 200) { const
+totalWords = paragraphs.reduce((acc, p) => { const text = p?.text || ''; const
+wordCount = text.trim().split(/\s+/).length; return acc + wordCount; }, 0);
+return Math.ceil(totalWords / wordsPerMinute); } %>
+
+<header class="post-header">
     <div class="post-header__meta">
-        <h1><%= post.title %></h1>
-        <p><%= post.description %></p>
+        <h1 class="post-header__meta--title"><%= post.title %></h1>
+        <p class="post-header__meta--description"><%= post.description %></p>
     </div>
     <div class="post-header__owner">
         <sl-avatar
-            style="--size: 2rem"
-            initials="<%= typeof post.owner === 'object' && post.owner ? post.owner.username.slice(0, 2) : '' %>"
+            class="post-header__owner--avatar"
+            initials="<%= post.owner.username.slice(0,2) %>"
             label="User avatar"
         ></sl-avatar>
         <span class="truncate">
             <%= typeof post.owner === 'object' && post.owner ?
             post.owner.username : 'Невідомий автор' %>
         </span>
+        <div class="post-header__owner--details">
+            <%= estimateTimeToRead(paragraphs) %> хв. читання
+            <span>•</span>
+            <sl-relative-time
+                date="<%= post.publishedAt%>"
+                lang="uk-UA"
+            ></sl-relative-time>
+        </div>
     </div>
     <div class="post-header__states">
-        <sl-tooltip content="Показувати менше">
-            <sl-icon-button name="dash-circle"></sl-icon-button>
-        </sl-tooltip>
-        <sl-tooltip content="Зберегти">
-            <sl-icon-button name="bookmark-plus"></sl-icon-button>
-        </sl-tooltip>
+        <div id="reactions-<%= post.id %>" class="skeleton-flex-line">
+            <sl-skeleton
+                class="skeleton-sm-text-icon-line"
+                effect="sheen"
+            ></sl-skeleton>
+            <sl-skeleton
+                class="skeleton-sm-text-icon-line"
+                effect="sheen"
+            ></sl-skeleton>
+            <sl-skeleton
+                class="skeleton-sm-text-icon-line"
+                effect="sheen"
+            ></sl-skeleton>
+        </div>
 
-        <sl-dropdown>
-            <sl-icon-button slot="trigger" name="three-dots"></sl-icon-button>
+        <div class="skeleton-flex-line">
+            <sl-tooltip content="Зберегти">
+                <sl-icon-button name="bookmark-plus"></sl-icon-button>
+            </sl-tooltip>
+            <sl-tooltip content="Поширити">
+                <sl-icon-button name="share"></sl-icon-button>
+            </sl-tooltip>
 
-            <sl-menu style="width: 220px">
-                <sl-menu-item class="accent">
-                    <sl-icon name="plus-circle" slot="prefix"></sl-icon>
-                    Показувати більше
-                </sl-menu-item>
-                <sl-menu-item class="accent">
-                    <sl-icon name="dash-circle" slot="prefix"></sl-icon>
-                    Показувати менше
-                </sl-menu-item>
-                <sl-divider></sl-divider>
-                <sl-menu-item>Заблокувати автора</sl-menu-item>
-                <sl-menu-item>Поскаржитися</sl-menu-item>
-            </sl-menu>
-        </sl-dropdown>
+            <sl-dropdown>
+                <sl-icon-button
+                    slot="trigger"
+                    name="three-dots"
+                ></sl-icon-button>
+
+                <sl-menu style="width: 220px">
+                    <sl-menu-item class="accent">
+                        <sl-icon name="dash-circle" slot="prefix"></sl-icon>
+                        Показувати менше
+                    </sl-menu-item>
+                    <sl-divider></sl-divider>
+                    <sl-menu-item>Приховати підсвічування</sl-menu-item>
+                    <sl-divider></sl-divider>
+                    <sl-menu-item>Заблокувати автора</sl-menu-item>
+                    <sl-menu-item>Поскаржитися</sl-menu-item>
+                </sl-menu>
+            </sl-dropdown>
+        </div>
     </div>
 </header>
 
-<article class="post-content ql-container ql-editor">
+<article class="post-content post-content__container" style="text-align: left">
     <%- renderer.raw(paragraphs) %>
 </article>
+
+<div class="post-details__wrapper">
+    <div class="post-details">
+        <div class="post-details__author">
+            <div class="post-details__author--info">
+                <sl-avatar
+                    initials="<%= post.owner.username.slice(0,2) %>"
+                    label="User avatar"
+                ></sl-avatar>
+
+                <p>
+                    Авторство
+                    <span class="truncate">
+                        <%= typeof post.owner === 'object' && post.owner ?
+                        post.owner.username : 'Невідомий автор' %>
+                    </span>
+                </p>
+            </div>
+
+            <div class="post-details__author--actions">
+                <sl-tooltip
+                    style="--max-width: 200px"
+                    content="Надсилати сповіщення про нові публікації від цього автора"
+                >
+                    <sl-button variant="neutral" square pill>
+                        <sl-icon
+                            name="envelope-arrow-down"
+                            label="Get mails"
+                        ></sl-icon>
+                    </sl-button>
+                </sl-tooltip>
+            </div>
+        </div>
+
+        <div class="post-details__categories">
+            <% for (let i = 0; i < 3; i++) { %>
+            <sl-button variant="default" pill>
+                Category
+                <%= i %>
+            </sl-button>
+            <% } %>
+        </div>
+
+        <div class="post-details__states">
+            <div id="reactions-<%= post.id %>" class="skeleton-flex-line">
+                <sl-skeleton
+                    class="skeleton-sm-text-icon-line"
+                    effect="sheen"
+                ></sl-skeleton>
+                <sl-skeleton
+                    class="skeleton-sm-text-icon-line"
+                    effect="sheen"
+                ></sl-skeleton>
+                <sl-skeleton
+                    class="skeleton-sm-text-icon-line"
+                    effect="sheen"
+                ></sl-skeleton>
+            </div>
+
+            <div class="skeleton-flex-line">
+                <sl-tooltip content="Зберегти">
+                    <sl-icon-button name="bookmark-plus"></sl-icon-button>
+                </sl-tooltip>
+                <sl-tooltip content="Поширити">
+                    <sl-icon-button name="share"></sl-icon-button>
+                </sl-tooltip>
+
+                <sl-dropdown>
+                    <sl-icon-button
+                        slot="trigger"
+                        name="three-dots"
+                    ></sl-icon-button>
+
+                    <sl-menu style="width: 220px">
+                        <sl-menu-item class="accent">
+                            <sl-icon name="dash-circle" slot="prefix"></sl-icon>
+                            Показувати менше
+                        </sl-menu-item>
+                        <sl-divider></sl-divider>
+                        <sl-menu-item>Приховати підсвічування</sl-menu-item>
+                        <sl-divider></sl-divider>
+                        <sl-menu-item>Заблокувати автора</sl-menu-item>
+                        <sl-menu-item>Поскаржитися</sl-menu-item>
+                    </sl-menu>
+                </sl-dropdown>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="post-comments">
+    <%- await include('../comment/post-comments.ejs', { postId: post.id }) %>
+</div>
