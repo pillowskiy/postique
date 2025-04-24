@@ -25,6 +25,12 @@ declare namespace render {
             csrfToken: Variable;
         };
         'auth/register/page': {};
+        'comment/post-comments': {
+            user: Variable;
+            postId: Variable;
+        };
+        'comment/post-comments.loader': {};
+        'comment/post-comments.oob': {};
         'components/file-input': {};
         'components/header': {
             user: { username: Variable };
@@ -84,10 +90,11 @@ declare namespace render {
                 title: Variable;
                 description: Variable;
                 'post.owner': { username: Array };
+                publishedAt: Variable;
+                id: Variable;
             };
             'post.owner': { username: Array };
             renderer: { raw: Function };
-            paragraphs: Variable;
         };
         'shared/error': {
             status: Variable;

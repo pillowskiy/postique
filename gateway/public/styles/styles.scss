@@ -1,5 +1,7 @@
 @use 'variables.scss';
+@use 'post.scss';
 @use 'me.scss';
+@use 'comments.scss';
 
 :not(:defined) {
     visibility: hidden;
@@ -148,6 +150,12 @@ sl-button.ghost::part(base) {
     background-color: transparent;
     border-color: transparent;
     color: var(--sl-color-neutral-600);
+}
+
+sl-button[square]::part(label) {
+    display: grid;
+    place-items: center;
+    padding: 0 8px;
 }
 
 sl-button.ghost::part(label) {
