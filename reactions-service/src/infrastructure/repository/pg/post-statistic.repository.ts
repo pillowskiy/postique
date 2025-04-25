@@ -36,7 +36,6 @@ export class PostgresPostStatisticRepository extends PostStatisticRepository {
       LEFT JOIN ${likes} ON ${likes.userId} = ${userId} AND ${likes.targetId} = pid
       LEFT JOIN ${bookmarks} ON ${bookmarks.userId} = ${userId} AND ${bookmarks.targetId} = pid
     `);
-    console.log(result);
 
     return result.rows.map((r) => this.#toEntity(r));
   }

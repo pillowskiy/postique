@@ -3,5 +3,6 @@ export class CreateCommentCommand {
     public readonly postId: string,
     public readonly content: string,
     public readonly initiatedBy: string,
+    public readonly parentId?: string,
   ) {}
 }

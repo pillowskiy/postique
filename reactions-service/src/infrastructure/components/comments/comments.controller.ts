@@ -20,17 +20,14 @@ import { CommentsService } from './comments.service';
 export class CommentsController {
   constructor(private readonly _commentsService: CommentsService) {}
 
-  @Post()
+  @Post('posts/:postId')
   @UseGuards(AuthGuard)
   async createComment(
     @Body() comment: input.CreateCommentInput,
+    @Param('postId', ParseUUIDPipe) postId: string,
     @InitiatedBy() initiatedBy: string,
   ): Promise<output.CreateCommentOutput> {
-    return this._commentsService.createComment(
-      comment.postId,
-      comment.content,
-      initiatedBy,
-    );
+    return this._commentsService.createComment(postId, comment, initiatedBy);
   }
 
   @Delete(':id')

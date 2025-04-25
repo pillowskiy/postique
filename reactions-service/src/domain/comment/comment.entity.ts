@@ -6,12 +6,12 @@ export class CommentEntity {
     const validComment = EntityFactory.create(CommentSchema, input);
 
     return new CommentEntity(
-      validComment.id,
+      validComment.id!,
       validComment.userId,
       validComment.postId,
       validComment.content,
-      validComment.createdAt,
-      validComment.updatedAt,
+      validComment.createdAt!,
+      validComment.updatedAt!,
       validComment.parentId,
     );
   }

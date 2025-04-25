@@ -12,6 +12,7 @@ import { DeleteCommentCommand } from '@/app/commands/comment/delete-comment';
 import { EditCommentCommand } from '@/app/commands/comment/edit-comment';
 import { GetPostCommentsQuery } from '@/app/queries/comment/get-comments';
 import { GetCommentRepliesQuery } from '@/app/queries/comment/get-replies';
+import { CreateCommentInput } from '@/app/boundaries/dto/input';
 
 @Injectable()
 export class CommentsService {
@@ -22,11 +23,16 @@ export class CommentsService {
 
   async createComment(
     postId: string,
-    content: string,
+    comment: CreateCommentInput,
     initiatedBy: string,
   ): Promise<CreateCommentOutput> {
     return this._commandBus.execute<CreateCommentCommand, CreateCommentOutput>(
-      new CreateCommentCommand(postId, content, initiatedBy),
+      new CreateCommentCommand(
+        postId,
+        comment.content,
+        initiatedBy,
+        comment.parentId,
+      ),
     );
   }
 

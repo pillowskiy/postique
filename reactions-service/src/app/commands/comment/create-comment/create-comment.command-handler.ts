@@ -40,6 +40,7 @@ export class CreateCommentCommandHandler extends Command<
     const comment = CommentEntity.create({
       userId: input.initiatedBy,
       postId: input.postId,
+      parentId: input.parentId,
       content: input.content,
     });
 

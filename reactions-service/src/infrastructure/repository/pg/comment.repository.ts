@@ -6,7 +6,7 @@ import { UserEntity } from '@/domain/user';
 import { DrizzleTransactional } from '@/infrastructure/drizzle';
 import { comments, users } from '@/infrastructure/drizzle/schemas';
 import { Inject, Injectable } from '@nestjs/common';
-import { and, count, eq, gt, type InferSelectModel } from 'drizzle-orm';
+import { and, count, eq, gt, isNull, type InferSelectModel } from 'drizzle-orm';
 
 @Injectable()
 export class PostgresCommentRepository extends CommentRepository {
@@ -34,13 +34,11 @@ export class PostgresCommentRepository extends CommentRepository {
       .select({ comments, users })
       .from(comments)
       .where(
-        cursor
-          ? and(
-              eq(comments.postId, postId),
-              gt(comments.createdAt, cursor),
-              eq(comments.parentId, null),
-            )
-          : undefined,
+        and(
+          eq(comments.postId, postId),
+          isNull(comments.parentId),
+          //cursor ? gt(comments.createdAt, cursor) : undefined,
+        ),
       )
       .leftJoin(users, eq(comments.userId, users.id))
       .limit(pageSize);
@@ -53,14 +51,16 @@ export class PostgresCommentRepository extends CommentRepository {
     cursor?: string,
     pageSize: number = 30,
   ): Promise<CommentAggregate[]> {
+    const conditions = [eq(comments.parentId, parentId)];
+
+    if (cursor) {
+      conditions.push(gt(comments.createdAt, cursor));
+    }
+
     const results = await this._txHost.exec
       .select({ comments, users })
       .from(comments)
-      .where(
-        cursor
-          ? and(eq(comments.parentId, parentId), gt(comments.createdAt, cursor))
-          : undefined,
-      )
+      .where(and(...conditions))
       .leftJoin(users, eq(comments.userId, users.id))
       .limit(pageSize);
 
@@ -132,7 +132,7 @@ export class PostgresCommentRepository extends CommentRepository {
         UserEntity.create({
           id: user.id,
           username: user.username,
-          avatarPath: user.avatarPath!,
+          avatarPath: user.avatarPath ?? '',
           email: user.email,
         }),
       );
