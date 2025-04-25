@@ -16,14 +16,16 @@
         <h3 class="post-card__title"><%= post.title %></h3>
 
         <% if (post.publishedAt) { %>
-        <p class="post-card__details">
-            Публіковано
-            <sl-relative-time
-                format="short"
-                date="<%= post.publishedAt %>"
-                lang="uk-UA"
-            ></sl-relative-time>
-        </p>
+        <div class="post-card__details">
+            <p>
+                Публіковано
+                <sl-relative-time
+                    format="narrow"
+                    date="<%= post.publishedAt %>"
+                    lang="uk-UA"
+                ></sl-relative-time>
+            </p>
+        </div>
         <% } %>
     </a>
 </li>

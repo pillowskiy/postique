@@ -5,6 +5,26 @@ totalWords = paragraphs.reduce((acc, p) => { const text = p?.text || ''; const
 wordCount = text.trim().split(/\s+/).length; return acc + wordCount; }, 0);
 return Math.ceil(totalWords / wordsPerMinute); } %>
 
+<% const postIds = JSON.stringify({ postIds: [post.id] }); %>
+
+<template
+    hx-post="/r/interactions/batch?withView=true"
+    hx-vals="<%= postIds %>"
+    hx-trigger="load"
+    hx-target="#root"
+    hx-swap="none"
+></template>
+
+<% if (user) { %>
+<template
+    hx-post="/r/interactions/states"
+    hx-vals="<%= postIds %>"
+    hx-trigger="load"
+    hx-target="#root"
+    hx-swap="none"
+></template>
+<% } %>
+
 <header class="post-header">
     <div class="post-header__meta">
         <h1 class="post-header__meta--title"><%= post.title %></h1>
@@ -46,8 +66,8 @@ return Math.ceil(totalWords / wordsPerMinute); } %>
         </div>
 
         <div class="skeleton-flex-line">
-            <sl-tooltip content="Зберегти">
-                <sl-icon-button name="bookmark-plus"></sl-icon-button>
+            <sl-tooltip id="save-<%= post.id %>" content="Зберегти">
+                <sl-icon-button name="bookmark-plus" disabled></sl-icon-button>
             </sl-tooltip>
             <sl-tooltip content="Поширити">
                 <sl-icon-button name="share"></sl-icon-button>
@@ -138,8 +158,11 @@ return Math.ceil(totalWords / wordsPerMinute); } %>
             </div>
 
             <div class="skeleton-flex-line">
-                <sl-tooltip content="Зберегти">
-                    <sl-icon-button name="bookmark-plus"></sl-icon-button>
+                <sl-tooltip id="save-<%= post.id %>" content="Зберегти">
+                    <sl-icon-button
+                        name="bookmark-plus"
+                        disabled
+                    ></sl-icon-button>
                 </sl-tooltip>
                 <sl-tooltip content="Поширити">
                     <sl-icon-button name="share"></sl-icon-button>

@@ -952,14 +952,14 @@ sl-alert::part(message) {
     }
 
     &__title {
-        &.large {
-            font-size: var(--sl-font-size-x-large);
-        }
-
         font-weight: 700;
         font-size: var(--sl-font-size-medium);
         line-height: 1.1;
         letter-spacing: 0;
+
+        &.large {
+            font-size: var(--sl-font-size-x-large);
+        }
     }
 
     &__description {

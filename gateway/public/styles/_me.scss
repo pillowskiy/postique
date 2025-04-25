@@ -55,30 +55,6 @@ body {
     padding-bottom: 8px;
     border-bottom: 1px solid var(--sl-input-border-color);
 
-    .post-meta {
-        display: flex;
-        flex-direction: column;
-        gap: 6px;
-        margin-bottom: 12px;
-    }
-
-    .post-title {
-        margin-top: 0;
-        margin-bottom: 0;
-        font-size: var(--sl-font-size-medium);
-        font-weight: 600;
-
-        a {
-            color: var(--sl-color-neutral-900);
-            text-decoration: none;
-
-            &:hover {
-                color: var(--sl-color-primary-500);
-                text-decoration: underline;
-            }
-        }
-    }
-
     .post-cover {
         aspect-ratio: 16 / 10;
         width: 80px;
@@ -92,17 +68,41 @@ body {
         }
     }
 
-    .post-description {
-        margin-bottom: 0;
+    &__meta {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        margin-bottom: 12px;
 
-        a {
-            line-height: 1.3;
-            text-decoration: none;
-            color: var(--sl-color-neutral-600);
+        &--title {
+            margin-top: 0;
+            margin-bottom: 0;
+            font-size: var(--sl-font-size-large);
+            font-weight: 600;
+
+            a {
+                color: var(--sl-color-neutral-900);
+                text-decoration: none;
+
+                &:hover {
+                    color: var(--sl-color-primary-500);
+                    text-decoration: underline;
+                }
+            }
+        }
+
+        &--description {
+            margin-bottom: 0;
+
+            a {
+                line-height: 1.3;
+                text-decoration: none;
+                color: var(--sl-color-neutral-600);
+            }
         }
     }
 
-    .post-details {
+    &__details {
         display: flex;
         justify-content: space-between;
         align-items: center;
@@ -156,9 +156,11 @@ body {
         }
     }
 
-    .post-details {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 8px;
+    .post-card {
+        &__details {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 8px;
+        }
     }
 }

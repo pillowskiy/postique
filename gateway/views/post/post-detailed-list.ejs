@@ -30,14 +30,16 @@
         <div class="post-card__reactions">
             <div class="post-card__reactions-count">
                 <% if (post.publishedAt) { %>
-                <p class="post-card__details">
-                    Публіковано
-                    <sl-relative-time
-                        format="narrow"
-                        date="<%= post.publishedAt %>"
-                        lang="uk-UA"
-                    ></sl-relative-time>
-                </p>
+                <div class="post-card__details">
+                    <p>
+                        Публіковано
+                        <sl-relative-time
+                            format="narrow"
+                            date="<%= post.publishedAt %>"
+                            lang="uk-UA"
+                        ></sl-relative-time>
+                    </p>
+                </div>
                 <% } %>
                 <div id="reactions-<%= post.id %>" class="skeleton-flex-line">
                     <sl-skeleton
