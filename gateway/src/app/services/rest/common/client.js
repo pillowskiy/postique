@@ -38,12 +38,17 @@ export class RestClient {
         this._client = ky.create({
             prefixUrl,
             timeout,
-            headers: {
-                'Content-Type': 'application/json',
-            },
             hooks: {
+                beforeRequest: [
+                    async (req, opts) => {
+                        console.log(`Request ${req.method} to ${req.url}`);
+                        if (req.method !== 'GET' && opts.headers) {
+                            opts.headers['Content-Type'] ??= 'application/json';
+                        }
+                    },
+                ],
                 afterResponse: [
-                    async (_, opts, res) => {
+                    async (req, __, res) => {
                         if (res.ok) {
                             return;
                         }
@@ -78,7 +83,7 @@ export class RestClient {
                         }
 
                         throw new ServiceError(
-                            message,
+                            message + `- At ${req.url}`,
                             restToServiceErrorCodeMap[res.status],
                             details,
                         );
@@ -86,5 +91,19 @@ export class RestClient {
                 ],
             },
         });
+    }
+
+    /**
+     * @param {string | null} auth
+     * @param {Object} headers
+     * @returns {Object}
+     */
+    _withAuth(auth, headers = {}) {
+        if (!auth) return headers;
+
+        return {
+            ...headers,
+            Authorization: `Bearer ${auth}`,
+        };
     }
 }

@@ -14,13 +14,14 @@ export class CommentService extends RestClient {
     /**
      * @param {string} postId
      * @param {string} content
+     * @param {string | null} parentId
      * @param {string} auth
      * @returns {Promise<import("#app/models").CommentIdentifier>}
      */
-    async createComment(postId, content, auth) {
+    async createComment(postId, content, parentId, auth) {
         const response = await this._client
-            .post('comments', {
-                json: { userId: '', postId, content },
+            .post(`comments/posts/${postId}`, {
+                json: { content, parentId },
                 headers: this._withAuth(auth),
             })
             .json();

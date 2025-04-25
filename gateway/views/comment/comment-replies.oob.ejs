@@ -1,0 +1,89 @@
+<% replies.forEach(function(reply) { %>
+    <div class="comment slim" id="reply-<%= reply.id %>" data-reply-id="<%= reply.id %>">
+        <div class="comment__author">
+            <sl-avatar
+                <% if (reply.author.avatarUrl) { %>
+                    image="<%= reply.author.avatarUrl %>"
+                <% } else { %>
+                    initials="<%= reply.author.username.slice(0,2) %>"
+                <% } %>
+            ></sl-avatar>
+            <div class="comment__reply-info">
+                <h3 class="comment__reply-info--name">
+                    <%= reply.author.username %>
+                </h3>
+                <span class="comment__reply-info--details">
+                    <%= new Date(reply.createdAt).toLocaleDateString('uk-UA', { day: 'numeric', month: 'long' }) %>
+                    <% if (reply.createdAt.getTime() !== reply.updatedAt.getTime()) { %>
+                        <small>(відредаговано)</small>
+                    <% } %>
+                </span>
+            </div>
+
+            <div class="comment__options">
+                <sl-dropdown>
+                    <sl-icon-button
+                        name="three-dots"
+                        slot="trigger"
+                        label="Опції"
+                    ></sl-icon-button>
+                    <sl-menu>
+                        <% if (user && user.id === reply.userId) { %>
+                            <sl-menu-item
+                                hx-get="/api/comments/<%= reply.id %>/edit-form"
+                                hx-target="#reply-content-<%= reply.id %>"
+                                hx-swap="innerHTML"
+                            >Редагувати</sl-menu-item>
+                            <sl-menu-item
+                                hx-post="/api/comments/delete"
+                                hx-vals='{"commentId": "<%= reply.id %>", "postId": "<%= reply.postId %>"}'
+                                hx-confirm="Ви впевнені, що хочете видалити цю відповідь?"
+                            >Видалити</sl-menu-item>
+                        <% } else { %>
+                            <sl-menu-item>Поскаржитися</sl-menu-item>
+                        <% } %>
+                    </sl-menu>
+                </sl-dropdown>
+            </div>
+        </div>
+        <div id="reply-content-<%= reply.id %>" class="comment__content">
+            <p><%= reply.content %></p>
+        </div>
+
+        <div class="comment__actions">
+            <sl-button
+                onclick="createReplyForm('<%= reply.parentId %>', '<%= reply.id %>')"
+                class="ghost"
+                variant="text"
+                pill
+                data-reply-btn
+            >
+                <sl-icon
+                    class="sm"
+                    slot="prefix"
+                    name="chat"
+                ></sl-icon>
+                Відповісти
+            </sl-button>
+        </div>
+
+        <div
+            id="reply-form-container-<%= reply.id %>"
+            class="reply-form-container"
+        ></div>
+    </div>
+<% }); %>
+
+<% if (cursor) { %>
+    <div 
+        id="replies-load-more-<%= commentId %>" 
+        class="replies-load-more"
+        hx-get="/r/comments/<%= commentId %>/replies?cursor=<%= cursor %>&pageSize=10"
+        hx-trigger="click"
+        hx-swap="outerHTML"
+    >
+        <sl-button variant="text" size="small">
+            Більше
+        </sl-button>
+    </div>
+<% } %>

@@ -1,5 +1,6 @@
 import {
     AuthController,
+    CommentController,
     HomeController,
     InteractionController,
     MeController,
@@ -14,6 +15,7 @@ const controllerRegistries = /** @type {const} */ {
     meController: asClass(MeController).singleton(),
     homeController: asClass(HomeController).singleton(),
     interactionController: asClass(InteractionController).singleton(),
+    commentController: asClass(CommentController).singleton(),
 };
 
 export default controllerRegistries;

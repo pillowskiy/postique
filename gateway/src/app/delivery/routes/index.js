@@ -5,3 +5,4 @@ export * from './me.js';
 export * from './home.js';
 export * from './interaction.js';
 export * from './reaction.js';
+export * from './comment.js';

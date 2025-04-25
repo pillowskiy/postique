@@ -25,12 +25,30 @@ declare namespace render {
             csrfToken: Variable;
         };
         'auth/register/page': {};
+        'comment/comment-replies.loader': {};
+        'comment/comment-replies.oob': {
+            replies: Array;
+            'new Date(reply.createdAt)': { toLocaleDateString: Function };
+            Date: Variable;
+            user: { id: Variable };
+            cursor: Variable;
+            commentId: Variable;
+        };
         'comment/post-comments': {
-            user: Variable;
+            user: { username: Array };
             postId: Variable;
         };
-        'comment/post-comments.loader': {};
-        'comment/post-comments.oob': {};
+        'comment/post-comments.loader': {
+            Math: { min: Function; random: Function };
+        };
+        'comment/post-comments.oob': {
+            cursor: Variable;
+            postId: Variable;
+            comments: Array;
+            'new Date(comment.createdAt)': { toLocaleDateString: Function };
+            Date: Variable;
+            user: { id: Variable };
+        };
         'components/file-input': {};
         'components/header': {
             user: { username: Variable };
@@ -86,6 +104,8 @@ declare namespace render {
             posts: Array;
         };
         'post/post-page': {
+            JSON: { stringify: Function };
+            user: Variable;
             post: {
                 title: Variable;
                 description: Variable;

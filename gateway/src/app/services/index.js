@@ -39,5 +39,15 @@
  * @property {(postIds: string[], auth: string) => Promise<import("#app/models").PostInteractionStates>} getBatchStates
  */
 
+/**
+ * Comment Service API
+ * @typedef {Object} CommentService
+ * @property {(postId: string, content: string, parentId: string | null, auth: string) => Promise<import("#app/models").CommentIdentifier>} createComment
+ * @property {(commentId: string, auth: string) => Promise<import("#app/models").CommentIdentifier>} deleteComment
+ * @property {(commentId: string, content: string, auth: string) => Promise<import("#app/models").EditedComment>} editComment
+ * @property {(postId: string, auth: string, cursor: string|null, pageSize: number|null) => Promise<import("#app/models").CommentCursor>} getPostComments
+ * @property {(commentId: string, auth: string, cursor: string|null, pageSize: number|null) => Promise<import("#app/models").CommentCursor>} getCommentReplies
+ */
+
 export * as grpc from './grpc/index.js';
 export * as rest from './rest/index.js';

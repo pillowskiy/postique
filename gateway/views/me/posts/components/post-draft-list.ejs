@@ -5,16 +5,16 @@
     x-data="{ visibility: '<%= post.visibility %>' }"
     class="post-card"
 >
-    <div class="post-meta">
-        <h2 class="post-title">
+    <div class="post-card__meta">
+        <h2 class="post-card__meta--title">
             <a href="/p/<%= post.id %>/edit"><%= post.title %></a>
         </h2>
-        <p class="post-description">
+        <p class="post-card__meta--description">
             <a href="/p/<%= post.id %>/edit"><%= post.description %></a>
         </p>
     </div>
 
-    <div class="post-details">
+    <div class="post-card__details">
         <% if (post.updatedAt) { %>
         <div class="last-edited">
             <sl-badge

@@ -1,19 +1,22 @@
 <div class="comments">
-    <h2 class="comments__title">Відповіді (2)</h2>
+    <h2 class="comments__title">Відповіді (0)</h2>
 
     <% if (user) { %>
     <div class="comment-form">
-        <div class="comment-form__avatar-row">
-            <img
-                src="https://i.pravatar.cc/150?img=12"
-                alt="Аватар користувача"
-                class="comment-form__avatar"
-            />
-            <div
-                class="comment-form__field"
+        <div class="comment__author">
+            <sl-avatar
+                initials="<%= user.username.slice(0,2) %>"
+                label="User avatar"
+            ></sl-avatar>
+
+            <form
                 x-data="{ active: false, text: '' }"
+                hx-post="/r/comments/<%= postId %>"
+                hx-swap="none"
+                :class="{ 'comment-form__field': true, 'active': active }"
             >
                 <textarea
+                    name="content"
                     class="comment-form__textarea"
                     placeholder="Які Ваші думки?"
                     x-model="text"
@@ -22,23 +25,27 @@
                 ></textarea>
 
                 <div class="comment-form__buttons" x-show="active" x-transition>
-                    <button
-                        class="comment-form__button comment-form__button--cancel"
-                        @click="active = false; text = ''"
+                    <sl-button
+                        class="ghost"
+                        size="small"
+                        variant="text"
+                        type="button"
+                        pill
+                        @click="active = false; text = '';"
                     >
                         Скасувати
-                    </button>
-                    <button
-                        class="comment-form__button comment-form__button--submit"
-                        :disabled="!text.trim()"
-                        hx-post="/api/comments/<%= postId %>"
-                        hx-trigger="click"
-                        hx-target="#comments-list"
-                        hx-swap="afterbegin"
+                    </sl-button>
+
+                    <sl-button
+                        size="small"
+                        variant="primary"
+                        pill
+                        type="submit"
                         @click="if(text.trim()) { active = false; text = ''; }"
+                        :disabled="!text.trim()"
                     >
                         Відправити
-                    </button>
+                    </sl-button>
                 </div>
             </div>
         </div>
@@ -47,271 +54,188 @@
 
     <div
         id="comments-list"
-        hx-get="/api/comments"
+        hx-get="/r/comments/post/<%= postId %>"
         hx-trigger="load"
         hx-indicator=".comments__loading"
     >
-        <div class="comments__loading">
-            <div class="comment">
-                <div class="comment__author">
-                    <div class="skeleton skeleton__avatar"></div>
-                    <div class="comment__info">
-                        <div class="skeleton skeleton__name"></div>
-                        <div class="skeleton skeleton__date"></div>
-                    </div>
-                </div>
-                <div class="comment__content">
-                    <div
-                        class="skeleton skeleton__text"
-                        style="width: 100%"
-                    ></div>
-                    <div
-                        class="skeleton skeleton__text"
-                        style="width: 90%"
-                    ></div>
-                    <div
-                        class="skeleton skeleton__text"
-                        style="width: 80%"
-                    ></div>
-                </div>
-            </div>
-        </div>
-
-        <div class="comment">
-            <div class="comment__author">
-                <img
-                    src="https://i.pravatar.cc/150?img=67"
-                    alt="Аватар користувача"
-                    class="comment__avatar"
-                />
-                <div class="comment__info">
-                    <h3 class="comment__name">Раві Ясас</h3>
-                    <span class="comment__date"
-                        >16 квітня
-                        <span class="comment__status"
-                            >(відредаговано)</span
-                        ></span
-                    >
-                </div>
-                <div class="comment__options">
-                    <sl-dropdown>
-                        <sl-icon-button
-                            name="three-dots"
-                            slot="trigger"
-                            label="Опції"
-                        ></sl-icon-button>
-                        <sl-menu>
-                            <sl-menu-item>Редагувати</sl-menu-item>
-                            <sl-menu-item>Видалити</sl-menu-item>
-                        </sl-menu>
-                    </sl-dropdown>
-                </div>
-            </div>
-            <div class="comment__content">
-                <p>
-                    Гарна стаття, я хотів би поділитися цією статтею в якості
-                    доповнення. Сподіваюся, читачі отримають широкі знання
-                </p>
-                <p>
-                    https://medium.com/@raviyasas/nestjs-best-practices-for-developers-0666d95b783e
-                </p>
-            </div>
-            <div class="comment__actions">
-                <sl-button variant="text" pill>
-                    <sl-icon
-                        class="sm"
-                        slot="prefix"
-                        name="chevron-down"
-                    ></sl-icon>
-                    Відповіді (1)
-                </sl-button>
-
-                <sl-button
-                    x-data="{ showForm: false }"
-                    @click="$store.replies.showForm1 = !$store.replies.showForm1"
-                    class="ghost"
-                    variant="text"
-                    pill
-                >
-                    <sl-icon class="sm" slot="prefix" name="chat"></sl-icon>
-                    Відповісти
-                </sl-button>
-            </div>
-
-            <!-- Форма відповіді, яка з'являється при кліку на "Відповісти" -->
-            <div
-                class="comment__form"
-                x-data="{ active: false }"
-                :class="{ 'comment__form--active': active }"
-                x-init="$watch('$store.replies.showForm1', value => { active = value })"
-            >
-                <div class="comment-form">
-                    <div class="comment-form__avatar-row">
-                        <img
-                            src="https://i.pravatar.cc/150?img=12"
-                            alt="Аватар користувача"
-                            class="comment-form__avatar"
-                        />
-                        <div class="comment-form__field" x-data="{ text: '' }">
-                            <textarea
-                                class="comment-form__textarea"
-                                placeholder="Напишіть відповідь..."
-                                x-model="text"
-                            ></textarea>
-
-                            <div class="comment-form__buttons">
-                                <button
-                                    class="comment-form__button comment-form__button--cancel"
-                                    @click="active = false; text = ''"
-                                >
-                                    Скасувати
-                                </button>
-                                <button
-                                    class="comment-form__button comment-form__button--submit"
-                                    :disabled="!text.trim()"
-                                    hx-post="/api/comments/1/replies"
-                                    hx-trigger="click"
-                                    hx-target="#replies-1"
-                                    hx-swap="beforeend"
-                                    @click="if(text.trim()) { active = false; text = ''; }"
-                                >
-                                    Відправити
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Контейнер для відповідей -->
-            <div class="reply">
-                <div id="reply-loading-1" class="comment">
-                    <div class="comment__author">
-                        <div class="skeleton skeleton__avatar"></div>
-                        <div class="comment__info">
-                            <div class="skeleton skeleton__name"></div>
-                            <div class="skeleton skeleton__date"></div>
-                        </div>
-                    </div>
-                    <div class="comment__content">
-                        <div
-                            class="skeleton skeleton__text"
-                            style="width: 90%"
-                        ></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Другий коментар -->
-        <div class="comment">
-            <div class="comment__author">
-                <img
-                    src="https://i.pravatar.cc/150?img=25"
-                    alt="Аватар користувача"
-                    class="comment__avatar"
-                />
-                <div class="comment__info">
-                    <h3 class="comment__name">Йоган Вролікс</h3>
-                    <span class="comment__date">3 дні тому</span>
-                </div>
-                <div class="comment__options">
-                    <sl-dropdown>
-                        <sl-icon-button
-                            name="three-dots"
-                            slot="trigger"
-                            label="Опції"
-                        ></sl-icon-button>
-                        <sl-menu>
-                            <sl-menu-item>Редагувати</sl-menu-item>
-                            <sl-menu-item>Видалити</sl-menu-item>
-                        </sl-menu>
-                    </sl-dropdown>
-                </div>
-            </div>
-            <div class="comment__content">
-                <p>Гарна стаття.</p>
-                <p>
-                    Стосовно Fastify, найближчим часом NestJS буде підтримувати
-                    перевірку схеми та серіалізацію Fastify, роблячи застарілу
-                    перевірку на основі class-validator.
-                </p>
-            </div>
-            <div class="comment__actions">
-                <button class="comment__button">
-                    <sl-icon
-                        class="comment__button-icon"
-                        name="hand-thumbs-up"
-                    ></sl-icon>
-                    <span class="comment__likes-count">1</span>
-                </button>
-                <button
-                    class="comment__button"
-                    x-data="{ showForm: false }"
-                    @click="$store.replies.showForm2 = !$store.replies.showForm2"
-                >
-                    <sl-icon class="comment__button-icon" name="chat"></sl-icon>
-                    Відповісти
-                </button>
-            </div>
-
-            <!-- Форма відповіді -->
-            <div
-                class="comment__form"
-                x-data="{ active: false }"
-                :class="{ 'comment__form--active': active }"
-                x-init="$watch('$store.replies.showForm2', value => { active = value })"
-            >
-                <div class="comment-form">
-                    <div class="comment-form__avatar-row">
-                        <img
-                            src="https://i.pravatar.cc/150?img=12"
-                            alt="Аватар користувача"
-                            class="comment-form__avatar"
-                        />
-                        <div class="comment-form__field" x-data="{ text: '' }">
-                            <textarea
-                                class="comment-form__textarea"
-                                placeholder="Напишіть відповідь..."
-                                x-model="text"
-                            ></textarea>
-
-                            <div class="comment-form__buttons">
-                                <button
-                                    class="comment-form__button comment-form__button--cancel"
-                                    @click="active = false; text = ''"
-                                >
-                                    Скасувати
-                                </button>
-                                <button
-                                    class="comment-form__button comment-form__button--submit"
-                                    :disabled="!text.trim()"
-                                    hx-post="/api/comments/2/replies"
-                                    hx-trigger="click"
-                                    hx-target="#replies-2"
-                                    hx-swap="beforeend"
-                                    @click="if(text.trim()) { active = false; text = ''; }"
-                                >
-                                    Відправити
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Контейнер для відповідей -->
-            <div
-                id="replies-2"
-                class="reply"
-                hx-get="/api/comments/2/replies"
-                hx-trigger="load"
-                hx-indicator="#reply-loading-2"
-            >
-                <div id="reply-loading-2" class="comment">
-                    <!-- Скелет для завантаження відповідей буде тут -->
-                </div>
-            </div>
-        </div>
     </div>
+
+    <template id="reply-form-template">
+        <div class="comment-form reply">
+            <form
+                hx-post="/r/comments/<%= postId %>"
+                hx-swap="none"
+                class="comment-form__field active"
+            >
+                <input id="parent" name="parentId" type="hidden" />
+
+                <textarea
+                    id="content"
+                    name="content"
+                    class="comment-form__textarea"
+                    placeholder="Що скажете на це?"
+                ></textarea>
+
+                <div class="comment-form__buttons">
+                    <sl-button
+                        class="cancel-reply-btn ghost"
+                        size="small"
+                        variant="text"
+                        type="button"
+                        pill
+                    >
+                        Скасувати
+                    </sl-button>
+
+                    <sl-button
+                        class="submit-reply-btn"
+                        size="small"
+                        variant="primary"
+                        type="submit"
+                        pill
+                    >
+                        Відправити
+                    </sl-button>
+                </div>
+            </form>
+        </div>
+    </template>
+
+    <script>
+        const postId = "<%= postId %>";
+        let visibleReplies = new Set();
+        let activeFormId = null;
+
+
+        function toggleReplies(commentId) {
+            const repliesContainer = document.getElementById(
+                `replies-${commentId}`,
+            );
+            const replyIcon = document.getElementById(
+                `reply-icon-${commentId}`,
+            );
+
+            if (repliesContainer) {
+                if (visibleReplies.has(commentId)) {
+                    repliesContainer.style.display = 'none';
+                    visibleReplies.delete(commentId);
+                    replyIcon.style.transform = '';
+                } else {
+                    repliesContainer.style.display = 'block';
+                    visibleReplies.add(commentId);
+                    replyIcon.style.transform = 'rotate(180deg)';
+
+                    if (!repliesContainer.getAttribute('data-loaded')) {
+                        repliesContainer.setAttribute('data-loaded', 'true');
+                        htmx.trigger(`#replies-${commentId}`, 'load', {});
+                    }
+                }
+            }
+        }
+
+        function removeAllReplyForms() {
+            const formContainers = document.querySelectorAll(
+                '.reply-form-container',
+            );
+            formContainers.forEach((container) => {
+                container.innerHTML = '';
+            });
+
+            activeFormId = null;
+        }
+
+        function createReplyForm(commentId, replyId) {
+            removeAllReplyForms();
+
+            const template = document.getElementById('reply-form-template');
+            const formNode = template.content.cloneNode(true).firstElementChild;
+
+            const textarea = formNode.querySelector('#content');
+            const parent = formNode.querySelector('#parent');
+            const cancelBtn = formNode.querySelector('.cancel-reply-btn');
+            const submitBtn = formNode.querySelector('.submit-reply-btn');
+
+            parent.setAttribute('value', commentId);
+            htmx.process(formNode);
+
+            cancelBtn.addEventListener('click', () => {
+                removeAllReplyForms();
+            });
+
+            submitBtn.addEventListener('click', () => {
+                if (textarea.value.trim()) {
+                    // If it's a reply to a comment and replies are hidden, show them
+                    if (!isReplyToReply && !visibleReplies.has(commentId)) {
+                        toggleReplies(commentId);
+                    }
+
+                    setTimeout(() => {
+                        removeAllReplyForms();
+                    }, 100);
+                }
+            });
+
+            const containerId = `reply-form-container-${replyId ?? commentId}`;
+            const container = document.getElementById(containerId);
+            if (container) {
+                container.innerHTML = '';
+                container.appendChild(formNode);
+
+                activeFormId = commentId;
+
+                setTimeout(() => {
+                    textarea.focus();
+                }, 0);
+            }
+        }
+
+        document.addEventListener('click', (e) => {
+            if (
+                activeFormId &&
+                !e.target.closest('.comment-form') &&
+                !e.target.closest('[data-reply-btn]')
+            ) {
+                removeAllReplyForms();
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', function () {
+            if (
+                'IntersectionObserver' in window &&
+                document.getElementById('comment-load-more')
+            ) {
+                const loadMoreElement =
+                    document.getElementById('comment-load-more');
+
+                const observer = new IntersectionObserver(
+                    (entries) => {
+                        entries.forEach((entry) => {
+                            if (entry.isIntersecting) {
+                                htmx.trigger(entry.target, 'loadMore', {});
+                            }
+                        });
+                    },
+                    { threshold: 0.5 },
+                );
+
+                observer.observe(loadMoreElement);
+            }
+        });
+    </script>
+
+    <style>
+        .reply-form-container {
+            margin: 10px 0;
+        }
+
+        .sm {
+            transition: transform 0.2s ease;
+        }
+
+        .comment-load-more {
+            text-align: center;
+            padding: 15px;
+            margin-top: 10px;
+        }
+    </style>
 </div>

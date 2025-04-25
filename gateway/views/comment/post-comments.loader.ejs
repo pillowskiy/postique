@@ -1,0 +1,27 @@
+<div class="comments__loading">
+    <% for (let i = 0; i < 3; i++) { %>
+    <div class="comment">
+        <div class="comment__author">
+            <div class="skeleton skeleton__avatar"></div>
+            <div class="comment__info">
+                <div class="skeleton skeleton__name"></div>
+                <div class="skeleton skeleton__date"></div>
+            </div>
+        </div>
+        <div class="comment__content">
+            <div
+                class="skeleton skeleton__text"
+                style="width: <% Math.min(Math.random() * 100, 70) %>"
+            ></div>
+            <div
+                class="skeleton skeleton__text"
+                style="width: <% Math.min(Math.random() * 100, 30) %>"
+            ></div>
+            <div
+                class="skeleton skeleton__text"
+                style="width: <% Math.min(Math.random() * 100, 40) %>"
+            ></div>
+        </div>
+    </div>
+    <% } %>
+</div>

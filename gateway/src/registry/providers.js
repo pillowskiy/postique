@@ -16,11 +16,15 @@ const interactionService = asClass(
     services.rest.InteractionService,
 ).singleton();
 
+/** @type {ReturnType<typeof asClass<services.CommentService>>} */
+const commentService = asClass(services.rest.CommentService).singleton();
+
 const providerRegistries = /** @type {const} */ {
     authService,
     fileService,
     postService,
     interactionService,
+    commentService,
 };
 
 export default providerRegistries;
