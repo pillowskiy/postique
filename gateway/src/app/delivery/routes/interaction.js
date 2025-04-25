@@ -1,5 +1,5 @@
 import express from 'express';
-import { body } from 'express-validator';
+import { body, oneOf } from 'express-validator';
 
 import handler from '../common/handler.js';
 
@@ -11,13 +11,23 @@ export function InteractionRoutes(interactionController) {
 
     interactionRouter.post(
         '/batch',
-        [body('postIds').isArray().isLength({ min: 1 })],
+        [
+            body('postIds')
+                .customSanitizer((v) => (typeof v === 'string' ? [v] : v))
+                .isArray()
+                .isLength({ min: 1 }),
+        ],
         handler(interactionController, 'swapInteractions'),
     );
 
     interactionRouter.post(
         '/states',
-        [body('postIds').isArray().isLength({ min: 1 })],
+        [
+            body('postIds')
+                .customSanitizer((v) => (typeof v === 'string' ? [v] : v))
+                .isArray()
+                .isLength({ min: 1 }),
+        ],
         handler(interactionController, 'swapStates'),
     );
 
