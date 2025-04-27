@@ -2,6 +2,7 @@
 @use 'post.scss';
 @use 'me.scss';
 @use 'comments.scss';
+@use 'bookmarks.scss';
 
 :not(:defined) {
     visibility: hidden;

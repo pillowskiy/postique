@@ -4,3 +4,5 @@ export * from './me.js';
 export * from './home.js';
 export * from './interaction.js';
 export * from './comment.js';
+export * from './bookmark.js';
+export * from './collection.js';

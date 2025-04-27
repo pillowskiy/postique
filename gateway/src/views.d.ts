@@ -25,6 +25,13 @@ declare namespace render {
             csrfToken: Variable;
         };
         'auth/register/page': {};
+        'bookmark/bookmark-popup.oob': {
+            targetId: Variable;
+        };
+        'bookmark/collection-list.oob': {
+            targetId: Variable;
+            collections: Array;
+        };
         'comment/comment-replies.loader': {};
         'comment/comment-replies.oob': {
             replies: Array;
@@ -42,8 +49,6 @@ declare namespace render {
             Math: { min: Function; random: Function };
         };
         'comment/post-comments.oob': {
-            cursor: Variable;
-            postId: Variable;
             comments: Array;
             'new Date(comment.createdAt)': { toLocaleDateString: Function };
             Date: Variable;

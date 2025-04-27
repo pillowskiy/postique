@@ -6,3 +6,5 @@ export * from './home.js';
 export * from './interaction.js';
 export * from './reaction.js';
 export * from './comment.js';
+export * from './bookmark.js';
+export * from './collection.js';

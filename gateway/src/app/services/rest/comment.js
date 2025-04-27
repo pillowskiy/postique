@@ -153,6 +153,7 @@ export class CommentService extends RestClient {
             author: this.#userToModel(comment.author),
             createdAt: new Date(comment.createdAt),
             updatedAt: new Date(comment.updatedAt),
+            repliesCount: comment.repliesCount,
             parentId: comment.parentId,
         };
     }

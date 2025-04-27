@@ -1,10 +1,19 @@
 <% states.forEach((state) => { %>
-<sl-tooltip
-    id="save-<%= state.postId %>"
-    content="Зберегти"
-    style="<%= state.saved ? 'color: var(--sl-color-success-500)' : '' %>"
-    hx-swap-oob="true"
->
-    <sl-icon-button name="bookmark-plus"></sl-icon-button>
-</sl-tooltip>
+<div id="save-<%= state.postId %>" hx-swap-oob="true">
+    <sl-tooltip
+        content="Зберегти"
+        style="<%= state.saved ? 'color: var(--sl-color-success-500)' : '' %>"
+    >
+        <sl-icon-button
+            id="trigger-<%= state.postId %>"
+            name="<%= state.saved ? 'bookmark-check' : 'bookmark-plus' %>"
+            hx-get="/r/bookmarks/popup/<%= state.postId %>"
+            hx-target="#bookmark-popup-<%= state.postId %>"
+            hx-trigger="click"
+            hx-swap="innerHTML"
+        ></sl-icon-button>
+    </sl-tooltip>
+
+    <div id="bookmark-popup-<%= state.postId %>"></div>
+</div>
 <% }) %>

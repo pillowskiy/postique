@@ -16,6 +16,9 @@ const interactionService = asClass(
     services.rest.InteractionService,
 ).singleton();
 
+const bookmarkService = asClass(services.rest.BookmarkService).singleton();
+const collectionService = asClass(services.rest.CollectionService).singleton();
+
 /** @type {ReturnType<typeof asClass<services.CommentService>>} */
 const commentService = asClass(services.rest.CommentService).singleton();
 
@@ -25,6 +28,8 @@ const providerRegistries = /** @type {const} */ {
     postService,
     interactionService,
     commentService,
+    bookmarkService,
+    collectionService,
 };
 
 export default providerRegistries;

@@ -20,6 +20,7 @@
  * @property {string} userId
  * @property {string} postId
  * @property {string} content
+ * @property {number} repliesCount
  * @property {import('./user').User} author
  * @property {Date} createdAt
  * @property {Date} updatedAt

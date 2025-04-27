@@ -1,104 +1,90 @@
-<div id="comments-list" x-data="{cursor: '<%= cursor %>'}" data-post-id="<%= postId %>">
-    <% comments.forEach(function(comment) { %>
-        <div class="comment" id="comment-<%= comment.id %>" data-comment-id="<%= comment.id %>">
-            <div class="comment__author">
-                <sl-avatar 
-                    <% if (comment.author.avatarUrl) { %>
-                        image="<%= comment.author.avatarUrl %>"
-                    <% } else { %>
-                        initials="<%= comment.author.username.slice(0,2) %>"
+<% comments.forEach(function(comment) { %>
+    <div class="comment" id="comment-<%= comment.id %>" data-comment-id="<%= comment.id %>">
+        <div class="comment__author">
+            <sl-avatar 
+                <% if (comment.author.avatarUrl) { %>
+                    image="<%= comment.author.avatarUrl %>"
+                <% } else { %>
+                    initials="<%= comment.author.username.slice(0,2) %>"
+                <% } %>
+            ></sl-avatar>
+
+            <div class="comment__info">
+                <h3 class="comment__info--name"><%= comment.author.username %></h3>
+                <span class="comment__info--details">
+                    <%= new Date(comment.createdAt).toLocaleDateString('uk-UA', { day: 'numeric', month: 'long' }) %>
+                    <% if (comment.createdAt.getTime() !== comment.updatedAt.getTime()) { %>
+                        <small>(відредаговано)</small>
                     <% } %>
-                ></sl-avatar>
-
-                <div class="comment__info">
-                    <h3 class="comment__info--name"><%= comment.author.username %></h3>
-                    <span class="comment__info--details">
-                        <%= new Date(comment.createdAt).toLocaleDateString('uk-UA', { day: 'numeric', month: 'long' }) %>
-                        <% if (comment.createdAt.getTime() !== comment.updatedAt.getTime()) { %>
-                            <small>(відредаговано)</small>
+                </span>
+            </div>
+            <div class="comment__options">
+                <sl-dropdown>
+                    <sl-icon-button
+                        name="three-dots"
+                        slot="trigger"
+                        label="Опції"
+                    ></sl-icon-button>
+                    <sl-menu>
+                        <% if (user && user.id === comment.author.id) { %>
+                            <sl-menu-item disabled>Редагувати</sl-menu-item>
+                            <sl-menu-item 
+                                hx-delete="/r/comments/<%= comment.id %>"
+                                hx-confirm="Ви впевнені, що хочете видалити цей коментар?"
+                                hx-remove="#comment-<%= comment.id %>"
+                            >
+                                Видалити
+                            </sl-menu-item>
+                        <% } else { %>
+                            <sl-menu-item>Поскаржитися</sl-menu-item>
                         <% } %>
-                    </span>
-                </div>
-                <div class="comment__options">
-                    <sl-dropdown>
-                        <sl-icon-button
-                            name="three-dots"
-                            slot="trigger"
-                            label="Опції"
-                        ></sl-icon-button>
-                        <sl-menu>
-                            <% if (user && user.id === comment.userId) { %>
-                                <sl-menu-item 
-                                    hx-get="/api/comments/<%= comment.id %>/edit-form" 
-                                    hx-target="#comment-content-<%= comment.id %>"
-                                    hx-swap="innerHTML"
-                                >Редагувати</sl-menu-item>
-                                <sl-menu-item 
-                                    hx-post="/api/comments/delete" 
-                                    hx-vals='{"commentId": "<%= comment.id %>", "postId": "<%= postId %>"}'
-                                    hx-confirm="Ви впевнені, що хочете видалити цей коментар?"
-                                >Видалити</sl-menu-item>
-                            <% } else { %>
-                                <sl-menu-item>Поскаржитися</sl-menu-item>
-                            <% } %>
-                        </sl-menu>
-                    </sl-dropdown>
-                </div>
+                    </sl-menu>
+                </sl-dropdown>
             </div>
-            <div id="comment-content-<%= comment.id %>" class="comment__content">
-                <p><%= comment.content %></p>
-            </div>
+        </div>
+        <div id="comment-content-<%= comment.id %>" class="comment__content">
+            <p><%= comment.content %></p>
+        </div>
 
-            <div class="comment__actions">
-                <sl-button variant="text" pill onclick="toggleReplies('<%= comment.id %>')">
-                    <sl-icon
-                        class="sm"
-                        slot="prefix"
-                        name="chevron-down"
-                        id="reply-icon-<%= comment.id %>"
-                    ></sl-icon>
-                    Відповіді (<span id="reply-count-<%= comment.id %>">0</span>)
-                </sl-button>
-
-                <sl-button
-                    onclick="createReplyForm('<%= comment.id %>')"
-                    class="ghost"
-                    variant="text"
-                    pill
-                    data-reply-btn
-                >
-                    <sl-icon class="sm" slot="prefix" name="chat"></sl-icon>
-                    Відповісти
-                </sl-button>
-            </div>
-
-            <div id="reply-form-container-<%= comment.id %>" class="reply-form-container"></div>
-
-            <div 
-                id="replies-<%= comment.id %>" 
-                class="reply" 
-                style="display: none"
-                hx-get="/r/comments/<%= comment.id %>/replies"
-                hx-trigger="load"
-                hx-indicator="#reply-loading-<%= comment.id %>"
+        <div class="comment__actions">
+            <sl-button
+                variant="text"
+                pill 
+                onclick="toggleReplies('<%= comment.id %>')"
+                <%= !comment.repliesCount ? 'disabled' : '' %>
             >
-                <div id="reply-loading-<%= comment.id %>" class="reply-loading">
-                </div>
+                <sl-icon
+                    class="sm"
+                    slot="prefix"
+                    name="chevron-down"
+                ></sl-icon>
+                Відповіді (<%= comment.repliesCount ?? 0 %>)
+            </sl-button>
+
+            <sl-button
+                onclick="createReplyForm('<%= comment.id %>')"
+                class="ghost"
+                variant="text"
+                pill
+                data-reply-btn
+            >
+                <sl-icon class="sm" slot="prefix" name="chat"></sl-icon>
+                Відповісти
+            </sl-button>
+        </div>
+
+        <div id="reply-form-container-<%= comment.id %>" class="reply-form-container"></div>
+
+        <div 
+            id="replies-<%= comment.id %>" 
+            class="reply" 
+            style="display: none"
+            hx-get="/r/comments/<%= comment.id %>/replies"
+            hx-trigger="load"
+            hx-indicator="#reply-loading-<%= comment.id %>"
+        >
+            <div id="reply-loading-<%= comment.id %>" class="reply-loading">
             </div>
         </div>
-    <% }); %>
-
-    <template x-if="!!cursor">
-        <div 
-            x-data="{ show: false }"
-            id="comment-load-more" 
-            class="comment-load-more" 
-            :hx-get="`/r/comments/post/<%= postId %>?cursor=${cursor}&pageSize=10`" 
-            hx-trigger="revealed"
-            hx-swap="outerHTML"
-        >
-            <sl-spinner></sl-spinner>
-            <div>Завантаження коментарів...</div>
-        </div>
-    </template>
-</div>
+    </div>
+<% }); %>

@@ -1,0 +1,82 @@
+<sl-popup
+    id="bookmark-popup"
+    x-data="{ open: true }"
+    x-ref="popup"
+    x-effect="open ? $refs.popup.setAttribute('active', '') : $refs.popup.removeAttribute('active')"
+    anchor="#trigger-<%= targetId %>"
+    active
+>
+    <span slot="anchor"></span>
+    <div class="bookmark-popup__container" @mousedown.outside="open = false">
+        <div id="collections-list">
+            <%- await include('./collection-list.oob.ejs') %>
+        </div>
+
+        <div
+            class="bookmark-popup__collection-form"
+            x-data="{ showForm: false, name: '', description: '' }"
+        >
+            <div x-show="!showForm">
+                <button
+                    class="collection-form__trigger"
+                    @click="showForm = true"
+                >
+                    <sl-icon name="plus-circle"></sl-icon>
+                    <span style="margin-left: 8px">Створити новий список</span>
+                </button>
+            </div>
+
+            <div x-show="showForm">
+                <form
+                    hx-post="/r/collections"
+                    hx-target="#collections-list"
+                    hx-swap="innerHTML"
+                    @submit="showForm = false"
+                >
+                    <input
+                        type="hidden"
+                        name="targetId"
+                        value="<%= targetId %>"
+                    />
+                    <div style="margin-bottom: 8px">
+                        <input
+                            class="collection-form__input"
+                            type="text"
+                            name="name"
+                            x-model="name"
+                            placeholder="Назва колекції"
+                            required
+                        />
+                    </div>
+                    <div style="margin-bottom: 12px">
+                        <textarea
+                            class="collection-form__input"
+                            name="description"
+                            x-model="description"
+                            placeholder="Опис (необов'язково)"
+                        ></textarea>
+                    </div>
+                    <div style="display: flex; justify-content: space-between">
+                        <sl-button
+                            type="button"
+                            @click="showForm = false"
+                            variant="neutral"
+                            size="small"
+                            pill
+                        >
+                            Скасувати
+                        </sl-button>
+                        <sl-button
+                            type="submit"
+                            variant="primary"
+                            size="small"
+                            pill
+                        >
+                            Створити
+                        </sl-button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</sl-popup>

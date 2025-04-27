@@ -1,0 +1,32 @@
+<ul class="collections-list">
+    <li class="collection-item">
+        <sl-checkbox
+            hx-post="/r/bookmarks"
+            hx-vals='{"targetId": "<%= targetId %>"}'
+            hx-swap="none"
+            help-text="Зберігається в колекції «Список читання»"
+        >
+            Список читання
+        </sl-checkbox>
+        <sl-icon
+            style="color: var(--sl-color-neutral-600)"
+            name="lock"
+        ></sl-icon>
+    </li>
+
+    <% collections.forEach(function(collection) { %>
+    <li class="collection-item">
+        <sl-checkbox
+            hx-post="/r/bookmarks"
+            hx-vals='{"targetId": "<%= targetId %>", "collectionId": "<%= collection.id %>"}'
+            hx-swap="none"
+            help-text="<%= collection.description %>"
+        >
+            <%= collection.name %>
+        </sl-checkbox>
+        <div class="collection-item__count">
+            <%= collection.bookmarksCount %> закладки
+        </div>
+    </li>
+    <% }); %>
+</ul>

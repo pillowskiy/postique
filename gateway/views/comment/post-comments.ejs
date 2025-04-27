@@ -1,5 +1,5 @@
 <div class="comments">
-    <h2 class="comments__title">Відповіді (0)</h2>
+    <h2 class="comments__title">Відповіді</h2>
 
     <% if (user) { %>
     <div class="comment-form">
@@ -55,9 +55,23 @@
     <div
         id="comments-list"
         hx-get="/r/comments/post/<%= postId %>"
-        hx-trigger="load"
+        hx-trigger="revealed"
+        hx-swap="beforeend"
         hx-indicator=".comments__loading"
     >
+        <template x-if="!!cursor">
+            <div 
+                x-data="{ show: false }"
+                id="comment-load-more" 
+                class="comment-load-more" 
+                :hx-get="`/r/comments/post/<%= postId %>?cursor=${cursor}&pageSize=10`" 
+                hx-trigger="revealed"
+                hx-swap="outerHTML"
+            >
+                <sl-spinner></sl-spinner>
+                <div>Завантаження коментарів...</div>
+            </div>
+        </template>
     </div>
 
     <template id="reply-form-template">

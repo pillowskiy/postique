@@ -19,7 +19,7 @@ export class CollectionService extends RestClient {
      */
     async createCollection(name, auth, description) {
         const response = await this._client
-            .post('collcetions', {
+            .post('collections', {
                 json: { userId: '', name, description },
                 headers: this._withAuth(auth),
             })
@@ -35,7 +35,7 @@ export class CollectionService extends RestClient {
      */
     async deleteCollection(collectionId, auth) {
         const response = await this._client
-            .delete(`collcetions/${collectionId}`, {
+            .delete(`collections/${collectionId}`, {
                 headers: this._withAuth(auth),
             })
             .json();
@@ -56,7 +56,7 @@ export class CollectionService extends RestClient {
         if (pageSize) params.set('pageSize', pageSize.toString());
 
         const response = await this._client
-            .get(`collcetions/${collectionId}/bookmarks?${params}`, {
+            .get(`collections/${collectionId}/bookmarks?${params}`, {
                 headers: this._withAuth(auth),
             })
             .json();
@@ -71,7 +71,7 @@ export class CollectionService extends RestClient {
      */
     async getUserCollections(userId, auth) {
         const response = await this._client
-            .get(`collcetions/users/${userId}`, {
+            .get(`collections/users/${userId}`, {
                 headers: this._withAuth(auth),
             })
             .json();
@@ -87,7 +87,7 @@ export class CollectionService extends RestClient {
      */
     #collectionIdentifierToModel(data) {
         return {
-            id: data.id,
+            id: data.collectionId,
         };
     }
 
