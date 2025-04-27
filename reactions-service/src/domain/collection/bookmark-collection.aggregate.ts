@@ -5,7 +5,7 @@ export class BookmarkCollectionAggregate extends BookmarkCollectionEntity {
   static fromEntity(
     entity: BookmarkCollectionEntity,
   ): BookmarkCollectionAggregate {
-    Object.setPrototypeOf(entity, BookmarkCollectionEntity.prototype);
+    Object.setPrototypeOf(entity, BookmarkCollectionAggregate.prototype);
     return entity as BookmarkCollectionAggregate;
   }
 

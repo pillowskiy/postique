@@ -1,12 +1,12 @@
-import { CommandHandler } from '@nestjs/cqrs';
-import { Inject } from '@nestjs/common';
-import { Command } from '../../common';
-import { CreateCollectionCommand } from './create-collection.command';
+import { BookmarkCollectionAccessControlList } from '@/app/boundaries/acl';
+import { CreateBookmarkCollectionOutput } from '@/app/boundaries/dto/output';
+import { ForbiddenException } from '@/app/boundaries/errors';
 import { BookmarkCollectionRepository } from '@/app/boundaries/repository';
 import { BookmarkCollectionEntity } from '@/domain/collection';
-import { CreateBookmarkCollectionOutput } from '@/app/boundaries/dto/output';
-import { BookmarkCollectionAccessControlList } from '@/app/boundaries/acl';
-import { ForbiddenException } from '@/app/boundaries/errors';
+import { Inject } from '@nestjs/common';
+import { CommandHandler } from '@nestjs/cqrs';
+import { Command } from '../../common';
+import { CreateCollectionCommand } from './create-collection.command';
 
 @CommandHandler(CreateCollectionCommand)
 export class CreateCollectionCommandHandler extends Command<
@@ -37,7 +37,6 @@ export class CreateCollectionCommandHandler extends Command<
       name: input.name,
       description: input.description,
     });
-
     await this._collectionRepository.save(collection);
 
     return new CreateBookmarkCollectionOutput(collection.id);

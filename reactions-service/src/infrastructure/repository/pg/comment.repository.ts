@@ -6,7 +6,15 @@ import { UserEntity } from '@/domain/user';
 import { DrizzleTransactional } from '@/infrastructure/drizzle';
 import { comments, users } from '@/infrastructure/drizzle/schemas';
 import { Inject, Injectable } from '@nestjs/common';
-import { and, count, eq, gt, isNull, type InferSelectModel } from 'drizzle-orm';
+import {
+  and,
+  count,
+  eq,
+  gt,
+  isNull,
+  sql,
+  type InferSelectModel,
+} from 'drizzle-orm';
 
 @Injectable()
 export class PostgresCommentRepository extends CommentRepository {
@@ -30,20 +38,28 @@ export class PostgresCommentRepository extends CommentRepository {
     cursor?: string,
     pageSize: number = 30,
   ): Promise<CommentAggregate[]> {
+    const countSubquery = sql<number>`(
+      SELECT COUNT(1) 
+      FROM ${comments} AS c2 
+      WHERE c2.parent_id = ${comments.id}
+    )`;
+
     const results = await this._txHost.exec
-      .select({ comments, users })
+      .select({ comments, users, repliesCount: countSubquery })
       .from(comments)
       .where(
         and(
           eq(comments.postId, postId),
           isNull(comments.parentId),
-          //cursor ? gt(comments.createdAt, cursor) : undefined,
+          cursor ? gt(comments.createdAt, new Date(cursor)) : undefined,
         ),
       )
       .leftJoin(users, eq(comments.userId, users.id))
       .limit(pageSize);
 
-    return results.map((result) => this.#toAggregate(result));
+    return results.map((result) =>
+      this.#toAggregate(result, result.repliesCount),
+    );
   }
 
   async findByParent(
@@ -51,16 +67,15 @@ export class PostgresCommentRepository extends CommentRepository {
     cursor?: string,
     pageSize: number = 30,
   ): Promise<CommentAggregate[]> {
-    const conditions = [eq(comments.parentId, parentId)];
-
-    if (cursor) {
-      conditions.push(gt(comments.createdAt, cursor));
-    }
-
     const results = await this._txHost.exec
       .select({ comments, users })
       .from(comments)
-      .where(and(...conditions))
+      .where(
+        and(
+          eq(comments.parentId, parentId),
+          cursor ? gt(comments.createdAt, new Date(cursor)) : undefined,
+        ),
+      )
       .leftJoin(users, eq(comments.userId, users.id))
       .limit(pageSize);
 
@@ -118,14 +133,18 @@ export class PostgresCommentRepository extends CommentRepository {
   }
 
   // TEMP: It might be a good temporary read model.
-  #toAggregate(result: {
-    comments: InferSelectModel<typeof comments>;
-    users: InferSelectModel<typeof users> | null;
-  }): CommentAggregate {
+  #toAggregate(
+    result: {
+      comments: InferSelectModel<typeof comments>;
+      users: InferSelectModel<typeof users> | null;
+    },
+    repliesCount = 0,
+  ): CommentAggregate {
     const comment = CommentAggregate.fromEntity(
       this.#toEntity(result.comments),
     );
 
+    comment.setRepliesCount(repliesCount);
     const user = result.users;
     if (user) {
       comment.setAuthor(

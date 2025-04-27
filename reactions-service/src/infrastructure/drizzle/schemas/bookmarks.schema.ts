@@ -8,7 +8,7 @@ export const bookmarks = pgTable(
   (t) => ({
     id: t.uuid('id').primaryKey().defaultRandom(),
     userId: t
-      .uuid('id')
+      .uuid('user_id')
       .notNull()
       .references(() => users.id, {
         onDelete: 'cascade',
@@ -27,7 +27,7 @@ export const bookmarks = pgTable(
   (t) => {
     return {
       userTargetIdx: uniqueIndex('bookmarks_user_target_idx').on(
-        t.userId,
+        t.collectionId,
         t.targetId,
       ),
       collectionIdIdx: index('bookmarks_collection_id_idx').on(t.collectionId),
