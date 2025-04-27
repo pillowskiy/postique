@@ -73,8 +73,8 @@
                         hx-swap="none"
                         hx-vals='{"postId": "<%= post.id %>"}'
                         hx-target="#<%= nodeId %>"
-                        hx-on::after-request="htmx.find('#<%= nodeId %>').remove()"
                         hx-confirm="Ви впевнені, що хочете архівувати цей пост?"
+                        hx-remove="#<%= nodeId %>"
                     >
                         <sl-icon name="archive" slot="prefix"></sl-icon>
                         Архівувати

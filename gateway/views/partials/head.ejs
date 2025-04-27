@@ -13,3 +13,83 @@
 <script src="https://unpkg.com/alpinejs" defer></script>
 <script src="https://cdn.jsdelivr.net/gh/Emtyloc/json-enc-custom@main/json-enc-custom.js"></script>
 <script src="https://unpkg.com/htmx.org@1.9.6/dist/ext/intersection-observer.js"></script>
+
+<script>
+    document.addEventListener('htmx:afterRequest', (event) => {
+        const xhr = event.detail.xhr;
+        const errorCode = xhr.getResponseHeader('X-Error-Code');
+
+        const isSuccess = event.detail.successful && !errorCode;
+        if (isSuccess && event.target.hasAttribute('hx-remove')) {
+            const removeTarget = event.target.getAttribute('hx-remove');
+            document.querySelector(removeTarget).remove();
+        }
+    });
+
+    document.addEventListener('htmx:confirm', function (e) {
+        if (!e.detail.elt.hasAttribute('hx-confirm')) {
+            return;
+        }
+
+        e.preventDefault();
+
+        confirm(e.detail.question, function () {
+            e.detail.issueRequest(true);
+        });
+    });
+
+    function escapeHtml(html) {
+        const div = document.createElement('div');
+        div.textContent = html;
+        return div.innerHTML;
+    }
+
+    function confirm(message, onConfirm) {
+        const dialog = document.createElement('sl-dialog');
+
+        dialog.label = 'Підтвердження дії';
+        dialog.innerHTML = `
+            ${escapeHtml(message)}
+            <div slot="footer">
+                <sl-button id="cancel" variant="default">Скасувати</sl-button>
+                <sl-button id="confirm" variant="primary">Підтвердити</sl-button>
+            </div>
+        `;
+
+        const cancelButton = dialog.querySelector('#cancel');
+        const confirmButton = dialog.querySelector('#confirm');
+
+        const preventOverlayClose = (event) => {
+            if (event.detail.source === 'overlay') {
+                event.preventDefault();
+            }
+        };
+
+        const hideDialog = () => {
+            dialog.removeEventListener('sl-request-close', preventOverlayClose);
+            cancelButton.removeEventListener('click', hideDialog);
+            confirmButton.removeEventListener('click', confirmAction);
+            dialog.removeEventListener('sl-after-hide', cleanup);
+
+            dialog.hide();
+            dialog.remove();
+        };
+
+        const confirmAction = () => {
+            hideDialog();
+            onConfirm();
+        };
+
+        const cleanup = () => {
+            dialog.remove();
+        };
+
+        dialog.addEventListener('sl-request-close', preventOverlayClose);
+        cancelButton.addEventListener('click', hideDialog, true);
+        confirmButton.addEventListener('click', confirmAction, true);
+        dialog.addEventListener('sl-after-hide', cleanup, { once: true });
+
+        document.body.append(dialog);
+        return dialog.show();
+    }
+</script>
