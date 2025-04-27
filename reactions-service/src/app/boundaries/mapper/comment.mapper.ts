@@ -24,6 +24,7 @@ export class CommentMapper {
       comment.author,
       comment.createdAt,
       comment.updatedAt,
+      comment.repliesCount,
       comment.parentId,
     );
   }

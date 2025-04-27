@@ -36,15 +36,14 @@ export class PostgresBookmarkCollectionRepository extends BookmarkCollectionRepo
       .select({
         users,
         bookmarkCollections,
-        count: sql<number>`COUNT(bookmarks.id) AS count`,
+        count: sql<number>`COUNT(${bookmarks.id}) AS count`,
       })
       .from(bookmarkCollections)
       .leftJoin(users, eq(users.id, bookmarkCollections.userId))
       .leftJoin(bookmarks, eq(bookmarks.collectionId, bookmarkCollections.id))
-      .groupBy(bookmarkCollections.id)
+      .groupBy(bookmarkCollections.id, users.id)
       .where(eq(bookmarkCollections.userId, userId));
 
-    // @ts-ignore
     return results.map((res) => this.#toAggregate(res));
   }
 
@@ -90,11 +89,11 @@ export class PostgresBookmarkCollectionRepository extends BookmarkCollectionRepo
 
   #toAggregate(result: {
     users: InferSelectModel<typeof users> | null;
-    bookmarkColletions: InferSelectModel<typeof bookmarkCollections>;
+    bookmarkCollections: InferSelectModel<typeof bookmarkCollections>;
     count: number;
   }): BookmarkCollectionAggregate {
     const aggregate = BookmarkCollectionAggregate.fromEntity(
-      this.#toEntity(result.bookmarkColletions),
+      this.#toEntity(result.bookmarkCollections),
     );
     aggregate.setBookmarksCount(result.count);
 

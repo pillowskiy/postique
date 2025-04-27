@@ -9,7 +9,13 @@ export class CommentAggregate extends CommentEntity {
 
   public author: Readonly<UserEntity>;
 
+  public repliesCount: number = 0;
+
   setAuthor(author: UserEntity): void {
     this.author = author;
+  }
+
+  setRepliesCount(repliesCount: number): void {
+    this.repliesCount = repliesCount;
   }
 }

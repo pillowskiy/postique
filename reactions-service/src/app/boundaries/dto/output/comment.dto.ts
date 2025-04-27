@@ -22,6 +22,7 @@ export class DetailedCommentOutput implements CommentOutput {
     public readonly author: UserOutput,
     public readonly createdAt: Date,
     public readonly updatedAt: Date,
+    public readonly repliesCount: number,
     public readonly parentId?: string,
   ) {}
 }
