@@ -1,5 +1,5 @@
 <% replies.forEach(function(reply) { %>
-    <div class="comment slim" id="reply-<%= reply.id %>" data-reply-id="<%= reply.id %>">
+    <div class="comment slim" id="reply-<%= reply.id %>">
         <div class="comment__author">
             <sl-avatar
                 <% if (reply.author.avatarUrl) { %>
@@ -13,7 +13,11 @@
                     <%= reply.author.username %>
                 </h3>
                 <span class="comment__reply-info--details">
-                    <%= new Date(reply.createdAt).toLocaleDateString('uk-UA', { day: 'numeric', month: 'long' }) %>
+                    <sl-relative-time
+                        date="<%= reply.createdAt %>"
+                        lang="uk-UA"
+                        format="narrow"
+                    ></sl-relative-time>
                     <% if (reply.createdAt.getTime() !== reply.updatedAt.getTime()) { %>
                         <small>(відредаговано)</small>
                     <% } %>
@@ -73,17 +77,3 @@
         ></div>
     </div>
 <% }); %>
-
-<% if (cursor) { %>
-    <div 
-        id="replies-load-more-<%= commentId %>" 
-        class="replies-load-more"
-        hx-get="/r/comments/<%= commentId %>/replies?cursor=<%= cursor %>&pageSize=10"
-        hx-trigger="click"
-        hx-swap="outerHTML"
-    >
-        <sl-button variant="text" size="small">
-            Більше
-        </sl-button>
-    </div>
-<% } %>

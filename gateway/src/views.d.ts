@@ -35,11 +35,7 @@ declare namespace render {
         'comment/comment-replies.loader': {};
         'comment/comment-replies.oob': {
             replies: Array;
-            'new Date(reply.createdAt)': { toLocaleDateString: Function };
-            Date: Variable;
             user: { id: Variable };
-            cursor: Variable;
-            commentId: Variable;
         };
         'comment/post-comments': {
             user: { username: Array };
@@ -50,8 +46,6 @@ declare namespace render {
         };
         'comment/post-comments.oob': {
             comments: Array;
-            'new Date(comment.createdAt)': { toLocaleDateString: Function };
-            Date: Variable;
             user: { id: Variable };
         };
         'components/file-input': {};
@@ -101,6 +95,9 @@ declare namespace render {
         };
         'post/components/posts-states.oob': {
             states: Array;
+        };
+        'post/components/posts-stats.oob': {
+            stats: Array;
         };
         'post/post-aside-card-list.swap': {
             posts: Array;

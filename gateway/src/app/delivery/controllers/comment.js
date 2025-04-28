@@ -42,17 +42,30 @@ export class CommentController {
         const { postId } = req.params;
         const { content, parentId } = req.body;
 
-        await this.#commentService.createComment(
+        const createdComment = await this.#commentService.createComment(
             postId,
             content,
             parentId,
             token,
         );
 
-        return render(res).template('components/toast.oob', {
-            initiator: 'Коментарі',
-            message: 'Коментар успішно створено',
-            variant: 'success',
+        /** @type {import("#app/models").DetailedComment} */
+        const comment = {
+            ...createdComment,
+            repliesCount: 0,
+            author: req.user,
+        };
+
+        if (parentId) {
+            return render(res).template('comment/comment-replies.oob', {
+                replies: [comment],
+                user: req.user,
+            });
+        }
+
+        return render(res).template('comment/post-comments.oob', {
+            comments: [comment],
+            user: req.user,
         });
     }
 
@@ -114,7 +127,6 @@ export class CommentController {
         return render(res).template('comment/post-comments.oob', {
             comments: comments.items,
             postId,
-            user: req.user,
             cursor: comments.cursorField,
         });
     }
@@ -147,7 +159,6 @@ export class CommentController {
         return render(res).template('comment/comment-replies.oob', {
             replies: replies.items,
             commentId,
-            user: req.user,
             cursor: replies.cursorField,
         });
     }

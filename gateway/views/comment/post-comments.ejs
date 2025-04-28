@@ -12,7 +12,8 @@
             <form
                 x-data="{ active: false, text: '' }"
                 hx-post="/r/comments/<%= postId %>"
-                hx-swap="none"
+                hx-target="#comments-list"
+                hx-swap="beforeend"
                 :class="{ 'comment-form__field': true, 'active': active }"
             >
                 <textarea
@@ -57,14 +58,13 @@
         hx-get="/r/comments/post/<%= postId %>"
         hx-trigger="revealed"
         hx-swap="beforeend"
-        hx-indicator=".comments__loading"
     >
         <template x-if="!!cursor">
-            <div 
+            <div
                 x-data="{ show: false }"
-                id="comment-load-more" 
-                class="comment-load-more" 
-                :hx-get="`/r/comments/post/<%= postId %>?cursor=${cursor}&pageSize=10`" 
+                id="comment-load-more"
+                class="comment-load-more"
+                :hx-get="`/r/comments/post/<%= postId %>?cursor=${cursor}&pageSize=10`"
                 hx-trigger="revealed"
                 hx-swap="outerHTML"
             >
@@ -78,7 +78,8 @@
         <div class="comment-form reply">
             <form
                 hx-post="/r/comments/<%= postId %>"
-                hx-swap="none"
+                hx-swap="beforeend"
+                hx-on::after-on-load="afterReply(event)"
                 class="comment-form__field active"
             >
                 <input id="parent" name="parentId" type="hidden" />
@@ -117,35 +118,8 @@
 
     <script>
         const postId = "<%= postId %>";
-        let visibleReplies = new Set();
         let activeFormId = null;
 
-
-        function toggleReplies(commentId) {
-            const repliesContainer = document.getElementById(
-                `replies-${commentId}`,
-            );
-            const replyIcon = document.getElementById(
-                `reply-icon-${commentId}`,
-            );
-
-            if (repliesContainer) {
-                if (visibleReplies.has(commentId)) {
-                    repliesContainer.style.display = 'none';
-                    visibleReplies.delete(commentId);
-                    replyIcon.style.transform = '';
-                } else {
-                    repliesContainer.style.display = 'block';
-                    visibleReplies.add(commentId);
-                    replyIcon.style.transform = 'rotate(180deg)';
-
-                    if (!repliesContainer.getAttribute('data-loaded')) {
-                        repliesContainer.setAttribute('data-loaded', 'true');
-                        htmx.trigger(`#replies-${commentId}`, 'load', {});
-                    }
-                }
-            }
-        }
 
         function removeAllReplyForms() {
             const formContainers = document.querySelectorAll(
@@ -170,23 +144,11 @@
             const submitBtn = formNode.querySelector('.submit-reply-btn');
 
             parent.setAttribute('value', commentId);
+            formNode.setAttribute('hx-target', `#replies-${commentId}`)
             htmx.process(formNode);
 
             cancelBtn.addEventListener('click', () => {
                 removeAllReplyForms();
-            });
-
-            submitBtn.addEventListener('click', () => {
-                if (textarea.value.trim()) {
-                    // If it's a reply to a comment and replies are hidden, show them
-                    if (!isReplyToReply && !visibleReplies.has(commentId)) {
-                        toggleReplies(commentId);
-                    }
-
-                    setTimeout(() => {
-                        removeAllReplyForms();
-                    }, 100);
-                }
             });
 
             const containerId = `reply-form-container-${replyId ?? commentId}`;
@@ -203,6 +165,30 @@
             }
         }
 
+        function afterReply(event) {
+            console.log(event, event.detail.failed)
+            if (event.detail.failed) {
+                return
+            }
+
+            console.log(event.detail.requestConfig.path);
+            removeAllReplyForms();
+
+            const commentId = event.detail.requestConfig.parameters.parentId;
+            if (!commentId) {
+                return void console.error(`Comment ID not found in request path`);
+            }
+
+            const commentContainer = document.getElementById(`comment-${commentId}`);
+            if (!commentContainer) {
+                return void console.error(`Comment container for comment ${commentId} not found`);
+            }
+
+            const $commentState = Alpine.$data(commentContainer);
+            $commentState.repliesCount++;
+            $commentState.showReplies = true;
+        }
+
         document.addEventListener('click', (e) => {
             if (
                 activeFormId &&
@@ -210,29 +196,6 @@
                 !e.target.closest('[data-reply-btn]')
             ) {
                 removeAllReplyForms();
-            }
-        });
-
-        document.addEventListener('DOMContentLoaded', function () {
-            if (
-                'IntersectionObserver' in window &&
-                document.getElementById('comment-load-more')
-            ) {
-                const loadMoreElement =
-                    document.getElementById('comment-load-more');
-
-                const observer = new IntersectionObserver(
-                    (entries) => {
-                        entries.forEach((entry) => {
-                            if (entry.isIntersecting) {
-                                htmx.trigger(entry.target, 'loadMore', {});
-                            }
-                        });
-                    },
-                    { threshold: 0.5 },
-                );
-
-                observer.observe(loadMoreElement);
             }
         });
     </script>

@@ -1,7 +1,7 @@
 <% comments.forEach(function(comment) { %>
-    <div class="comment" id="comment-<%= comment.id %>" data-comment-id="<%= comment.id %>">
+    <div class="comment" id="comment-<%= comment.id %>" x-data="{repliesCount: <%= comment.repliesCount %>, showReplies: false}">
         <div class="comment__author">
-            <sl-avatar 
+            <sl-avatar
                 <% if (comment.author.avatarUrl) { %>
                     image="<%= comment.author.avatarUrl %>"
                 <% } else { %>
@@ -12,7 +12,11 @@
             <div class="comment__info">
                 <h3 class="comment__info--name"><%= comment.author.username %></h3>
                 <span class="comment__info--details">
-                    <%= new Date(comment.createdAt).toLocaleDateString('uk-UA', { day: 'numeric', month: 'long' }) %>
+                    <sl-relative-time
+                        date="<%= comment.createdAt %>"
+                        lang="uk-UA"
+                        format="narrow"
+                    ></sl-relative-time>
                     <% if (comment.createdAt.getTime() !== comment.updatedAt.getTime()) { %>
                         <small>(відредаговано)</small>
                     <% } %>
@@ -28,7 +32,7 @@
                     <sl-menu>
                         <% if (user && user.id === comment.author.id) { %>
                             <sl-menu-item disabled>Редагувати</sl-menu-item>
-                            <sl-menu-item 
+                            <sl-menu-item
                                 hx-delete="/r/comments/<%= comment.id %>"
                                 hx-confirm="Ви впевнені, що хочете видалити цей коментар?"
                                 hx-remove="#comment-<%= comment.id %>"
@@ -49,16 +53,18 @@
         <div class="comment__actions">
             <sl-button
                 variant="text"
-                pill 
-                onclick="toggleReplies('<%= comment.id %>')"
-                <%= !comment.repliesCount ? 'disabled' : '' %>
+                pill
+                x-on:click="showReplies = !showReplies"
+                x-show="repliesCount > 0"
             >
                 <sl-icon
                     class="sm"
                     slot="prefix"
                     name="chevron-down"
+                    :style="showReplies ? 'transform: rotate(180deg)' : ''"
                 ></sl-icon>
-                Відповіді (<%= comment.repliesCount ?? 0 %>)
+
+                <span x-text="`Відповіді (${repliesCount})`"></span>
             </sl-button>
 
             <sl-button
@@ -75,15 +81,14 @@
 
         <div id="reply-form-container-<%= comment.id %>" class="reply-form-container"></div>
 
-        <div 
-            id="replies-<%= comment.id %>" 
-            class="reply" 
-            style="display: none"
+        <div
+            id="replies-<%= comment.id %>"
+            class="reply"
+            x-show="showReplies"
             hx-get="/r/comments/<%= comment.id %>/replies"
             hx-trigger="load"
-            hx-indicator="#reply-loading-<%= comment.id %>"
         >
-            <div id="reply-loading-<%= comment.id %>" class="reply-loading">
+            <div class="reply-loading">
             </div>
         </div>
     </div>

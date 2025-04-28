@@ -18,14 +18,15 @@
 }
 
 .comment {
-    margin-bottom: 32px;
-    position: relative;
     --avatar-size: 2.5rem;
     --spacing-left: 52px;
+    margin-bottom: 24px;
+    position: relative;
 
     .slim {
         --avatar-size: 2rem;
         --spacing-left: 44px;
+        margin-bottom: 12px;
     }
 
     &__author {
