@@ -6,7 +6,7 @@
     >
         <sl-icon-button
             id="trigger-<%= state.postId %>"
-            name="<%= state.saved ? 'bookmark-check' : 'bookmark-plus' %>"
+            name="<%= state.saved ? 'bookmark-fill' : 'bookmark-plus' %>"
             hx-get="/r/bookmarks/popup/<%= state.postId %>"
             hx-target="#bookmark-popup-<%= state.postId %>"
             hx-trigger="click"

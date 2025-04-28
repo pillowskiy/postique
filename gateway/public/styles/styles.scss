@@ -996,10 +996,11 @@ sl-alert::part(message) {
         }
 
         &-count {
-            gap: 16px;
+            gap: 12px;
 
             & > .item {
                 font-size: var(--sl-font-size-small);
+                color: var(--sl-color-neutral-500);
             }
         }
     }

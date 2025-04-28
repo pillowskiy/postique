@@ -4,24 +4,45 @@
     class="post-card__reactions-count"
     hx-swap-oob="true"
 >
-    <sl-tooltip distance="18" class="item" content="Лайків">
-        <div class="skeleton-flex-line">
-            <sl-icon class="sm" fill="black" name="heart"></sl-icon>
-            <%= stat.likesCount %>
-        </div>
+    <sl-tooltip distance="8" class="item" content="Лайків">
+        <sl-button
+            x-data="{ active: false, count: <%= stat.likesCount %>, afterLike: function() { this.active = !this.active; this.count += this.active ? 1 : -1 } }"
+            hx-post="/r/likes/<%= stat.postId %>"
+            hx-trigger="click"
+            hx-on::after-on-load="if(event.detail.sucessful) Alpine.$data(this).afterLike.apply(Alpine.$data(this))"
+            class="ghost"
+            variant="text"
+            pill
+        >
+            <sl-icon
+                slot="prefix"
+                class="sm"
+                fill="black"
+                :name="active ? 'heart-fill' : 'heart'"
+            ></sl-icon>
+            <span x-text="count"></span>
+        </sl-button>
     </sl-tooltip>
 
-    <sl-tooltip distance="18" class="item" content="Коментарів">
-        <div class="skeleton-flex-line">
-            <sl-icon class="sm filled" name="chat"></sl-icon>
+    <sl-tooltip distance="8" class="item" content="Коментарів">
+        <sl-button
+            onclick="document.querySelector('#comments-list').scrollIntoView({behavior: 'smooth'})"
+            class="ghost"
+            variant="text"
+            pill
+        >
+            <sl-icon slot="prefix" class="sm filled" name="chat"></sl-icon>
             <%= stat.commentsCount %>
-        </div>
+        </sl-button>
     </sl-tooltip>
 
     <% if (withView) { %>
     <sl-tooltip distance="18" class="item" content="Переглядів">
-        <div class="skeleton-flex-line">
-            <sl-icon class="sm filled" name="eye"></sl-icon>
+        <div
+            class="skeleton-flex-line"
+            style="margin-left: var(--sl-spacing-medium)"
+        >
+            <sl-icon slot="prefix" class="sm filled" name="eye"></sl-icon>
             <%= stat.viewsCount %>
         </div>
     </sl-tooltip>

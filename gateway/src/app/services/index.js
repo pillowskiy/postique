@@ -42,9 +42,9 @@
 /**
  * Comment Service API
  * @typedef {Object} CommentService
- * @property {(postId: string, content: string, parentId: string | null, auth: string) => Promise<import("#app/models").CommentIdentifier>} createComment
+ * @property {(postId: string, content: string, parentId: string | null, auth: string) => Promise<import("#app/models").Comment>} createComment
  * @property {(commentId: string, auth: string) => Promise<import("#app/models").CommentIdentifier>} deleteComment
- * @property {(commentId: string, content: string, auth: string) => Promise<import("#app/models").EditedComment>} editComment
+ * @property {(commentId: string, content: string, auth: string) => Promise<import("#app/models").Comment>} editComment
  * @property {(postId: string, auth: string, cursor: string|null, pageSize: number|null) => Promise<import("#app/models").CommentCursor>} getPostComments
  * @property {(commentId: string, auth: string, cursor: string|null, pageSize: number|null) => Promise<import("#app/models").CommentCursor>} getCommentReplies
  */

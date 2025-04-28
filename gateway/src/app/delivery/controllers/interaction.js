@@ -24,6 +24,30 @@ export class InteractionController {
      * @param {Request} req
      * @param {Response} res
      */
+    async swapStats(req, res) {
+        const errors = validate(req);
+        if (!errors.isEmpty()) {
+            return render(res).template('components/toast.oob', {
+                initiator: 'Реакції',
+                message: JSON.stringify(errors.mapped()),
+                variant: 'danger',
+            });
+        }
+
+        const withView = req.query.withView === 'true' || false;
+
+        const { postIds } = req.body;
+        const interactions = await this.#interactionService.findBatch(postIds);
+        return render(res).template('post/components/posts-stats.oob', {
+            stats: interactions.stats,
+            withView,
+        });
+    }
+
+    /**
+     * @param {Request} req
+     * @param {Response} res
+     */
     async swapInteractions(req, res) {
         const errors = validate(req);
         if (!errors.isEmpty()) {

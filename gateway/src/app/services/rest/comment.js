@@ -16,7 +16,7 @@ export class CommentService extends RestClient {
      * @param {string} content
      * @param {string | null} parentId
      * @param {string} auth
-     * @returns {Promise<import("#app/models").CommentIdentifier>}
+     * @returns {Promise<import("#app/models").Comment>}
      */
     async createComment(postId, content, parentId, auth) {
         const response = await this._client
@@ -26,7 +26,7 @@ export class CommentService extends RestClient {
             })
             .json();
 
-        return this.#commentIdentifierToModel(response);
+        return this.#commentToModel(response);
     }
 
     /**
@@ -48,7 +48,7 @@ export class CommentService extends RestClient {
      * @param {string} commentId
      * @param {string} content
      * @param {string} auth
-     * @returns {Promise<import("#app/models").EditedComment>}
+     * @returns {Promise<import("#app/models").Comment>}
      */
     async editComment(commentId, content, auth) {
         const response = await this._client
@@ -58,7 +58,7 @@ export class CommentService extends RestClient {
             })
             .json();
 
-        return this.#editedCommentToModel(response);
+        return this.#commentToModel(response);
     }
 
     /**
@@ -115,19 +115,6 @@ export class CommentService extends RestClient {
 
     /**
      * @param {Object} data
-     * @returns {import("#app/models").EditedComment}
-     */
-    #editedCommentToModel(data) {
-        return {
-            id: data.id,
-            content: data.content,
-            createdAt: new Date(data.createdAt),
-            updatedAt: new Date(data.updatedAt),
-        };
-    }
-
-    /**
-     * @param {Object} data
      * @returns {import("#app/models").CommentCursor}
      */
     #commentCursorToModel(data) {
@@ -154,6 +141,22 @@ export class CommentService extends RestClient {
             createdAt: new Date(comment.createdAt),
             updatedAt: new Date(comment.updatedAt),
             repliesCount: comment.repliesCount,
+            parentId: comment.parentId,
+        };
+    }
+
+    /**
+     * @param {Object} comment
+     * @returns {import("#app/models").Comment}
+     */
+    #commentToModel(comment) {
+        return {
+            id: comment.id,
+            userId: comment.userId,
+            postId: comment.postId,
+            content: comment.content,
+            createdAt: new Date(comment.createdAt),
+            updatedAt: new Date(comment.updatedAt),
             parentId: comment.parentId,
         };
     }

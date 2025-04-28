@@ -1,0 +1,35 @@
+<% stats.forEach((stat) => { %>
+<div
+    id="reactions-<%= stat.postId %>"
+    class="post-card__reactions-count"
+    hx-swap-oob="true"
+>
+    <sl-tooltip distance="18" class="item" content="Лайків">
+        <div class="skeleton-flex-line">
+            <sl-icon
+                slot="prefix"
+                class="sm"
+                fill="black"
+                name="heart-fill"
+            ></sl-icon>
+            <%= stat.likesCount %>
+        </div>
+    </sl-tooltip>
+
+    <sl-tooltip distance="18" class="item" content="Коментарів">
+        <div class="skeleton-flex-line">
+            <sl-icon slot="prefix" class="sm filled" name="chat-fill"></sl-icon>
+            <%= stat.commentsCount %>
+        </div>
+    </sl-tooltip>
+
+    <% if (withView) { %>
+    <sl-tooltip distance="18" class="item" content="Переглядів">
+        <div class="skeleton-flex-line">
+            <sl-icon slot="prefix" class="sm filled" name="eye-fill"></sl-icon>
+            <%= stat.viewsCount %>
+        </div>
+    </sl-tooltip>
+    <% } %>
+</div>
+<% }) %>
