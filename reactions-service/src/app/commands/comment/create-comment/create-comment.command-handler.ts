@@ -50,6 +50,14 @@ export class CreateCommentCommandHandler extends Command<
       new ReactedEvent(comment.postId, ReactionType.Comment, true),
     );
 
-    return new CreateCommentOutput(comment.id);
+    return new CreateCommentOutput(
+      comment.id,
+      comment.userId,
+      comment.postId,
+      comment.content,
+      comment.createdAt,
+      comment.updatedAt,
+      comment.parentId,
+    );
   }
 }

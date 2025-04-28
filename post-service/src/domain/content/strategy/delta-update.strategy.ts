@@ -19,7 +19,6 @@ export class ContentChangeStrategy {
       this.applyDelta(delta);
     });
   }
-
   public applyDelta(delta: DeltaEntity) {
     const deltaType = delta.type;
     switch (deltaType) {
@@ -35,8 +34,8 @@ export class ContentChangeStrategy {
   public insertDelta(delta: DeltaEntity): void {
     const paragraph = this._paragraphs[delta.index];
     if (paragraph) {
-      // Redirecting to update to ensure system reliability for users.
-      // Throwing a violation is an option, but keeping it simple for now.
+      // Paragraph at the specified index exist.
+      // Fallback to update to maintain consistency and avoid runtime issues.
       return this.updateDelta(delta);
     }
 
@@ -68,10 +67,14 @@ export class ContentChangeStrategy {
   public updateDelta(delta: DeltaEntity): void {
     const paragraph = this._paragraphs[delta.index];
     if (!paragraph) {
-      // Redirecting to create to ensure system reliability for users.
-      // Throwing a violation is an option, but keeping it simple for now.
+      // Paragraph at the specified index doesn't exist.
+      // Fallback to insert to maintain consistency and avoid runtime issues.
       return this.insertDelta(delta);
     }
+
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-expect-error
+    delta.paragraph.id = paragraph;
 
     this._changeList.push(
       new BulkOperation(

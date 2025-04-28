@@ -43,9 +43,12 @@ export class EditCommentCommandHandler extends Command<
 
     return new EditCommentOutput(
       comment.id,
+      comment.userId,
+      comment.postId,
       comment.content,
       comment.createdAt,
       comment.updatedAt,
+      comment.parentId,
     );
   }
 }

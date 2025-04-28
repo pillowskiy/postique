@@ -27,13 +27,6 @@ export class DetailedCommentOutput implements CommentOutput {
   ) {}
 }
 
-export class CreateCommentOutput extends IdentifierDto {}
-export class EditCommentOutput {
-  constructor(
-    public readonly id: string,
-    public readonly content: string,
-    public readonly createdAt: Date,
-    public readonly updatedAt: Date,
-  ) {}
-}
+export class CreateCommentOutput extends CommentOutput {}
+export class EditCommentOutput extends CommentOutput {}
 export class DeleteCommentOutput extends IdentifierDto {}

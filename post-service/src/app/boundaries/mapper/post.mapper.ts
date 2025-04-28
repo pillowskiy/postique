@@ -32,7 +32,6 @@ export class PostMapper {
       ParagraphMapper.toDto(p),
     );
 
-    console.log(post.ownerRef);
     const postDto = new DetailedPostOutput(
       post.id,
       post.title,
