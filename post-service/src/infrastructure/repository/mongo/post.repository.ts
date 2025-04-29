@@ -197,7 +197,7 @@ export class MongoPostRepository extends PostRepository {
   }
 
   findManyPosts(ids: string[]): AsyncGenerator<PostAggregate> {
-    return this._cursor({}, 'createdAt', { $in: ids });
+    return this._cursor({}, 'createdAt', { _id: { $in: ids } });
   }
 
   private async *_cursor(
