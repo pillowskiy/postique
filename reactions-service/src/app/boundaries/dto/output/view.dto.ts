@@ -11,3 +11,7 @@ export class ViewOutput {
 }
 
 export class RegisterViewOutput {}
+
+export class ClearHistoryOutput {}
+
+export class RemoveViewOutput {}

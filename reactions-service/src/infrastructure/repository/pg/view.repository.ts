@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { and, eq, avg, count, InferSelectModel } from 'drizzle-orm';
+import { and, eq, avg, count, InferSelectModel, gt } from 'drizzle-orm';
 import { ViewRepository } from '@/app/boundaries/repository';
 import { ViewEntity } from '@/domain/view/view.entity';
 import { Transactional } from '@/app/boundaries/common';
@@ -49,6 +49,16 @@ export class PostgresViewRepository extends ViewRepository {
     });
   }
 
+  async deleteByUser(userId: string): Promise<void> {
+    await this._txHost.exec.delete(views).where(eq(views.userId, userId));
+  }
+
+  async delete(userId: string, targetId: string): Promise<void> {
+    await this._txHost.exec
+      .delete(views)
+      .where(and(eq(views.userId, userId), eq(views.targetId, targetId)));
+  }
+
   async countByTarget(targetId: string): Promise<number> {
     const [result] = await this._txHost.exec
       .select({ count: count() })
@@ -86,6 +96,25 @@ export class PostgresViewRepository extends ViewRepository {
       avgReadingTime: +result.avgReadingTime!,
       totalViews: result.totalViews,
     };
+  }
+
+  async getUserHistory(
+    userId: string,
+    cursor?: string,
+    pageSize: number = 20,
+  ): Promise<ViewEntity[]> {
+    const results = await this._txHost.exec
+      .select()
+      .from(views)
+      .where(
+        and(
+          eq(views.userId, userId),
+          cursor ? gt(views.createdAt, new Date(cursor)) : undefined,
+        ),
+      )
+      .limit(pageSize);
+
+    return results.map((res) => this.#toEntity(res));
   }
 
   #toEntity(result: InferSelectModel<typeof views>): ViewEntity {
