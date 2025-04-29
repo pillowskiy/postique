@@ -9,11 +9,15 @@
             x-data="{ active: false, count: <%= stat.likesCount %>, afterLike: function() { this.active = !this.active; this.count += this.active ? 1 : -1 } }"
             hx-post="/r/likes/<%= stat.postId %>"
             hx-trigger="click"
-            hx-on::after-on-load="if(event.detail.sucessful) Alpine.$data(this).afterLike.apply(Alpine.$data(this))"
+            hx-swap="none"
+            hx-on::after-on-load="if(!event.detail.failed) Alpine.$data(this).afterLike.apply(Alpine.$data(this))"
             class="ghost"
             variant="text"
             pill
         >
+            <template
+                id="alpine-like-state-effect-<%=stat.postId %>"
+            ></template>
             <sl-icon
                 slot="prefix"
                 class="sm"
@@ -35,17 +39,5 @@
             <%= stat.commentsCount %>
         </sl-button>
     </sl-tooltip>
-
-    <% if (withView) { %>
-    <sl-tooltip distance="18" class="item" content="Переглядів">
-        <div
-            class="skeleton-flex-line"
-            style="margin-left: var(--sl-spacing-medium)"
-        >
-            <sl-icon slot="prefix" class="sm filled" name="eye"></sl-icon>
-            <%= stat.viewsCount %>
-        </div>
-    </sl-tooltip>
-    <% } %>
 </div>
 <% }) %>

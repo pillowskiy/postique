@@ -22,14 +22,5 @@
             <%= stat.commentsCount %>
         </div>
     </sl-tooltip>
-
-    <% if (withView) { %>
-    <sl-tooltip distance="18" class="item" content="Переглядів">
-        <div class="skeleton-flex-line">
-            <sl-icon slot="prefix" class="sm filled" name="eye-fill"></sl-icon>
-            <%= stat.viewsCount %>
-        </div>
-    </sl-tooltip>
-    <% } %>
 </div>
 <% }) %>

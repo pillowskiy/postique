@@ -1,4 +1,10 @@
 <% states.forEach((state) => { %>
+<span
+    id="alpine-like-state-effect-<%=state.postId %>"
+    x-init="active = <%= state.liked %>"
+    hx-swap-oob="true"
+></span>
+
 <div id="save-<%= state.postId %>" hx-swap-oob="true">
     <sl-tooltip
         content="Зберегти"

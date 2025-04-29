@@ -34,13 +34,10 @@ export class InteractionController {
             });
         }
 
-        const withView = req.query.withView === 'true' || false;
-
         const { postIds } = req.body;
         const interactions = await this.#interactionService.findBatch(postIds);
         return render(res).template('post/components/posts-stats.oob', {
             stats: interactions.stats,
-            withView,
         });
     }
 
@@ -58,13 +55,10 @@ export class InteractionController {
             });
         }
 
-        const withView = req.query.withView === 'true' || false;
-
         const { postIds } = req.body;
         const interactions = await this.#interactionService.findBatch(postIds);
         return render(res).template('post/components/posts-interaction.oob', {
             stats: interactions.stats,
-            withView,
         });
     }
 

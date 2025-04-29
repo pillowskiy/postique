@@ -9,7 +9,7 @@ return Math.ceil(totalWords / wordsPerMinute); } %>
 <% const postIds = JSON.stringify({ postIds: [post.id] }); %>
 
 <template
-    hx-post="/r/interactions/istats?withView=true"
+    hx-post="/r/interactions/istats"
     hx-vals="<%= postIds %>"
     hx-trigger="load"
     hx-target="#root"
