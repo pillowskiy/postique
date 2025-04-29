@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { count, eq, InferSelectModel, sql } from 'drizzle-orm';
+import { eq, InferSelectModel, sql } from 'drizzle-orm';
 import { BookmarkCollectionRepository } from '@/app/boundaries/repository';
 import {
   BookmarkCollectionAggregate,

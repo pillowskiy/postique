@@ -23,6 +23,7 @@ export class DetailedBookmarkCollectionOutput
     public readonly createdAt: Date,
     public readonly updatedAt: Date,
     public readonly bookmarksCount: number = 0,
+    public readonly coverImages: string[] = [],
     public readonly author?: Readonly<UserOutput>,
   ) {}
 }

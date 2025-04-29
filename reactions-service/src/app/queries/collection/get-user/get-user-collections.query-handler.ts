@@ -1,10 +1,10 @@
-import { QueryHandler } from '@nestjs/cqrs';
-import { Inject } from '@nestjs/common';
-import { Query } from '../../common';
-import { GetUserCollectionsQuery } from './get-user-collections.query';
-import { BookmarkCollectionRepository } from '@/app/boundaries/repository';
 import { BookmarkCollectionOutput } from '@/app/boundaries/dto/output';
 import { BookmarkCollectionMapper } from '@/app/boundaries/mapper';
+import { BookmarkCollectionRepository } from '@/app/boundaries/repository';
+import { Inject } from '@nestjs/common';
+import { QueryHandler } from '@nestjs/cqrs';
+import { Query } from '../../common';
+import { GetUserCollectionsQuery } from './get-user-collections.query';
 
 @QueryHandler(GetUserCollectionsQuery)
 export class GetUserCollectionsQueryHandler extends Query<

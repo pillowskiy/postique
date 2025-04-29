@@ -14,6 +14,7 @@ export class BookmarkCollectionMapper {
       collection.createdAt,
       collection.updatedAt,
       collection.bookmarksCount,
+      [...collection.coverImages],
       collection.author ? UserMapper.toDto(collection.author) : undefined,
     );
   }

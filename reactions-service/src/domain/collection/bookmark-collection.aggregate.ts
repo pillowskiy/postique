@@ -10,10 +10,19 @@ export class BookmarkCollectionAggregate extends BookmarkCollectionEntity {
   }
 
   public author: Readonly<UserEntity>;
-  public bookmarksCount: number;
+  public bookmarksCount: Readonly<number>;
+  private _coverImages: string[] = [];
+
+  get coverImages(): Readonly<string[]> {
+    return this._coverImages ?? [];
+  }
 
   setBookmarksCount(count: number): void {
     this.bookmarksCount = count;
+  }
+
+  appendCoverImage(image: string): void {
+    this._coverImages.push(image);
   }
 
   setAuthor(author: UserEntity): void {
