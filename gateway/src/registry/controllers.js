@@ -1,25 +1,19 @@
-import {
-    AuthController,
-    BookmarkController,
-    CollectionController,
-    CommentController,
-    HomeController,
-    InteractionController,
-    MeController,
-    PostController,
-} from '#app/delivery/controllers/index.js';
+import * as controllers from '#app/delivery/controllers/index.js';
 
 import { asClass } from 'awilix';
 
 const controllerRegistries = /** @type {const} */ {
-    authController: asClass(AuthController).singleton(),
-    postController: asClass(PostController).singleton(),
-    meController: asClass(MeController).singleton(),
-    homeController: asClass(HomeController).singleton(),
-    interactionController: asClass(InteractionController).singleton(),
-    commentController: asClass(CommentController).singleton(),
-    bookmarkController: asClass(BookmarkController).singleton(),
-    collectionController: asClass(CollectionController).singleton(),
+    authController: asClass(controllers.AuthController).singleton(),
+    postController: asClass(controllers.PostController).singleton(),
+    meController: asClass(controllers.MeController).singleton(),
+    homeController: asClass(controllers.HomeController).singleton(),
+    interactionController: asClass(
+        controllers.InteractionController,
+    ).singleton(),
+    commentController: asClass(controllers.CommentController).singleton(),
+    bookmarkController: asClass(controllers.BookmarkController).singleton(),
+    collectionController: asClass(controllers.CollectionController).singleton(),
+    likeController: asClass(controllers.LikeController).singleton(),
 };
 
 export default controllerRegistries;

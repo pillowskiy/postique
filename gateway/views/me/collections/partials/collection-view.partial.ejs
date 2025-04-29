@@ -1,0 +1,67 @@
+<div class="collection-promo">
+    <div class="collection-promo__content">
+        <h2>Створіть колекцію для легкої організації та обміну історіями</h2>
+        <sl-button variant="neutral" size="small" pill>
+            Створити колекцію
+        </sl-button>
+    </div>
+
+    <div class="collection-promo__decoration">
+        <div class="collection-promo__decoration--icon">
+            <sl-icon name="bookmark-plus"></sl-icon>
+        </div>
+    </div>
+</div>
+
+<ul>
+    <% if (collections && collections.length > 0) { %> <%
+    collections.forEach(collection => { %>
+    <li class="collection-card" x-data="{}">
+        <div class="collection-card__content">
+            <div class="collection-card__author">
+                <sl-avatar
+                    class="collection-card__author--avatar"
+                    label="User avatar"
+                    initials="<%= collection.author.username.slice(0,2) %>"
+                ></sl-avatar>
+                <%= collection.author.username %>
+            </div>
+
+            <div class="collection-card__info">
+                <h2 class="collection-card__info--title">
+                    <%= collection.name %>
+                </h2>
+                <% if (collection.description) { %>
+                <p class="collection-card__info--decription">
+                    <%= collection.description %>
+                </p>
+                <% } %>
+            </div>
+
+            <div class="collection-card__meta">
+                <span
+                    x-text="getCollectionLabel(<%= collection.bookmarksCount %>)"
+                ></span>
+
+                <sl-tooltip content="Більше">
+                    <sl-icon-button
+                        name="three-dots"
+                        variant="neutral"
+                        size="small"
+                    ></sl-icon-button>
+                </sl-tooltip>
+            </div>
+        </div>
+    </li>
+    <% }); %>
+    <% } else { %>
+    <div class="empty-state">
+        <div class="create-list-prompt">
+            <h2>Створіть список для легкої організації та обміну історіями</h2>
+            <sl-button variant="primary" class="start-list-button">
+                Створити список
+            </sl-button>
+        </div>
+    </div>
+    <% } %>
+</ul>

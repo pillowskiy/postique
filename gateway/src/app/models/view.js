@@ -9,4 +9,11 @@
  * @property {string} [userAgent]
  */
 
+/**
+ * @typedef {Object} ViewCursor
+ * @property {View[]} items
+ * @property {string|Date|null} cursorField
+ * @property {number} size
+ */
+
 export {};

@@ -8,3 +8,4 @@ export * from './reaction.js';
 export * from './comment.js';
 export * from './bookmark.js';
 export * from './collection.js';
+export * from './like.js';

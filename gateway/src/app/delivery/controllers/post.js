@@ -19,16 +19,21 @@ export class PostController {
     /** @type {import("#app/services").PostService} */
     #postService;
 
+    /** @type {import("#app/services").ViewService} */
+    #viewService;
+
     /** @type {import("#app/services").FileService} */
     #fileService;
 
     /**
      * @param {import("#app/services").PostService} postService
      * @param {import("#app/services").FileService} fileService
+     * @param {import("#app/services").ViewService} viewService
      */
-    constructor(postService, fileService) {
+    constructor(postService, fileService, viewService) {
         this.#postService = postService;
         this.#fileService = fileService;
+        this.#viewService = viewService;
     }
 
     /**
@@ -51,8 +56,6 @@ export class PostController {
             throw new ClientException('You should be logged in', 401);
         }
 
-        console.log('Token', token);
-
         const errors = validate(req);
         if (!errors.isEmpty()) {
             throw new ClientException(errors.mapped(), 400);
@@ -67,6 +70,12 @@ export class PostController {
         );
         if (titleIndex !== -1) {
             content.splice(titleIndex, 1);
+        }
+
+        if (token) {
+            this.#viewService.registerView(post.id, token).catch((err) => {
+                console.log(err);
+            });
         }
 
         return render(res).template('post/post-page', {

@@ -1,0 +1,32 @@
+<% if (posts && posts.length > 0) { %>
+
+<!-- Declarations -->
+<% const postIds = JSON.stringify({ postIds: posts.map((p) => p.id) }); %>
+
+<div
+    hx-post="/r/interactions/stats"
+    hx-vals="<%= postIds %>"
+    hx-trigger="revealed"
+    hx-target="#posts-list"
+    hx-swap="none"
+></div>
+
+<% if (user) { %>
+<div
+    hx-post="/r/interactions/states"
+    hx-vals="<%= postIds %>"
+    hx-trigger="revealed"
+    hx-target="#posts-list"
+    hx-swap="none"
+></div>
+<% } %>
+
+<ul id="posts-list" class="post-list">
+    <%- await include('../../../post/post-detailed-list.ejs', { posts }) %>
+</ul>
+<% } else { %>
+<div class="no-posts">
+    <sl-icon name="journal-x" size="large"></sl-icon>
+    <p>Історія переглядів пуста</p>
+</div>
+<% } %>

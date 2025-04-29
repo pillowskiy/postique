@@ -13,6 +13,7 @@ const routeRegistries = /** @type {const} */ {
     commentRouter: awilix.asFunction(routes.CommentRoutes).singleton(),
     bookmarkRouter: awilix.asFunction(routes.BookmarkRoutes).singleton(),
     collectionRouter: awilix.asFunction(routes.CollectionRoutes).singleton(),
+    likeRouter: awilix.asFunction(routes.LikeRoutes).singleton(),
 };
 
 export default routeRegistries;

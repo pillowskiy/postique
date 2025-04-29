@@ -70,6 +70,15 @@ declare namespace render {
             title: Variable;
             __renderTarget: Variable;
         };
+        'me/collections/collections-page': {};
+        'me/collections/partials/collection-view.partial': {
+            collections: Array;
+        };
+        'me/collections/partials/history-view.partial': {
+            posts: Array;
+            JSON: { stringify: Function };
+            user: Variable;
+        };
         'me/posts/components/post-archived-card': {};
         'me/posts/components/post-draft-list': {
             posts: Array;
@@ -98,6 +107,10 @@ declare namespace render {
         };
         'post/components/posts-stats.oob': {
             stats: Array;
+        };
+        'post/partials/posts-view.partial': {
+            JSON: { stringify: Function };
+            user: Variable;
         };
         'post/post-aside-card-list.swap': {
             posts: Array;

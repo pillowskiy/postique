@@ -16,11 +16,20 @@ const interactionService = asClass(
     services.rest.InteractionService,
 ).singleton();
 
+/** @type {ReturnType<typeof asClass<services.BookmarkService>>} */
 const bookmarkService = asClass(services.rest.BookmarkService).singleton();
+
+/** @type {ReturnType<typeof asClass<services.CollectionService>>} */
 const collectionService = asClass(services.rest.CollectionService).singleton();
 
 /** @type {ReturnType<typeof asClass<services.CommentService>>} */
 const commentService = asClass(services.rest.CommentService).singleton();
+
+/** @type {ReturnType<typeof asClass<services.LikeService>>} */
+const likeService = asClass(services.rest.LikeService).singleton();
+
+/** @type {ReturnType<typeof asClass<services.ViewService>>} */
+const viewService = asClass(services.rest.ViewService).singleton();
 
 const providerRegistries = /** @type {const} */ {
     authService,
@@ -30,6 +39,8 @@ const providerRegistries = /** @type {const} */ {
     commentService,
     bookmarkService,
     collectionService,
+    likeService,
+    viewService,
 };
 
 export default providerRegistries;

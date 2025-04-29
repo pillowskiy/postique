@@ -1,0 +1,88 @@
+<div class="container">
+    <header class="header">
+        <h1>Ваша бібліотека</h1>
+        <div class="header-actions">
+            <sl-button variant="primary" pill>Новий список</sl-button>
+        </div>
+    </header>
+
+    <sl-tab-group class="tabs-container" id="library-tabs">
+        <sl-tab
+            slot="nav"
+            panel="your-lists"
+            hx-get="/me/collections"
+            hx-trigger="click once"
+            hx-target="#your-lists"
+            hx-swap="innerHTML"
+        >
+            Ваші колекції
+        </sl-tab>
+
+        <sl-tab slot="nav" panel="watchlist">Список читання</sl-tab>
+        <sl-tab
+            slot="nav"
+            panel="history"
+            hx-get="/me/collections/history"
+            hx-trigger="click once"
+            hx-target="#history"
+            hx-swap="innerHTML"
+        >
+            Історія читання
+        </sl-tab>
+
+        <sl-tab-panel id="your-lists" name="your-lists"></sl-tab-panel>
+        <sl-tab-panel id="watchlist" name="watchlist"
+            >Not implemented yet</sl-tab-panel
+        >
+        <sl-tab-panel id="history" name="history"></sl-tab-panel>
+    </sl-tab-group>
+</div>
+
+<script>
+    (async () => {
+        await customElements.whenDefined('sl-tab-group');
+
+        const registeredTabs = ['your-lists', 'watchlist', 'history'];
+        const path = window.location.pathname;
+        const tabs = document.querySelector('sl-tab-group');
+
+        if (!tabs) {
+            throw new Error('Cannot find tab group');
+        }
+
+        const parts = path.split('/');
+        const collectionIndex = parts.indexOf('collections');
+        const activeTab =
+            parts.length > collectionIndex + 1
+                ? parts[collectionIndex + 1]
+                : 'your-lists';
+
+        const tabNode = tabs.querySelector(`[panel="${activeTab}"]`);
+        if (tabNode) {
+            tabNode.setAttribute('hx-trigger', 'load');
+            tabNode.setAttribute('active', '');
+            htmx.process(tabNode);
+        }
+    })();
+
+    document.addEventListener('sl-tab-show', (event) => {
+        const activeTab = event.target.activeTab;
+        if (activeTab) {
+            window.history.pushState({}, '', activeTab.getAttribute('hx-get'));
+        }
+    });
+
+    const pluralRules = new Intl.PluralRules('uk-UA');
+
+    const forms = {
+        one: 'публікацію',
+        few: 'публікації',
+        many: 'публікацій',
+        other: 'публікацій',
+    };
+
+    function getCollectionLabel(count) {
+        const rule = pluralRules.select(count);
+        return `Містить ${count} ${forms[rule]}`;
+    }
+</script>

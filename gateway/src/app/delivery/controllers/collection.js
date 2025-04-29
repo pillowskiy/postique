@@ -41,8 +41,8 @@ export class CollectionController {
 
         const { name, description } = req.body;
         await this.#collectionService.createCollection(
-            name,
             token,
+            name,
             description,
         );
 

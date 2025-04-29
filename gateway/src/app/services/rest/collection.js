@@ -12,12 +12,12 @@ export class CollectionService extends RestClient {
     }
 
     /**
-     * @param {string} name
      * @param {string} auth
+     * @param {string} name
      * @param {string|undefined} description
      * @returns {Promise<import("#app/models").CollectionIdentifier>}
      */
-    async createCollection(name, auth, description) {
+    async createCollection(auth, name, description) {
         const response = await this._client
             .post('collections', {
                 json: { userId: '', name, description },

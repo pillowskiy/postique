@@ -30,5 +30,17 @@ export function MeRoutes(meController, authMiddlewares) {
         handler(meController, 'getPostListView'),
     );
 
+    meRouter.get(
+        '/collections',
+        authMiddlewares.withAuth.bind(authMiddlewares),
+        handler(meController, 'getCollectionsTabView'),
+    );
+
+    meRouter.get(
+        '/collections/history',
+        authMiddlewares.withAuth.bind(authMiddlewares),
+        handler(meController, 'getHistoryTabView'),
+    );
+
     return meRouter;
 }
