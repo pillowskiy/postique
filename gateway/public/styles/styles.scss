@@ -61,6 +61,10 @@ sl-skeleton {
     padding: 0;
 }
 
+a {
+    text-decoration: none;
+}
+
 body {
     --brand-font: 'Open Sans';
     --headline-font: 'Montserrat';
@@ -121,6 +125,7 @@ sl-menu-item::part(base) {
     font-size: var(--sl-font-size-small);
     background: transparent;
     color: var(--sl-color-neutral-600);
+    text-decoration: none;
 }
 
 sl-menu-item.accent::part(base) {
@@ -277,13 +282,12 @@ sl-alert::part(message) {
     }
 }
 
-.faq-container {
+.faq-container,
+.sign-container {
     padding: 24px;
-    background-color: var(--sl-color-primary-300);
     display: flex;
     flex-direction: column;
     gap: 24px;
-    color: var(--sl-color-neutral-1000);
     font-size: var(--sl-font-size-medium);
     border-radius: var(--sl-border-radius-large);
 
@@ -291,6 +295,11 @@ sl-alert::part(message) {
         font-size: var(--sl-font-size-medium);
         font-weight: 700;
     }
+}
+
+.faq-container {
+    background-color: var(--sl-color-primary-300);
+    color: var(--sl-color-neutral-1000);
 
     &__list {
         list-style: none;
@@ -303,9 +312,15 @@ sl-alert::part(message) {
         }
     }
 
-    &_button {
+    &__button {
         width: fit-content;
     }
+}
+
+.sign-container {
+    background-color: transparent;
+    color: var(--sl-color-neutral-900);
+    border: 1px solid var(--sl-input-border-color);
 }
 
 .auth-container {
@@ -435,9 +450,14 @@ sl-alert::part(message) {
     }
 
     &__logo {
-        font-size: 1.5rem;
-        font-weight: bold;
-        color: var(--sl-color-gray-900);
+        height: 36px;
+        overflow: hidden;
+
+        img {
+            height: 100%;
+            width: auto;
+            object-fit: contain;
+        }
     }
 
     &__name {
@@ -449,6 +469,30 @@ sl-alert::part(message) {
         padding-top: 0.25rem;
         font-size: var(--sl-font-size-small);
         color: var(--sl-color-neutral-500);
+    }
+}
+
+.search-box {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+    max-width: 240px;
+    width: 100%;
+    border-radius: 9999px;
+    background: var(--sl-color-neutral-100);
+    border: solid 1px var(--docs-input-border-color);
+    font-size: var(--sl-font-size-medium);
+    color: var(--sl-color-neutral-700);
+    padding: 0.75rem 1rem;
+    cursor: pointer;
+    margin-left: 8px;
+
+    &__label {
+        font-size: var(--sl-font-size-small);
+    }
+
+    &__icon {
+        font-size: 1.2rem;
     }
 }
 

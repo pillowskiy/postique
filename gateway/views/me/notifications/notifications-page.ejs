@@ -1,0 +1,24 @@
+<div class="container">
+    <header class="header">
+        <h1>Сповіщення</h1>
+    </header>
+
+    <sl-tab-group class="tabs-container" id="status-tabs">
+        <sl-tab slot="nav" panel="all"> Усі </sl-tab>
+
+        <sl-tab slot="nav" panel="responses" active> Відповіді </sl-tab>
+
+        <sl-tab-panel id="all" name="all">
+            <div class="no-posts">
+                <sl-icon name="journal-x" size="large"></sl-icon>
+                <p>Список сповіщень пустий</p>
+            </div>
+        </sl-tab-panel>
+        <sl-tab-panel id="responses" name="responses">
+            <div class="no-posts">
+                <sl-icon name="journal-x" size="large"></sl-icon>
+                <p>Жодних відповідей</p>
+            </div>
+        </sl-tab-panel>
+    </sl-tab-group>
+</div>

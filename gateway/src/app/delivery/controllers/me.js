@@ -33,6 +33,21 @@ export class MeController {
      * @param {Request} req
      * @param {Response} res
      */
+    async getNotificationsView(req, res) {
+        const token = getAuthToken(req);
+        if (!token) {
+            throw new ClientException('Ви повинні бути авторизовані', 401);
+        }
+
+        return render(res)
+            .template('me/notifications/notifications-page', {})
+            .layout('grid-layout');
+    }
+
+    /**
+     * @param {Request} req
+     * @param {Response} res
+     */
     async getCollectionsTabView(req, res) {
         const token = getAuthToken(req);
         if (!token) {

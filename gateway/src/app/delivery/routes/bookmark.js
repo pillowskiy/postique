@@ -1,5 +1,5 @@
 import express from 'express';
-import { body, param } from 'express-validator';
+import { body, param, query } from 'express-validator';
 
 import handler from '../common/handler.js';
 
@@ -11,11 +11,11 @@ export function BookmarkRoutes(bookmarkController, authMiddlewares) {
     const bookmarkRouter = express.Router();
 
     bookmarkRouter.post(
-        '/',
+        '/:targetId',
         authMiddlewares.withAuth.bind(authMiddlewares),
         [
-            body('targetId').isString().isLength({ min: 1 }),
-            body('collectionId').optional().isString(),
+            param('targetId').isString().isLength({ min: 1 }),
+            query('collectionId').optional().isString(),
         ],
         handler(bookmarkController, 'addBookmark'),
     );
@@ -23,7 +23,10 @@ export function BookmarkRoutes(bookmarkController, authMiddlewares) {
     bookmarkRouter.delete(
         '/:targetId',
         authMiddlewares.withAuth.bind(authMiddlewares),
-        [param('targetId').isString().isLength({ min: 1 })],
+        [
+            param('targetId').isString().isLength({ min: 1 }),
+            query('collectionId').optional().isString(),
+        ],
         handler(bookmarkController, 'deleteBookmark'),
     );
 
@@ -32,6 +35,12 @@ export function BookmarkRoutes(bookmarkController, authMiddlewares) {
         authMiddlewares.withAuth.bind(authMiddlewares),
         [param('targetId').isString().isLength({ min: 1 })],
         handler(bookmarkController, 'getBookmarkPopup'),
+    );
+
+    bookmarkRouter.get(
+        '/recently',
+        authMiddlewares.withAuth.bind(authMiddlewares),
+        handler(bookmarkController, 'getRecentlyView'),
     );
 
     return bookmarkRouter;

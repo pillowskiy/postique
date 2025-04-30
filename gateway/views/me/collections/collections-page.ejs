@@ -59,8 +59,8 @@
 
         const tabNode = tabs.querySelector(`[panel="${activeTab}"]`);
         if (tabNode) {
+            tabs.show(activeTab);
             tabNode.setAttribute('hx-trigger', 'load');
-            tabNode.setAttribute('active', '');
             htmx.process(tabNode);
         }
     })();

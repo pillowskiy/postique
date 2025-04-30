@@ -1,0 +1,23 @@
+<% const postIds = JSON.stringify({ postIds: posts.map((p) => p.id) }); %>
+
+<template
+    hx-post="/r/interactions/stats"
+    hx-vals="<%= postIds %>"
+    hx-trigger="load"
+    hx-target="#posts-list"
+    hx-swap="none"
+></template>
+
+<% if (user) { %>
+<template
+    hx-post="/r/interactions/states"
+    hx-vals="<%= postIds %>"
+    hx-trigger="load"
+    hx-target="#posts-list"
+    hx-swap="none"
+></template>
+<% } %>
+
+<ul id="posts-list" class="post-list">
+    <%- await include('../post/post-detailed-list.ejs', { posts }) %>
+</ul>

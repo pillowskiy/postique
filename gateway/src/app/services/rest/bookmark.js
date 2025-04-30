@@ -12,15 +12,19 @@ export class BookmarkService extends RestClient {
     }
 
     /**
-     * @param {string} auth
      * @param {string} targetId
      * @param {string|undefined} collectionId
+     * @param {string} auth
      * @returns {Promise<import("#app/models").BookmarkIdentifier>}
      */
-    async addBookmark(auth, targetId, collectionId) {
+    async addBookmark(targetId, collectionId, auth) {
+        const query = new URLSearchParams();
+        if (collectionId) {
+            query.append('collectionId', collectionId);
+        }
+
         const response = await this._client
-            .post('bookmarks', {
-                json: { userId: '', targetId, collectionId },
+            .post(`bookmarks/${targetId}?${query}`, {
                 headers: this._withAuth(auth),
             })
             .json();
@@ -30,12 +34,18 @@ export class BookmarkService extends RestClient {
 
     /**
      * @param {string} targetId
+     * @param {string|null} collectionId
      * @param {string} auth
      * @returns {Promise<import("#app/models").BookmarkIdentifier>}
      */
-    async deleteBookmark(targetId, auth) {
+    async deleteBookmark(targetId, collectionId, auth) {
+        const query = new URLSearchParams();
+        if (collectionId) {
+            query.append('collectionId', collectionId);
+        }
+
         const response = await this._client
-            .delete(`bookmarks/${targetId}`, {
+            .delete(`bookmarks/${targetId}?${query}`, {
                 headers: this._withAuth(auth),
             })
             .json();

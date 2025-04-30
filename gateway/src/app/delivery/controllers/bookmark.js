@@ -16,13 +16,49 @@ export class BookmarkController {
     /** @type {import("#app/services").CollectionService} */
     #collectionService;
 
+    /** @type {import("#app/services").PostService} */
+    #postService;
+
     /**
      * @param {import("#app/services").BookmarkService} bookmarkService
      * @param {import("#app/services").CollectionService} collectionService
+     * @param {import("#app/services").PostService} postService
      */
-    constructor(bookmarkService, collectionService) {
+    constructor(bookmarkService, collectionService, postService) {
         this.#bookmarkService = bookmarkService;
         this.#collectionService = collectionService;
+        this.#postService = postService;
+    }
+
+    /**
+     * @param {Request} req
+     * @param {Response} res
+     */
+    async getRecentlyView(req, res) {
+        const token = getAuthToken(req);
+        if (!token) {
+            throw new ClientException('Ви повинні бути авторизовані', 401);
+        }
+
+        const data = await this.#bookmarkService.getUserBookmarks(
+            req.user.id,
+            token,
+            null,
+            2,
+        );
+
+        const posts = await this.#postService.findBatch(
+            token,
+            data.items.map((b) => b.targetId),
+        );
+
+        if (posts.length < 1) {
+            return res.status(204).send();
+        }
+
+        return render(res).template('post/post-aside-card-list.swap', {
+            posts,
+        });
     }
 
     /**
@@ -44,8 +80,9 @@ export class BookmarkController {
             throw new ClientException('Ви повинні бути авторизовані', 401);
         }
 
-        const { targetId, collectionId } = req.body;
-        await this.#bookmarkService.addBookmark(token, targetId, collectionId);
+        const { collectionId } = req.query;
+        const { targetId } = req.params;
+        await this.#bookmarkService.addBookmark(targetId, collectionId, token);
 
         return res.status(200).send();
     }
@@ -69,8 +106,13 @@ export class BookmarkController {
             throw new ClientException('Ви повинні бути авторизовані', 401);
         }
 
+        const { collectionId } = req.query;
         const { targetId } = req.params;
-        await this.#bookmarkService.deleteBookmark(targetId, token);
+        await this.#bookmarkService.deleteBookmark(
+            targetId,
+            collectionId,
+            token,
+        );
 
         return render(res).template('components/toast.oob', {
             initiator: 'Закладки',

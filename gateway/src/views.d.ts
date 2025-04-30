@@ -29,7 +29,6 @@ declare namespace render {
             targetId: Variable;
         };
         'bookmark/collection-list.oob': {
-            targetId: Variable;
             collections: Array;
         };
         'comment/comment-replies.loader': {};
@@ -60,6 +59,7 @@ declare namespace render {
         'grid-layout': {
             title: Variable;
             __renderTarget: Variable;
+            user: Variable;
             locals: { user: Variable };
         };
         'home/home-page': {
@@ -79,6 +79,7 @@ declare namespace render {
             JSON: { stringify: Function };
             user: Variable;
         };
+        'me/notifications/notifications-page': {};
         'me/posts/components/post-archived-card': {};
         'me/posts/components/post-draft-list': {
             posts: Array;

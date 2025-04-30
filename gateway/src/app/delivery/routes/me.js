@@ -11,6 +11,12 @@ export function MeRoutes(meController, authMiddlewares) {
     const meRouter = express.Router();
 
     meRouter.get(
+        '/notifications',
+        authMiddlewares.withAuth.bind(authMiddlewares),
+        handler(meController, 'getNotificationsView'),
+    );
+
+    meRouter.get(
         '/posts',
         authMiddlewares.withAuth.bind(authMiddlewares),
         handler(meController, 'getPostsView'),

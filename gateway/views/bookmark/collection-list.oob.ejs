@@ -1,9 +1,10 @@
 <ul class="collections-list">
-    <li class="collection-item">
+    <li
+        class="collection-item"
+        x-data="{bookmarksCount: 0, targetId: '<%= targetId %>'}"
+    >
         <sl-checkbox
-            hx-post="/r/bookmarks"
-            hx-vals='{"targetId": "<%= targetId %>"}'
-            hx-swap="none"
+            x-on:sl-change="handleCheckbox(event)"
             help-text="Зберігається в колекції «Список читання»"
         >
             Список читання
@@ -14,19 +15,73 @@
         ></sl-icon>
     </li>
 
-    <% collections.forEach(function(collection) { %>
-    <li class="collection-item">
+    <% collections.forEach((collection) => { %>
+    <li
+        class="collection-item"
+        x-data="{bookmarksCount: <%= collection.bookmarksCount %>, id: '<%= collection.id %>', targetId: '<%= targetId %>'}"
+    >
         <sl-checkbox
-            hx-post="/r/bookmarks"
-            hx-vals='{"targetId": "<%= targetId %>", "collectionId": "<%= collection.id %>"}'
-            hx-swap="none"
+            x-on:sl-change="handleCheckbox(event)"
             help-text="<%= collection.description %>"
         >
             <%= collection.name %>
         </sl-checkbox>
-        <div class="collection-item__count">
-            <%= collection.bookmarksCount %> закладки
-        </div>
+        <span
+            class="collection-item__count"
+            x-text="`${bookmarksCount} закладки`"
+        >
+        </span>
     </li>
     <% }); %>
 </ul>
+
+<script>
+    function addBookmark(targetId, collectionId) {
+        const query = new URLSearchParams();
+        if (collectionId) {
+            query.append('collectionId', collectionId);
+        }
+
+        return htmx.__.ajax('POST', `/r/bookmarks/${targetId}?${query}`, {
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        });
+    }
+
+    function removeBookmark(bookmarkId, collectionId) {
+        const query = new URLSearchParams();
+        if (collectionId) {
+            query.append('collectionId', collectionId);
+        }
+
+        return htmx.__.ajax('DELETE', `/r/bookmarks/${bookmarkId}?${query}`, {
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        });
+    }
+
+    function postAction(type, stateProxy) {
+        return function () {
+            stateProxy.bookmarksCount += type === 'add' ? 1 : -1;
+            stateProxy.saved = type === 'add' ? true : false;
+        };
+    }
+
+    function handleCheckbox(event, globalNode) {
+        const { checked } = event.target;
+        const vals = Alpine.$data(event.target);
+
+        let method;
+        if (checked) {
+            method = addBookmark(vals.targetId, vals.id ?? null).then(
+                postAction('add', vals),
+            );
+        } else {
+            method = removeBookmark(vals.targetId, vals.id ?? null).then(
+                postAction('remove', vals),
+            );
+        }
+    }
+</script>

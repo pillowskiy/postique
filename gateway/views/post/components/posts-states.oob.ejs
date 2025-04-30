@@ -5,14 +5,15 @@
     hx-swap-oob="true"
 ></span>
 
-<div id="save-<%= state.postId %>" hx-swap-oob="true">
-    <sl-tooltip
-        content="Зберегти"
-        style="<%= state.saved ? 'color: var(--sl-color-success-500)' : '' %>"
-    >
+<div
+    x-data="{saved: <%= state.saved %>}"
+    id="save-<%= state.postId %>"
+    hx-swap-oob="true"
+>
+    <sl-tooltip content="Зберегти">
         <sl-icon-button
             id="trigger-<%= state.postId %>"
-            name="<%= state.saved ? 'bookmark-fill' : 'bookmark-plus' %>"
+            :name="saved ? 'bookmark-fill' : 'bookmark-plus'"
             hx-get="/r/bookmarks/popup/<%= state.postId %>"
             hx-target="#bookmark-popup-<%= state.postId %>"
             hx-trigger="click"

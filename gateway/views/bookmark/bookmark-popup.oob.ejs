@@ -28,7 +28,7 @@
 
             <div x-show="showForm">
                 <form
-                    hx-post="/r/collections"
+                    hx-post="/r/collections?targetId=<%= targetId %>"
                     hx-target="#collections-list"
                     hx-swap="innerHTML"
                     @submit="showForm = false"

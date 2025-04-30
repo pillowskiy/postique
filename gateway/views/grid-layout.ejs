@@ -12,6 +12,40 @@
                 <%- await include(__renderTarget) %>
             </main>
             <aside class="grid-container__sidebar">
+                <% if (!user) { %>
+                <div class="sign-container aside-section">
+                    <h3 class="sign-container__title">
+                        Postique — платформа для глибоких думок, ідей та
+                        натхнення.
+                    </h3>
+                    <p>
+                        Тут автори діляться досвідом, розповідають історії,
+                        досліджують теми, що хвилюють, та розвивають власний
+                        голос.
+                    </p>
+                    <div>
+                        <sl-button
+                            class="sign-container__button"
+                            href="/register"
+                            size="small"
+                            variant="neutral"
+                            pill
+                        >
+                            Зареєструватися
+                        </sl-button>
+                        <sl-button
+                            class="sign-container__button ghost"
+                            href="/register"
+                            size="small"
+                            variant="text"
+                            pill
+                        >
+                            Увійти
+                        </sl-button>
+                    </div>
+                </div>
+                <% } %>
+
                 <div class="aside-section">
                     <h3 class="aside-section__title">Популярні публікації</h3>
 
@@ -69,8 +103,19 @@
                         <li>Поради від експертів</li>
                         <li>Підвищуйте охоплення</li>
                     </ul>
+                    <% if (!user) { %>
                     <sl-button
-                        class="faq-container_button"
+                        class="faq-container__button"
+                        href="/register"
+                        size="small"
+                        variant="neutral"
+                        pill
+                    >
+                        Увійдіть для публікації
+                    </sl-button>
+                    <%} else { %>
+                    <sl-button
+                        class="faq-container__button"
                         href="/new-story"
                         size="small"
                         variant="neutral"
@@ -78,6 +123,7 @@
                     >
                         Публікувати
                     </sl-button>
+                    <% } %>
                 </div>
 
                 <div class="aside-section">
@@ -123,43 +169,26 @@
                 </div>
 
                 <% if (locals.user) { %>
-                <div class="aside-section">
+                <div
+                    class="aside-section"
+                    x-data="{ show: false }"
+                    x-show="show"
+                    x-cloak
+                    x-transition
+                >
                     <h3 class="aside-section__title">Недавно збережені</h3>
 
-                    <ul class="aside-section__list saved-stories-list">
-                        <% for (let i = 0; i < 3; i++) { %>
-                        <li>
-                            <div class="post-card__header skeleton-flex-line">
-                                <sl-skeleton
-                                    class="skeleton-avatar"
-                                    effect="sheen"
-                                ></sl-skeleton>
-                                <sl-skeleton
-                                    class="skeleton-md-line"
-                                    effect="sheen"
-                                ></sl-skeleton>
-                            </div>
-                            <div class="post-card__content">
-                                <div class="skeleton-multiline-text">
-                                    <sl-skeleton
-                                        class="skeleton-line"
-                                        effect="sheen"
-                                    ></sl-skeleton>
-                                    <sl-skeleton
-                                        class="skeleton-line"
-                                        effect="sheen"
-                                    ></sl-skeleton>
-                                </div>
-                                <sl-skeleton
-                                    class="skeleton-sm-line"
-                                    effect="sheen"
-                                ></sl-skeleton>
-                            </div>
-                        </li>
-                        <% } %>
-                    </ul>
+                    <ul
+                        class="aside-section__list saved-stories-list"
+                        hx-get="/r/bookmarks/recently"
+                        hx-trigger="revealed"
+                        hx-swap="innerHTML"
+                        hx-on::after-on-load="if(!event.failed && event.detail.xhr.status !== 204) Alpine.$data(this).show = true;"
+                    ></ul>
 
-                    <a href="/new-story" class="link">Мій список збереження</a>
+                    <a href="/me/collections" class="link">
+                        Мій список збереження
+                    </a>
                 </div>
                 <% } %>
             </aside>
