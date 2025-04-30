@@ -1,10 +1,29 @@
 <header class="workbench-header__wrapper">
     <div class="workbench-header__container">
-        <div class="workbench-header__block">
-            <a href="/" class="workbench-header__logo">Postique</a>
+        <div class="workbench-header__block" style="width: 100%">
+            <a href="/" class="workbench-header__logo">
+                <img src="/assets/branding/logo-long.svg" alt="Postique" />
+            </a>
+
+            <button class="search-box">
+                <sl-icon
+                    class="search-box__icon"
+                    name="search"
+                    slot="prefix"
+                ></sl-icon>
+                <span class="search-box__label">Пошук</span>
+            </button>
         </div>
 
-        <div class="workbench-header__block">
+        <div
+            class="workbench-header__block"
+            x-data="{ path: window.location.pathname }"
+            x-init="
+                window.addEventListener('popstate', () => path = window.location.pathname);
+                window.addEventListener('pushstate', () => path = window.location.pathname);
+                window.addEventListener('replaceState', () => path = window.location.pathname);
+            "
+        >
             <sl-button
                 href="/new-story"
                 class="ghost"
@@ -17,10 +36,13 @@
             </sl-button>
             <% if (user) { %>
             <sl-icon-button
-                name="bell"
+                slot="anchor"
+                href="/me/notifications"
+                :name="path.startsWith('/me/notifications') ? 'bell-fill' : 'bell'"
                 label="Notifications"
                 pill
             ></sl-icon-button>
+
             <sl-dropdown distance="12">
                 <button class="slot" slot="trigger">
                     <sl-avatar
@@ -31,32 +53,67 @@
                 </button>
 
                 <sl-menu style="width: 240px">
-                    <sl-menu-item class="accent" value="profile">
-                        <sl-icon name="person" slot="prefix"></sl-icon>
-                        Профіль
-                    </sl-menu-item>
-                    <sl-menu-item class="accent" value="library">
-                        <sl-icon name="book" slot="prefix"></sl-icon>
-                        Бібліотека
-                    </sl-menu-item>
+                    <a href="#">
+                        <sl-menu-item class="accent" value="profile">
+                            <sl-icon
+                                :name="path.includes('<%= user.username %>') ? 'person-fill' : 'person'"
+                                slot="prefix"
+                            ></sl-icon>
+                            Профіль
+                        </sl-menu-item>
+                    </a>
+                    <a href="/me/collections">
+                        <sl-menu-item class="accent" value="library">
+                            <sl-icon
+                                :name="path.startsWith('/me/collections') ? 'book-fill' : 'book'"
+                                slot="prefix"
+                            ></sl-icon>
+                            Бібліотека
+                        </sl-menu-item>
+                    </a>
                     <a href="/me/posts/draft">
                         <sl-menu-item class="accent" value="stories">
-                            <sl-icon name="stickies" slot="prefix"></sl-icon>
+                            <sl-icon
+                                :name="path.startsWith('/me/posts') ? 'stickies-fill' : 'stickies'"
+                                slot="prefix"
+                            ></sl-icon>
                             Публікації
                         </sl-menu-item>
                     </a>
-                    <sl-menu-item class="accent" value="stats">
-                        <sl-icon name="bar-chart-line" slot="prefix"></sl-icon>
-                        Статистика
-                    </sl-menu-item>
+
+                    <a href="#">
+                        <sl-menu-item class="accent" value="stats">
+                            <sl-icon
+                                :name="path.startsWith('/me/stats') ? 'bar-chart-line-fill' : 'bar-chart-line'"
+                                slot="prefix"
+                            ></sl-icon>
+                            Статистика
+                        </sl-menu-item>
+                    </a>
+
                     <sl-divider></sl-divider>
-                    <sl-menu-item value="settings">Налаштування</sl-menu-item>
-                    <sl-menu-item value="recomendations">
-                        Мої Рекомендації
-                    </sl-menu-item>
-                    <sl-menu-item value="about">Про проект</sl-menu-item>
-                    <sl-menu-item value="help">Допомога</sl-menu-item>
+
+                    <a href="#">
+                        <sl-menu-item value="settings" disabled>
+                            Налаштування
+                        </sl-menu-item>
+                    </a>
+                    <a href="#">
+                        <sl-menu-item value="recomendations">
+                            Мої Рекомендації
+                        </sl-menu-item>
+                    </a>
+                    <a href="#">
+                        <sl-menu-item value="about" disabled
+                            >Про проект</sl-menu-item
+                        >
+                    </a>
+                    <a href="#">
+                        <sl-menu-item value="help">Допомога</sl-menu-item>
+                    </a>
+
                     <sl-divider></sl-divider>
+
                     <sl-menu-item>
                         Вийти
                         <br />

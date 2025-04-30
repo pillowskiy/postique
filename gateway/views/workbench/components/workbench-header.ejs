@@ -1,7 +1,10 @@
 <header class="workbench-header__wrapper">
     <div class="workbench-container workbench-header__container">
         <div class="workbench-header__block">
-            <a href="/" class="workbench-header__logo truncate">Postique</a>
+            <a href="/" class="workbench-header__logo">
+                <img src="/assets/branding/logo-long.svg" alt="Postique" />
+            </a>
+
             <p
                 id="workbench-status-state"
                 class="workbench-header__name truncate"
@@ -13,7 +16,15 @@
             ></span>
         </div>
 
-        <div class="workbench-header__block">
+        <div
+            class="workbench-header__block"
+            x-data="{ path: window.location.pathname }"
+            x-init="
+                window.addEventListener('popstate', () => path = window.location.pathname);
+                window.addEventListener('pushstate', () => path = window.location.pathname);
+                window.addEventListener('replaceState', () => path = window.location.pathname);
+            "
+        >
             <%- await include('./workbench-publish-dialog.ejs') %>
 
             <sl-tooltip content="Actions">
@@ -26,10 +37,13 @@
 
             <% if (user) { %>
             <sl-icon-button
-                name="bell"
+                slot="anchor"
+                href="/me/notifications"
+                :name="path.startsWith('/me/notifications') ? 'bell-fill' : 'bell'"
                 label="Notifications"
                 pill
             ></sl-icon-button>
+
             <sl-dropdown distance="12">
                 <sl-avatar
                     type="button"
