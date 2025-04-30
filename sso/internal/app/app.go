@@ -1,18 +1,22 @@
 package app
 
 import (
+	"context"
 	"log/slog"
+	"net/http"
 
 	"github.com/pillowskiy/postique/sso/internal/app/grpc"
 	"github.com/pillowskiy/postique/sso/internal/config"
 	"github.com/pillowskiy/postique/sso/internal/infrastructure/rmq"
 	"github.com/pillowskiy/postique/sso/internal/storage/pg"
 	"github.com/pillowskiy/postique/sso/internal/usecase"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
 type App struct {
-	grpcApp *grpc.App
-	userPub *rmq.RabbitMQProducer
+	grpcApp    *grpc.App
+	userPub    *rmq.RabbitMQProducer
+	httpServer *http.Server
 }
 
 func New(log *slog.Logger, cfg *config.Config) *App {
@@ -43,10 +47,28 @@ func New(log *slog.Logger, cfg *config.Config) *App {
 
 	grpcApp := grpc.NewApp(log, cfg.Server, appUC, authUC, permUC, profileUC)
 
-	return &App{grpcApp: grpcApp, userPub: userPub}
+	mux := http.NewServeMux()
+	mux.Handle("/metrics", promhttp.Handler())
+
+	metricsServer := &http.Server{
+		Addr:    ":9091",
+		Handler: mux,
+	}
+
+	return &App{
+		grpcApp:    grpcApp,
+		userPub:    userPub,
+		httpServer: metricsServer,
+	}
 }
 
 func (a *App) MustRun() {
+	go func() {
+		if err := a.httpServer.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+			panic(err)
+		}
+	}()
+
 	if err := a.grpcApp.Run(); err != nil {
 		panic(err)
 	}
@@ -55,4 +77,8 @@ func (a *App) MustRun() {
 func (a *App) GracefulStop() {
 	a.grpcApp.Stop()
 	a.userPub.Close()
+
+	if err := a.httpServer.Shutdown(context.Background()); err != nil {
+		slog.Error("Error shutting down metrics server", "error", err)
+	}
 }

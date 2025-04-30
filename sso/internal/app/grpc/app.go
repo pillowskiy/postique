@@ -5,6 +5,7 @@ import (
 	"log/slog"
 	"net"
 
+	grpc_prometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
 	"github.com/pillowskiy/postique/sso/internal/config"
 	"github.com/pillowskiy/postique/sso/internal/delivery/grpc/interceptor"
 	"github.com/pillowskiy/postique/sso/internal/delivery/grpc/server"
@@ -27,6 +28,9 @@ func NewApp(
 ) *App {
 	grpcServer := grpc.NewServer(
 		grpc.ChainUnaryInterceptor(
+			grpc_prometheus.UnaryServerInterceptor,
+			interceptor.UnaryWithMetrics(log),
+
 			interceptor.UnaryWithAuth(authUC)(
 				interceptor.Method("sso.permission", "*", "HasPermission"),
 				interceptor.Method("sso.auth", "*", "Verify"),
@@ -35,12 +39,18 @@ func NewApp(
 				interceptor.Method("sso.profile", "*", "UpdateProfile"),
 			),
 		),
+		grpc.ChainStreamInterceptor(
+			grpc_prometheus.StreamServerInterceptor,
+		),
 	)
 
 	server.RegisterAppServer(grpcServer, appUC)
 	server.RegisterAuthServer(grpcServer, authUC)
 	server.RegisterPermissionServer(grpcServer, permUC)
 	server.RegisterProfileServer(grpcServer, profileUC)
+
+	grpc_prometheus.EnableHandlingTimeHistogram()
+	grpc_prometheus.Register(grpcServer)
 
 	return &App{log: log, grpcServer: grpcServer, cfg: cfg}
 }

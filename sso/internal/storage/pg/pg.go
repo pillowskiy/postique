@@ -10,6 +10,7 @@ import (
 	"github.com/jmoiron/sqlx"
 	"github.com/pillowskiy/postique/sso/internal/config"
 	"github.com/pillowskiy/postique/sso/internal/storage"
+	"github.com/pillowskiy/postique/sso/pkg/metrics"
 	"github.com/pkg/errors"
 )
 
@@ -47,6 +48,8 @@ func MustConnect(cfg config.Postgres) *Storage {
 	db.SetMaxIdleConns(cfg.MaxIdleConns)
 	db.SetConnMaxLifetime(cfg.Timeout)
 	db.SetConnMaxIdleTime(cfg.Timeout)
+
+	metrics.SetupDBMetrics(db)
 
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*15)
 	defer cancel()

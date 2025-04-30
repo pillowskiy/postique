@@ -17,6 +17,9 @@ spec:
           image: postique/sso
           ports:
             - containerPort: 4000
+              name: grpc
+            - containerPort: 9091
+              name: metrics
 ---
 apiVersion: v1
 kind: Service
@@ -29,4 +32,7 @@ spec:
     - port: 4000
       name: grpc
       targetPort: 4000
+    - port: 9091
+      name: metrics
+      targetPort: 9091
   type: ClusterIP
