@@ -1,6 +1,6 @@
+import { PostPublisher } from '@/app/boundaries/providers';
 import { EventsHandler, IEventHandler } from '@nestjs/cqrs';
 import { PostModifiedEvent } from './post-modified.event';
-import { PostPublisher } from '@/app/boundaries/providers';
 
 @EventsHandler(PostModifiedEvent)
 export class PostModifiedEventHandler

@@ -6,7 +6,7 @@ export class BookmarkOutput {
     public readonly id: string,
     public readonly userId: string,
     public readonly targetId: string,
-    public readonly collectionId?: string,
+    public readonly collectionId: string | null,
     public readonly createdAt?: Date,
     public readonly updatedAt?: Date,
   ) {}
@@ -18,7 +18,7 @@ export class DetailedBookmarkOutput implements BookmarkOutput {
     public readonly userId: string,
     public readonly targetId: string,
     public readonly post: PostOutput,
-    public readonly collectionId?: string,
+    public readonly collectionId: string | null,
     public readonly createdAt?: Date,
     public readonly updatedAt?: Date,
   ) {}

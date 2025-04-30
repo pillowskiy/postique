@@ -1,12 +1,12 @@
-import { CommandHandler, EventBus } from '@nestjs/cqrs';
+import { BookmarkAccessControlList } from '@/app/boundaries/acl';
+import { DeleteBookmarkOutput } from '@/app/boundaries/dto/output';
+import { ForbiddenException, NotFoundException } from '@/app/boundaries/errors';
+import { BookmarkRepository } from '@/app/boundaries/repository';
+import { ReactedEvent, ReactionType } from '@/app/events/interaction/reacted';
 import { Inject } from '@nestjs/common';
+import { CommandHandler, EventBus } from '@nestjs/cqrs';
 import { Command } from '../../common';
 import { DeleteBookmarkCommand } from './delete-bookmark.command';
-import { BookmarkRepository } from '@/app/boundaries/repository';
-import { DeleteBookmarkOutput } from '@/app/boundaries/dto/output';
-import { BookmarkAccessControlList } from '@/app/boundaries/acl';
-import { ForbiddenException, NotFoundException } from '@/app/boundaries/errors';
-import { ReactedEvent, ReactionType } from '@/app/events/interaction/reacted';
 
 @CommandHandler(DeleteBookmarkCommand)
 export class DeleteBookmarkCommandHandler extends Command<
@@ -28,6 +28,7 @@ export class DeleteBookmarkCommandHandler extends Command<
     const bookmark = await this._bookmarkRepository.findUserBookmark(
       input.initiatedBy,
       input.targetId,
+      input.collectionId,
     );
 
     if (!bookmark) {

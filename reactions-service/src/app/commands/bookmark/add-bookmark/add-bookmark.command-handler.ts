@@ -37,6 +37,16 @@ export class AddBookmarkCommandHandler extends Command<
       );
     }
 
+    const storedBookmark = await this._bookmarkRepository.findUserBookmark(
+      input.initiatedBy,
+      input.targetId,
+      input.collectionId,
+    );
+
+    if (storedBookmark) {
+      return new AddBookmarkOutput(storedBookmark.id);
+    }
+
     const bookmark = BookmarkEntity.create({
       userId: input.initiatedBy,
       targetId: input.targetId,

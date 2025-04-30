@@ -1,14 +1,14 @@
-import { Injectable } from '@nestjs/common';
-import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import {
   AddBookmarkOutput,
+  CursorOutput,
   DeleteBookmarkOutput,
   DetailedBookmarkOutput,
-  CursorOutput,
 } from '@/app/boundaries/dto/output';
 import { AddBookmarkCommand } from '@/app/commands/bookmark/add-bookmark';
 import { DeleteBookmarkCommand } from '@/app/commands/bookmark/delete-bookmark';
 import { GetUserBookmarksQuery } from '@/app/queries/bookmark/get-user';
+import { Injectable } from '@nestjs/common';
+import { CommandBus, QueryBus } from '@nestjs/cqrs';
 
 @Injectable()
 export class BookmarksService {
@@ -19,22 +19,23 @@ export class BookmarksService {
 
   async addBookmark(
     targetId: string,
+    collectionId: string | null,
     initiatedBy: string,
-    collectionId?: string,
   ): Promise<AddBookmarkOutput> {
     return this._commandBus.execute<AddBookmarkCommand, AddBookmarkOutput>(
-      new AddBookmarkCommand(targetId, initiatedBy, collectionId),
+      new AddBookmarkCommand(targetId, collectionId, initiatedBy),
     );
   }
 
   async deleteBookmark(
     targetId: string,
+    collectionId: string,
     initiatedBy: string,
   ): Promise<DeleteBookmarkOutput> {
     return this._commandBus.execute<
       DeleteBookmarkCommand,
       DeleteBookmarkOutput
-    >(new DeleteBookmarkCommand(targetId, initiatedBy));
+    >(new DeleteBookmarkCommand(targetId, collectionId, initiatedBy));
   }
 
   async getUserBookmarks(

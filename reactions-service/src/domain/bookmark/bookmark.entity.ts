@@ -12,7 +12,7 @@ export class BookmarkEntity extends ReactionEntity {
       validBookmark.targetId,
       validBookmark.createdAt!,
       validBookmark.updatedAt!,
-      validBookmark.collectionId,
+      validBookmark.collectionId ?? null,
     );
   }
 
@@ -22,7 +22,7 @@ export class BookmarkEntity extends ReactionEntity {
     public readonly targetId: string,
     createdAt: Date,
     updatedAt: Date,
-    private _collectionId?: string,
+    private _collectionId: string | null,
   ) {
     super(userId, targetId, createdAt, updatedAt);
   }
@@ -31,7 +31,7 @@ export class BookmarkEntity extends ReactionEntity {
     return ReactionType.Bookmark;
   }
 
-  get collectionId(): string | undefined {
+  get collectionId(): string | null {
     return this._collectionId;
   }
 
@@ -40,6 +40,6 @@ export class BookmarkEntity extends ReactionEntity {
   }
 
   removeFromCollection(): void {
-    this._collectionId = undefined;
+    this._collectionId = null;
   }
 }

@@ -1,12 +1,12 @@
-import { Inject, Injectable } from '@nestjs/common';
-import { and, eq, gt, InferSelectModel, SQLWrapper } from 'drizzle-orm';
-import { BookmarkRepository } from '@/app/boundaries/repository';
-import { BookmarkEntity } from '@/domain/bookmark/bookmark.entity';
 import { Transactional } from '@/app/boundaries/common';
-import { bookmarks, posts } from '@/infrastructure/drizzle/schemas';
-import { DrizzleTransactional } from '@/infrastructure/drizzle';
+import { BookmarkRepository } from '@/app/boundaries/repository';
 import { BookmarkAggregate } from '@/domain/bookmark/bookmark.aggregate';
+import { BookmarkEntity } from '@/domain/bookmark/bookmark.entity';
 import { PostEntity } from '@/domain/post/post.entity';
+import { DrizzleTransactional } from '@/infrastructure/drizzle';
+import { bookmarks, posts } from '@/infrastructure/drizzle/schemas';
+import { Inject, Injectable } from '@nestjs/common';
+import { and, eq, gt, InferSelectModel, isNull, SQLWrapper } from 'drizzle-orm';
 
 @Injectable()
 export class PostgresBookmarkRepository extends BookmarkRepository {
@@ -28,12 +28,19 @@ export class PostgresBookmarkRepository extends BookmarkRepository {
   async findUserBookmark(
     userId: string,
     targetId: string,
+    collectionId: string | null = null,
   ): Promise<BookmarkEntity | null> {
     const [result] = await this._txHost.exec
       .select()
       .from(bookmarks)
       .where(
-        and(eq(bookmarks.userId, userId), eq(bookmarks.targetId, targetId)),
+        and(
+          eq(bookmarks.userId, userId),
+          eq(bookmarks.targetId, targetId),
+          collectionId
+            ? eq(bookmarks.collectionId, collectionId)
+            : isNull(bookmarks.collectionId),
+        ),
       );
 
     if (!result) {
@@ -138,6 +145,8 @@ export class PostgresBookmarkRepository extends BookmarkRepository {
           id: post.id,
           title: post.title,
           description: post.description!,
+          visibility: post.visibility,
+          status: post.status,
           coverImage: post.coverImage,
         }),
       );

@@ -1,34 +1,34 @@
+import * as output from '@/app/boundaries/dto/output';
+import { InitiatedBy } from '@/infrastructure/common/decorators';
+import { AuthGuard } from '@/infrastructure/common/guards';
 import {
   Controller,
-  Param,
-  Post,
   Delete,
-  Body,
-  UseGuards,
   Get,
-  Query,
+  Param,
   ParseUUIDPipe,
+  Post,
+  Query,
+  UseGuards,
 } from '@nestjs/common';
-import * as input from '@/app/boundaries/dto/input';
-import * as output from '@/app/boundaries/dto/output';
-import { AuthGuard } from '@/infrastructure/common/guards';
-import { InitiatedBy } from '@/infrastructure/common/decorators';
 import { BookmarksService } from './bookmarks.service';
 
 @Controller('bookmarks')
 export class BookmarksController {
   constructor(private readonly bookmarksService: BookmarksService) {}
 
-  @Post()
+  @Post(':targetId')
   @UseGuards(AuthGuard)
   async addBookmark(
-    @Body() bookmark: input.CreateBookmarkInput,
+    @Param('targetId', ParseUUIDPipe) targetId: string,
+    @Query('collectionId', new ParseUUIDPipe({ optional: true }))
+    collectionId: string,
     @InitiatedBy() initiatedBy: string,
   ): Promise<output.AddBookmarkOutput> {
     return this.bookmarksService.addBookmark(
-      bookmark.targetId,
+      targetId,
+      collectionId ?? null,
       initiatedBy,
-      bookmark.collectionId,
     );
   }
 
@@ -36,9 +36,15 @@ export class BookmarksController {
   @UseGuards(AuthGuard)
   async deleteBookmark(
     @Param('targetId', ParseUUIDPipe) targetId: string,
+    @Query('collectionId', new ParseUUIDPipe({ optional: true }))
+    collectionId: string,
     @InitiatedBy() initiatedBy: string,
   ): Promise<output.DeleteBookmarkOutput> {
-    return this.bookmarksService.deleteBookmark(targetId, initiatedBy);
+    return this.bookmarksService.deleteBookmark(
+      targetId,
+      collectionId ?? null,
+      initiatedBy,
+    );
   }
 
   @Get('users/:userId')
