@@ -105,10 +105,7 @@ export class PostgresCommentRepository extends CommentRepository {
   }
 
   async delete(commentId: string): Promise<void> {
-    await this._txHost.exec
-      .update(comments)
-      .set({ isDeleted: true })
-      .where(eq(comments.id, commentId));
+    await this._txHost.exec.delete(comments).where(eq(comments.id, commentId));
   }
 
   async countByPost(postId: string): Promise<number> {
