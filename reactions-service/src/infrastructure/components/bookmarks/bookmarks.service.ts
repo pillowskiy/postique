@@ -1,12 +1,13 @@
 import {
   AddBookmarkOutput,
+  BookmarkOutput,
   CursorOutput,
   DeleteBookmarkOutput,
-  DetailedBookmarkOutput,
 } from '@/app/boundaries/dto/output';
 import { AddBookmarkCommand } from '@/app/commands/bookmark/add-bookmark';
 import { DeleteBookmarkCommand } from '@/app/commands/bookmark/delete-bookmark';
 import { GetUserBookmarksQuery } from '@/app/queries/bookmark/get-user';
+import { GetWatchlistQuery } from '@/app/queries/bookmark/get-watchlist';
 import { Injectable } from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 
@@ -43,10 +44,34 @@ export class BookmarksService {
     requestedBy: string,
     cursor?: string,
     pageSize?: number,
-  ): Promise<CursorOutput<DetailedBookmarkOutput>> {
+  ): Promise<CursorOutput<BookmarkOutput>> {
     return this._queryBus.execute<
       GetUserBookmarksQuery,
-      CursorOutput<DetailedBookmarkOutput>
+      CursorOutput<BookmarkOutput>
     >(new GetUserBookmarksQuery(userId, requestedBy, cursor, pageSize));
+  }
+
+  async getWatchlistBookmarks(
+    userId: string,
+    requestedBy: string,
+    cursor?: string,
+    pageSize?: number,
+  ): Promise<CursorOutput<BookmarkOutput>> {
+    return this._queryBus.execute<
+      GetWatchlistQuery,
+      CursorOutput<BookmarkOutput>
+    >(new GetWatchlistQuery(userId, requestedBy, cursor, pageSize));
+  }
+
+  async getCollectionBookmarks(
+    collectionId: string,
+    requestedBy?: string,
+    cursor?: string,
+    pageSize?: number,
+  ): Promise<CursorOutput<BookmarkOutput>> {
+    return this._queryBus.execute<
+      GetUserBookmarksQuery,
+      CursorOutput<BookmarkOutput>
+    >(new GetUserBookmarksQuery(collectionId, requestedBy, cursor, pageSize));
   }
 }

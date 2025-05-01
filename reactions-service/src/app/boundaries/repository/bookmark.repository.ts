@@ -13,6 +13,12 @@ export abstract class BookmarkRepository {
     cursor?: string,
     pageSize?: number,
   ): Promise<BookmarkAggregate[]>;
+  abstract findWithoutCollection(
+    userId: string,
+    cursor?: string,
+    pageSize?: number,
+  ): Promise<BookmarkAggregate[]>;
+
   abstract findUserBookmark(
     userId: string,
     targetId: string,

@@ -1,6 +1,9 @@
 import * as output from '@/app/boundaries/dto/output';
-import { InitiatedBy } from '@/infrastructure/common/decorators';
-import { AuthGuard } from '@/infrastructure/common/guards';
+import {
+  InitiatedBy,
+  OptionalInitiatedBy,
+} from '@/infrastructure/common/decorators';
+import { AuthGuard, OptionalAuthGuard } from '@/infrastructure/common/guards';
 import {
   Controller,
   Delete,
@@ -54,9 +57,40 @@ export class BookmarksController {
     @InitiatedBy() initiatedBy: string,
     @Query('cursor') cursor?: string,
     @Query('pageSize') pageSize?: number,
-  ): Promise<output.CursorOutput<output.DetailedBookmarkOutput>> {
+  ): Promise<output.CursorOutput<output.BookmarkOutput>> {
     return this.bookmarksService.getUserBookmarks(
       userId,
+      initiatedBy,
+      cursor,
+      pageSize,
+    );
+  }
+
+  @Get('watchlist')
+  @UseGuards(AuthGuard)
+  async getWatchlistBookmarks(
+    @InitiatedBy() initiatedBy: string,
+    @Query('cursor') cursor?: string,
+    @Query('pageSize') pageSize?: number,
+  ): Promise<output.CursorOutput<output.BookmarkOutput>> {
+    return this.bookmarksService.getWatchlistBookmarks(
+      initiatedBy,
+      initiatedBy,
+      cursor,
+      pageSize,
+    );
+  }
+
+  @Get('list/:collectionId')
+  @UseGuards(OptionalAuthGuard)
+  async getCollectionBookmarks(
+    @Param('collectionId', ParseUUIDPipe) collectionId: string,
+    @OptionalInitiatedBy() initiatedBy?: string,
+    @Query('cursor') cursor?: string,
+    @Query('pageSize') pageSize?: number,
+  ): Promise<output.CursorOutput<output.BookmarkOutput>> {
+    return this.bookmarksService.getCollectionBookmarks(
+      collectionId,
       initiatedBy,
       cursor,
       pageSize,

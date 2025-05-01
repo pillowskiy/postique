@@ -10,5 +10,5 @@ export abstract class BookmarkAccessControlList {
     userId: string,
     bookmark: BookmarkEntity,
   ): Promise<boolean>;
-  abstract canView(userId: string, targetId: string): Promise<boolean>;
+  abstract canView(userId: string | null, targetId: string): Promise<boolean>;
 }

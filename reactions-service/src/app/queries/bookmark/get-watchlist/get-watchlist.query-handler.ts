@@ -1,16 +1,16 @@
 import { QueryHandler } from '@nestjs/cqrs';
-import { Inject } from '@nestjs/common';
+import { GetWatchlistQuery } from './get-watchlist.query';
 import { Query } from '../../common';
-import { GetUserBookmarksQuery } from './get-user-bookmarks.query';
-import { BookmarkRepository } from '@/app/boundaries/repository';
-import { BookmarkAccessControlList } from '@/app/boundaries/acl';
-import { ForbiddenException } from '@/app/boundaries/errors';
 import { BookmarkOutput, CursorOutput } from '@/app/boundaries/dto/output';
+import { Inject } from '@nestjs/common';
+import { BookmarkAccessControlList } from '@/app/boundaries/acl';
+import { BookmarkRepository } from '@/app/boundaries/repository';
+import { ForbiddenException } from '@/app/boundaries/errors';
 import { BookmarkMapper } from '@/app/boundaries/mapper';
 
-@QueryHandler(GetUserBookmarksQuery)
-export class GetUserBookmarksQueryHandler extends Query<
-  GetUserBookmarksQuery,
+@QueryHandler(GetWatchlistQuery)
+export class GetWatchlistQueryHandler extends Query<
+  GetWatchlistQuery,
   CursorOutput<BookmarkOutput>
 > {
   @Inject(BookmarkAccessControlList)
@@ -20,10 +20,10 @@ export class GetUserBookmarksQueryHandler extends Query<
   private readonly _bookmarkRepository: BookmarkRepository;
 
   protected async invoke(
-    query: GetUserBookmarksQuery,
+    query: GetWatchlistQuery,
   ): Promise<CursorOutput<BookmarkOutput>> {
     const canView = await this._bookmarkACL.canView(
-      query.requestedBy ?? null,
+      query.requestedBy,
       query.userId,
     );
 
@@ -33,7 +33,11 @@ export class GetUserBookmarksQueryHandler extends Query<
       );
     }
 
-    const bookmarks = await this._bookmarkRepository.findByUser(query.userId);
+    const bookmarks = await this._bookmarkRepository.findWithoutCollection(
+      query.userId,
+      query.cursor,
+      query.pageSize,
+    );
     const bookmarksDto = bookmarks.map((bookmark) =>
       BookmarkMapper.toDetailedDto(bookmark),
     );

@@ -74,6 +74,18 @@ export class PostgresBookmarkRepository extends BookmarkRepository {
     );
   }
 
+  async findWithoutCollection(
+    userId: string,
+    cursor?: string,
+    pageSize: number = 50,
+  ): Promise<BookmarkAggregate[]> {
+    return this.#findAsReadModelByCursor(
+      [eq(bookmarks.userId, userId), isNull(bookmarks.collectionId)],
+      cursor,
+      pageSize,
+    );
+  }
+
   async #findAsReadModelByCursor(
     conditions: SQLWrapper[],
     cursor?: string,
@@ -83,9 +95,10 @@ export class PostgresBookmarkRepository extends BookmarkRepository {
       .select()
       .from(bookmarks)
       .where(
-        cursor
-          ? and(...conditions, gt(bookmarks.createdAt, new Date(cursor)))
-          : undefined,
+        and(
+          ...conditions,
+          cursor ? gt(bookmarks.createdAt, new Date(cursor)) : undefined,
+        ),
       )
       .leftJoin(posts, eq(bookmarks.targetId, posts.id))
       .limit(pageSize);
@@ -126,7 +139,7 @@ export class PostgresBookmarkRepository extends BookmarkRepository {
       targetId: result.targetId,
       createdAt: result.createdAt,
       updatedAt: result.updatedAt,
-      collectionId: result.collectionId ?? undefined,
+      collectionId: result.collectionId ?? null,
     });
   }
 
