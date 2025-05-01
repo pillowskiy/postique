@@ -16,7 +16,7 @@
 <script src="https://unpkg.com/htmx.org@1.9.6/dist/ext/intersection-observer.js"></script>
 
 <script>
-    document.addEventListener('htmx:afterRequest', (event) => {
+    document.addEventListener('htmx:afterOnLoad', (event) => {
         const xhr = event.detail.xhr;
         const errorCode = xhr.getResponseHeader('X-Error-Code');
 
@@ -91,6 +91,7 @@
         dialog.addEventListener('sl-after-hide', cleanup, { once: true });
 
         document.body.append(dialog);
-        return dialog.show();
+
+        customElements.whenDefined('sl-dialog').then(() => dialog.show());
     }
 </script>

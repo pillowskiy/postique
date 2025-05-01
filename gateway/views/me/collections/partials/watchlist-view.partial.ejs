@@ -1,0 +1,10 @@
+<div x-data="{ len: <%= posts.length %> }">
+    <% if (posts && posts.length > 0) { %>
+    <%- await include('../../../post/partials/posts-view.partial.ejs', { posts, __postListTemplate: '../post-watch-list.ejs' }) %>
+    <% } %>
+
+    <div class="no-posts" x-show="len === 0">
+        <sl-icon name="journal-x" size="large"></sl-icon>
+        <p>Список читання пустий</p>
+    </div>
+</div>

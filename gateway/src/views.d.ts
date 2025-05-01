@@ -62,10 +62,7 @@ declare namespace render {
             user: Variable;
             locals: { user: Variable };
         };
-        'home/home-page': {
-            JSON: { stringify: Function };
-            user: Variable;
-        };
+        'home/home-page': {};
         layout: {
             title: Variable;
             __renderTarget: Variable;
@@ -76,8 +73,9 @@ declare namespace render {
         };
         'me/collections/partials/history-view.partial': {
             posts: Array;
-            JSON: { stringify: Function };
-            user: Variable;
+        };
+        'me/collections/partials/watchlist-view.partial': {
+            posts: Array;
         };
         'me/notifications/notifications-page': {};
         'me/posts/components/post-archived-card': {};
@@ -112,11 +110,15 @@ declare namespace render {
         'post/partials/posts-view.partial': {
             JSON: { stringify: Function };
             user: Variable;
+            __postListTemplate: Variable;
         };
         'post/post-aside-card-list.swap': {
             posts: Array;
         };
         'post/post-detailed-list': {
+            posts: Array;
+        };
+        'post/post-history-list': {
             posts: Array;
         };
         'post/post-page': {
@@ -131,6 +133,9 @@ declare namespace render {
             };
             'post.owner': { username: Array };
             renderer: { raw: Function };
+        };
+        'post/post-watch-list': {
+            posts: Array;
         };
         'shared/error': {
             status: Variable;

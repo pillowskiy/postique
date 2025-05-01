@@ -37,12 +37,16 @@
                                 hx-get="/api/comments/<%= reply.id %>/edit-form"
                                 hx-target="#reply-content-<%= reply.id %>"
                                 hx-swap="innerHTML"
-                            >Редагувати</sl-menu-item>
+                            >
+                                Редагувати
+                            </sl-menu-item>
                             <sl-menu-item
-                                hx-post="/api/comments/delete"
-                                hx-vals='{"commentId": "<%= reply.id %>", "postId": "<%= reply.postId %>"}'
-                                hx-confirm="Ви впевнені, що хочете видалити цю відповідь?"
-                            >Видалити</sl-menu-item>
+                                hx-delete="/r/comments/<%= reply.id %>"
+                                hx-confirm="Ви впевнені, що хочете видалити цей коментар?"
+                                hx-remove="#reply-<%= reply.id %>"
+                            >
+                                Видалити
+                            </sl-menu-item>
                         <% } else { %>
                             <sl-menu-item>Поскаржитися</sl-menu-item>
                         <% } %>

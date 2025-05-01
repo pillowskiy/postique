@@ -18,7 +18,17 @@
             Ваші колекції
         </sl-tab>
 
-        <sl-tab slot="nav" panel="watchlist">Список читання</sl-tab>
+        <sl-tab
+            slot="nav"
+            panel="watchlist"
+            hx-get="/me/collections/watchlist"
+            hx-trigger="click once"
+            hx-target="#watchlist"
+            hx-swap="innerHTML"
+        >
+            Список читання
+        </sl-tab>
+
         <sl-tab
             slot="nav"
             panel="history"
@@ -31,9 +41,7 @@
         </sl-tab>
 
         <sl-tab-panel id="your-lists" name="your-lists"></sl-tab-panel>
-        <sl-tab-panel id="watchlist" name="watchlist"
-            >Not implemented yet</sl-tab-panel
-        >
+        <sl-tab-panel id="watchlist" name="watchlist"></sl-tab-panel>
         <sl-tab-panel id="history" name="history"></sl-tab-panel>
     </sl-tab-group>
 </div>
@@ -59,16 +67,19 @@
 
         const tabNode = tabs.querySelector(`[panel="${activeTab}"]`);
         if (tabNode) {
-            tabs.show(activeTab);
             tabNode.setAttribute('hx-trigger', 'load');
             htmx.process(tabNode);
+            setTimeout(() => {
+                tabs.show(activeTab);
+            });
         }
     })();
 
     document.addEventListener('sl-tab-show', (event) => {
         const activeTab = event.target.activeTab;
         if (activeTab) {
-            window.history.pushState({}, '', activeTab.getAttribute('hx-get'));
+            const url = activeTab.getAttribute('hx-get');
+            window.history.pushState({}, '', url);
         }
     });
 

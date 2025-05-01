@@ -6,6 +6,7 @@ import express from 'express';
  * @param {import('express').Router} bookmarkRouter
  * @param {import('express').Router} collectionRouter
  * @param {import('express').Router} likeRouter
+ * @param {import('express').Router} viewRouter
  */
 export function ReactionRoutes(
     interactionRouter,
@@ -13,6 +14,7 @@ export function ReactionRoutes(
     bookmarkRouter,
     collectionRouter,
     likeRouter,
+    viewRouter,
 ) {
     const reactionRouter = express.Router();
 
@@ -21,6 +23,7 @@ export function ReactionRoutes(
     reactionRouter.use('/bookmarks', bookmarkRouter);
     reactionRouter.use('/collections', collectionRouter);
     reactionRouter.use('/likes', likeRouter);
+    reactionRouter.use('/views', viewRouter);
 
     return reactionRouter;
 }

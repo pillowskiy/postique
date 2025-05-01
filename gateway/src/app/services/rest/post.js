@@ -216,6 +216,10 @@ export class PostService extends RestClient {
      * @returns {Promise<Array<import("#app/models").PostWithOwner>>}
      */
     async findBatch(auth, ids) {
+        if (!ids.length) {
+            return [];
+        }
+
         const response = await this._client
             .post(`posts/batch`, {
                 json: { ids },

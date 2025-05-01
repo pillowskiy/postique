@@ -43,6 +43,12 @@ export function MeRoutes(meController, authMiddlewares) {
     );
 
     meRouter.get(
+        '/collections/watchlist',
+        authMiddlewares.withAuth.bind(authMiddlewares),
+        handler(meController, 'getWatchlistTabView'),
+    );
+
+    meRouter.get(
         '/collections/history',
         authMiddlewares.withAuth.bind(authMiddlewares),
         handler(meController, 'getHistoryTabView'),

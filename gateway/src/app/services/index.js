@@ -64,6 +64,8 @@
  * @property {(targetId: string, collectionId: string|null, auth: string) => Promise<import("#app/models").BookmarkIdentifier>} addBookmark
  * @property {(targetId: string, collectionId: string|null, auth: string) => Promise<import("#app/models").BookmarkIdentifier>} deleteBookmark
  * @property {(userId: string, auth: string, cursor: string|null, pageSize: number|null) => Promise<import("#app/models").BookmarkCursor>} getUserBookmarks
+ * @property {(auth: string|null, collectionId: string, cursor: string|null, pageSize: number|null) => Promise<import("#app/models").BookmarkCursor>} getCollectionBookmarks
+ * @property {(auth: string, cursor: string|null, pageSize: number|null) => Promise<import("#app/models").BookmarkCursor>} getWatchlistBookmarks
  */
 
 /**

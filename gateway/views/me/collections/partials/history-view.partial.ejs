@@ -1,32 +1,38 @@
-<% if (posts && posts.length > 0) { %>
+<div x-data="{ len: <%= posts.length %> }">
+    <% if (posts && posts.length > 0) { %>
+    <sl-alert
+        class="clear-history-alert"
+        variant="primary"
+        x-show="len > 0"
+        open
+    >
+        <sl-icon slot="icon" name="info-circle"></sl-icon>
+        <div class="clear-history-alert__content">
+            <p>
+                Ви можете очистити історію читання, щоб почати з чистого аркуша.
+            </p>
 
-<!-- Declarations -->
-<% const postIds = JSON.stringify({ postIds: posts.map((p) => p.id) }); %>
+            <sl-button
+                slot="primaryAction"
+                size="small"
+                variant="neutral"
+                pill
+                hx-trigger="click"
+                hx-delete="/r/views/history"
+                hx-remove="#posts-list"
+                hx-confirm="Ви впевнені, що хочете очистити вашу історію?"
+                hx-on::after-request="if (!event.failed) Alpine.$data(this).len = 0"
+            >
+                Очистити
+            </sl-button>
+        </div>
+    </sl-alert>
 
-<div
-    hx-post="/r/interactions/stats"
-    hx-vals="<%= postIds %>"
-    hx-trigger="revealed"
-    hx-target="#posts-list"
-    hx-swap="none"
-></div>
+    <%- await include('../../../post/partials/posts-view.partial.ejs', { posts, __postListTemplate: '../post-history-list.ejs' }) %>
+    <% } %>
 
-<% if (user) { %>
-<div
-    hx-post="/r/interactions/states"
-    hx-vals="<%= postIds %>"
-    hx-trigger="revealed"
-    hx-target="#posts-list"
-    hx-swap="none"
-></div>
-<% } %>
-
-<ul id="posts-list" class="post-list">
-    <%- await include('../../../post/post-detailed-list.ejs', { posts }) %>
-</ul>
-<% } else { %>
-<div class="no-posts">
-    <sl-icon name="journal-x" size="large"></sl-icon>
-    <p>Історія переглядів пуста</p>
+    <div class="no-posts" x-show="len === 0">
+        <sl-icon name="journal-x" size="large"></sl-icon>
+        <p>Історія переглядів пуста</p>
+    </div>
 </div>
-<% } %>

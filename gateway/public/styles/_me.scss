@@ -164,3 +164,18 @@ body {
         }
     }
 }
+
+.clear-history-alert {
+    margin: 24px 0;
+
+    &__content {
+        display: flex;
+        gap: 16px;
+        justify-content: space-between;
+
+        p {
+            padding: 6px 0;
+            font-size: var(--sl-font-size-small);
+        }
+    }
+}

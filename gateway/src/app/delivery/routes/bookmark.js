@@ -43,5 +43,12 @@ export function BookmarkRoutes(bookmarkController, authMiddlewares) {
         handler(bookmarkController, 'getRecentlyView'),
     );
 
+    bookmarkRouter.get(
+        '/watchlist',
+        authMiddlewares.withAuth.bind(authMiddlewares),
+        [query('cursor').optional().isString(), query('pageSize').optional()],
+        handler(bookmarkController, 'getWatchlist'),
+    );
+
     return bookmarkRouter;
 }

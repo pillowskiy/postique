@@ -75,6 +75,47 @@ export class BookmarkService extends RestClient {
     }
 
     /**
+     * @param {string} auth
+     * @param {string|null} cursor
+     * @param {number|null} pageSize
+     * @returns {Promise<import("#app/models").BookmarkCursor>}
+     */
+    async getWatchlistBookmarks(auth, cursor, pageSize) {
+        const params = new URLSearchParams();
+        if (cursor) params.set('cursor', cursor);
+        if (pageSize) params.set('pageSize', pageSize.toString());
+
+        const response = await this._client
+            .get(`bookmarks/watchlist?${params}`, {
+                headers: this._withAuth(auth),
+            })
+            .json();
+
+        return this.#bookmarkCursorToModel(response);
+    }
+
+    /**
+     * @param {string|null} auth
+     * @param {string} collectionId
+     * @param {string|null} cursor
+     * @param {number|null} pageSize
+     * @returns {Promise<import("#app/models").BookmarkCursor>}
+     */
+    async getCollectionBookmarks(auth, collectionId, cursor, pageSize) {
+        const params = new URLSearchParams();
+        if (cursor) params.set('cursor', cursor);
+        if (pageSize) params.set('pageSize', pageSize.toString());
+
+        const response = await this._client
+            .get(`bookmarks/list/${collectionId}?${params}`, {
+                headers: this._withAuth(auth),
+            })
+            .json();
+
+        return this.#bookmarkCursorToModel(response);
+    }
+
+    /**
      * @param {Object} data
      * @returns {import("#app/models").BookmarkIdentifier}
      */

@@ -18,15 +18,20 @@ export class MeController {
     /** @type {import("#app/services").ViewService} */
     #viewService;
 
+    /** @type {import("#app/services").BookmarkService} */
+    #bookmarkService;
+
     /**
      * @param {import("#app/services").PostService} postService
      * @param {import("#app/services").CollectionService} collectionService
-     * @param {import("#app/services").ViewService}viewService
+     * @param {import("#app/services").ViewService} viewService
+     * @param {import("#app/services").BookmarkService} bookmarkService
      */
-    constructor(postService, collectionService, viewService) {
+    constructor(postService, collectionService, viewService, bookmarkService) {
         this.#postService = postService;
         this.#collectionService = collectionService;
         this.#viewService = viewService;
+        this.#bookmarkService = bookmarkService;
     }
 
     /**
@@ -42,6 +47,77 @@ export class MeController {
         return render(res)
             .template('me/notifications/notifications-page', {})
             .layout('grid-layout');
+    }
+
+    /**
+     * @param {Request} req
+     * @param {Response} res
+     */
+    async getWatchlistTabView(req, res) {
+        const token = getAuthToken(req);
+        if (!token) {
+            throw new ClientException('Ви повинні бути авторизовані', 401);
+        }
+
+        if (!req.headers['hx-request']) {
+            return this._getCollectionsView(req, res);
+        }
+
+        const cursor = req.query.cursor ?? null;
+        const pageSize = req.query.pageSize ?? null;
+
+        const views = await this.#bookmarkService.getWatchlistBookmarks(
+            token,
+            cursor,
+            pageSize,
+        );
+        console.log(views);
+        const posts = await this.#postService.findBatch(
+            token,
+            views.items.map((v) => v.targetId),
+        );
+
+        return render(res).template(
+            'me/collections/partials/watchlist-view.partial',
+            {
+                posts,
+            },
+        );
+    }
+
+    /**
+     * @param {Request} req
+     * @param {Response} res
+     */
+    async getHistoryTabView(req, res) {
+        const token = getAuthToken(req);
+        if (!token) {
+            throw new ClientException('Ви повинні бути авторизовані', 401);
+        }
+
+        if (!req.headers['hx-request']) {
+            return this._getCollectionsView(req, res);
+        }
+
+        const cursor = req.query.cursor ?? null;
+        const pageSize = req.query.pageSize ?? null;
+
+        const views = await this.#viewService.getUserHistory(
+            token,
+            cursor,
+            pageSize,
+        );
+        const posts = await this.#postService.findBatch(
+            token,
+            views.items.map((v) => v.targetId),
+        );
+
+        return render(res).template(
+            'me/collections/partials/history-view.partial',
+            {
+                posts,
+            },
+        );
     }
 
     /**
@@ -71,55 +147,14 @@ export class MeController {
         );
     }
 
-    /**
-     * @param {Request} req
-     * @param {Response} res
-     */
-    async getHistoryTabView(req, res) {
-        const token = getAuthToken(req);
-        if (!token) {
-            throw new ClientException('Ви повинні бути авторизовані', 401);
-        }
-
-        if (!req.headers['hx-request']) {
-            return this._getCollectionsView(req, res);
-        }
-
-        const views = await this.#viewService.getUserHistory(
-            token,
-            req.query.cursor,
-            req.query.take,
-        );
-
-        const posts = await this.#postService.findBatch(
-            token,
-            views.items.map((v) => v.targetId),
-        );
-
-        return render(res).template(
-            'me/collections/partials/history-view.partial',
-            {
-                posts,
-            },
-        );
-    }
-
     async _getCollectionsView(req, res) {
         const token = getAuthToken(req);
         if (!token) {
             throw new ClientException('Ви повинні бути авторизовані', 401);
         }
 
-        const collections = await this.#collectionService.getUserCollections(
-            req.user.id,
-            token,
-        );
-
         return render(res)
-            .template('me/collections/collections-page', {
-                items: collections,
-                __partialNode: 'collections-view',
-            })
+            .template('me/collections/collections-page', {})
             .layout('grid-layout');
     }
 
