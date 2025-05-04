@@ -1,52 +1,39 @@
-import json
 import logging
 
-from aio_pika import IncomingMessage, connect_robust
 from app.config import settings
+from app.consumers.base_consumer import BaseConsumer, message_handler
 from app.models.metadata_database import MetadataDatabase
 
 
-class UserConsumer:
+class UserConsumer(BaseConsumer):
+    EXCHANGE_NAME = settings.USER_EXCHANGE
+    QUEUE_NAME = settings.USER_QUEUE
+
     def __init__(self):
         self.metadata_db = MetadataDatabase()
+        super().__init__()
 
-    async def setup(self):
-        self.connection = await connect_robust(settings.RABBITMQ_URL)
-        self.channel = await self.connection.channel()
+    @message_handler(pattern="user_registered")
+    async def handle_user_registered(self, payload):
+        user_id = payload.get("id")
 
-        exchange = await self.channel.declare_exchange(
-            settings.USER_EXCHANGE, type="fanout", durable=True
-        )
+        if not user_id:
+            logging.error("User message missing id field")
+            return
 
-        queue = await self.channel.declare_queue(
-            f"recommendation_service_users", durable=True
-        )
+        logging.info(f"Processing user: {user_id}")
+        self.metadata_db.store_user(user_id, payload)
+        logging.info(f"User {user_id} processed successfully")
 
-        await queue.bind(exchange)
-        await queue.consume(self.process_message)
+    @message_handler(pattern="user_profile")
+    async def handle_user_updated(self, message_data):
+        user_data = message_data.get("data", {})
+        user_id = user_data.get("id")
 
-        logging.info("User consumer started successfully")
+        if not user_id:
+            logging.error("User update message missing id field")
+            return
 
-    async def process_message(self, message: IncomingMessage):
-        async with message.process():
-            try:
-                message_data = json.loads(message.body.decode())
-                message_type = message_data.get("type")
-                if message_type != "user.created":
-                    return
-
-                logging.info(f"Processing message of type: {message_type}")
-                user_data = message_data.get("data")
-                user_id = user_data.get("id")
-
-                if not user_id:
-                    logging.error("User message missing id field")
-                    return
-
-                logging.info(f"Processing user: {user_id}")
-                self.metadata_db.store_user(user_id, user_data)
-
-                logging.info(f"User {user_id} processed successfully")
-
-            except Exception as e:
-                logging.error(f"Error processing user message: {e}")
+        logging.info(f"Processing user profile: {user_id}")
+        self.metadata_db.update_user(user_id, user_data)
+        logging.info(f"User {user_id} updated successfully")

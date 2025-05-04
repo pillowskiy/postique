@@ -29,64 +29,9 @@ class SearchResponse(BaseModel):
     total: int
     query: str
 
-class SearchPostRequest(BaseModel):
-    id: str
-    title: str
-    description: str
-    content: Optional[str] = None
 
 class SearchPostCreateResponse(BaseModel):
     id: str
-
-@router.post("/post", response_model=SearchPostCreateResponse)
-async def add_post(
-    post: SearchPostRequest,
-):
-    try:
-        logging.info(f"Processing post: {post.id}")
-
-        title = post.title
-        description = post.description or ""
-        content = post.content or ""
-
-        embedding = text_embedding.get_combined_embedding(
-            title, description, content
-        )
-        logging.info(f"Embedding generated for post {post.id}")
-
-        categories = category_model.predict_categories(
-            title, description, content
-        )
-        logging.info(f"Categories predicted for post {post.id}: {categories}")
-
-        vector_db.store_embedding(
-            post_id=post.id,
-            embedding=embedding,
-            metadata={
-                "title": title,
-                "description": description,
-                "categories": categories,
-                "created_at": datetime.utcnow().isoformat(),
-            },
-        )
-
-        metadata_db.store_post(
-            post_id=post.id,
-            title=title,
-            description=description,
-            categories=categories,
-        )
-
-        metadata_db.store_categories(categories)
-
-        logging.info(
-            f"Post {post.id} processed successfully."
-        )
-
-        return SearchPostCreateResponse(**post.dict())
-    except Exception as e:
-        logging.error(f"Error adding post: {e}")
-        raise HTTPException(status_code=500, detail="Failed to add post")
 
 @router.get("/text", response_model=SearchResponse)
 async def search_by_text(
@@ -147,7 +92,6 @@ async def search_by_category(
                     description=metadata.get("description", ""),
                     categories=metadata.get("categories", []),
                     score=score,
-                    author_id=metadata.get("author_id"),
                 )
             )
 

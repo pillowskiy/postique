@@ -1,8 +1,11 @@
 import os
+from pathlib import Path
+
 from dotenv import load_dotenv
 from pydantic_settings import BaseSettings
 
 load_dotenv()
+
 
 class Settings(BaseSettings):
     APP_NAME: str = "Recommendation Service"
@@ -11,7 +14,10 @@ class Settings(BaseSettings):
 
     RABBITMQ_URL: str = os.getenv("RABBITMQ_URL", "amqp://guest:guest@localhost:5672/")
     POST_EXCHANGE: str = os.getenv("POST_EXCHANGE", "post_exchange")
+    POST_QUEUE: str = os.getenv("POST_QUEUE", "post_queue")
+
     USER_EXCHANGE: str = os.getenv("USER_EXCHANGE", "user_exchange")
+    USER_QUEUE: str = os.getenv("USER_QUEUE", "user_queue")
 
     QDRANT_URL: str = os.getenv("QDRANT_URL", "http://localhost:6333")
     QDRANT_COLLECTION: str = os.getenv("QDRANT_COLLECTION", "articles")

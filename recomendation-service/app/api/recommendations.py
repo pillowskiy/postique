@@ -28,7 +28,7 @@ async def get_recommendations(
     user_id: str, limit: int = Query(10, ge=1, le=50), with_explanation: bool = False
 ):
     try:
-        posts = recommendation_engine.get_user_recommendations(user_id, limit)
+        posts = await recommendation_engine.get_user_recommendations(user_id, limit)
 
         recommendations = []
         for post in posts:

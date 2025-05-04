@@ -14,28 +14,6 @@ class MetadataDatabase:
         self.categories = self.db.categories
         self.user_preferences = self.db.user_preferences
 
-    def store_post(
-        self,
-        post_id: str,
-        title: str,
-        description: str,
-        categories: list[str],
-        author_id: str = None,
-    ):
-        self.posts.update_one(
-            {"_id": post_id},
-            {
-                "$set": {
-                    "title": title,
-                    "description": description,
-                    "categories": categories,
-                    "author_id": author_id,
-                    "created_at": datetime.utcnow(),
-                }
-            },
-            upsert=True,
-        )
-
     def store_categories(self, categories: list[str]):
         for category in categories:
             self.categories.update_one(
@@ -43,22 +21,33 @@ class MetadataDatabase:
             )
 
     def store_user(self, user_id: str, user_data: dict):
-        self.users.update_one({"_id": user_id}, {"$set": user_data}, upsert=True)
+        session = self.client.start_session()
+        session.start_transaction()
 
-        self.user_preferences.update_one(
-            {"user_id": user_id},
-            {
-                "$setOnInsert": {
-                    "user_id": user_id,
-                    "liked_categories": [],
-                    "disliked_categories": [],
-                    "viewed_posts": [],
-                    "liked_posts": [],
-                    "disliked_posts": [],
-                }
-            },
-            upsert=True,
-        )
+        try:
+            self.users.update_one({"_id": user_id}, {"$set": user_data}, upsert=True, session=session)
+
+            self.user_preferences.update_one(
+                {"user_id": user_id},
+                {
+                    "$setOnInsert": {
+                        "user_id": user_id,
+                        "liked_categories": [],
+                        "disliked_categories": [],
+                        "viewed_posts": [],
+                        "liked_posts": [],
+                        "disliked_posts": [],
+                    }
+                },
+                upsert=True,
+            )
+            session.commit_transaction()
+        except Exception as e:
+            session.abort_transaction()
+            raise e
+        finally:
+            session.end_session()
+
 
     def update_user_preference(self, user_id: str, post_id: str, action: str):
         if action == "show-more":

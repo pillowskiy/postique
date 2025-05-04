@@ -13,12 +13,14 @@ class RecommendationEngine:
         self.metadata_db = MetadataDatabase()
         self.text_embedding = TextEmbedding()
 
-    def get_user_recommendations(self, user_id: str, limit: int = 10) -> List[Dict]:
+    async def get_user_recommendations(self, user_id: str, limit: int = 10) -> List[Dict]:
+        print(f"Getting recommendations for user {user_id} with limit {limit}")
         try:
             user_prefs = self.metadata_db.get_user_preferences(user_id)
 
+            print(f"User preferences for {user_id}: {user_prefs}")
             if not user_prefs["liked_categories"] and not user_prefs["liked_posts"]:
-                return self._get_popular_posts(limit)
+                return await self._get_popular_posts(limit)
 
             liked_categories = user_prefs["liked_categories"]
             viewed_posts = set(user_prefs.get("viewed_posts", []))
@@ -74,7 +76,7 @@ class RecommendationEngine:
             )
 
             if len(sorted_recommendations) < limit:
-                popular_posts = self._get_popular_posts(
+                popular_posts = await self._get_popular_posts(
                     limit - len(sorted_recommendations),
                     exclude_ids=list(seen_ids)
                     + list(viewed_posts)
@@ -86,30 +88,12 @@ class RecommendationEngine:
 
         except Exception as e:
             logging.error(f"Error generating recommendations: {e}")
-            return self._get_popular_posts(limit)
+            return await self._get_popular_posts(limit)
 
-    def _get_popular_posts(
+    async def _get_popular_posts(
         self, limit: int = 10, exclude_ids: List[str] = None
     ) -> List[Dict]:
-        try:
-            exclude_ids = exclude_ids or []
-            cursor = (
-                self.metadata_db.posts.find({"_id": {"$nin": exclude_ids}})
-                .sort("created_at", -1)
-                .limit(limit)
-            )
-
-            return [
-                {
-                    "id": post["_id"],
-                    "score": 0.5,
-                    "metadata": post,
-                }
-                for post in cursor
-            ]
-        except Exception as e:
-            logging.error(f"Error getting popular posts: {e}")
-            return []
+        return await self.vector_db.get_popular_posts(limit, exclude_ids)
 
     def log_user_view(self, user_id: str, post_id: str):
         try:

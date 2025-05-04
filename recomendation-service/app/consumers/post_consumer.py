@@ -1,83 +1,65 @@
-import json
 import logging
+from datetime import datetime
+from typing import Optional
 
-from aio_pika import IncomingMessage, connect_robust
+from pydantic import BaseModel
+
 from app.config import settings
+from app.consumers.base_consumer import BaseConsumer, message_handler
 from app.models.categorization import CategoryClassifier
 from app.models.database import VectorDatabase
-from app.models.metadata_database import MetadataDatabase
 from app.models.embedding import TextEmbedding
-from datetime import datetime
+from app.models.metadata_database import MetadataDatabase
 
+class PostData(BaseModel):
+    id: str
+    title: str = ""
+    description: str = ""
+    visibility: str = "public"
+    status: str = "draft"
+    content: Optional[str] = None
 
-class PostConsumer:
+class PostConsumer(BaseConsumer):
+    EXCHANGE_NAME = settings.POST_EXCHANGE
+    QUEUE_NAME = settings.POST_QUEUE
+
     def __init__(self):
         self.embedding_model = TextEmbedding()
         self.category_model = CategoryClassifier()
         self.vector_db = VectorDatabase()
         self.metadata_db = MetadataDatabase()
+        super().__init__()
 
-    async def setup(self):
-        self.connection = await connect_robust(settings.RABBITMQ_URL)
-        self.channel = await self.connection.channel()
+    @message_handler(pattern="post.published", model=PostData)
+    async def handle_post_updated(self, payload):
+        await self._process_post(payload)
 
-        exchange = await self.channel.declare_exchange(
-            settings.POST_EXCHANGE, type="fanout", durable=True
+    async def _process_post(self, post: PostData):
+        logging.info(f"Processing post: {post.id}")
+
+        embedding = self.embedding_model.get_combined_embedding(
+            post.title, post.description, post.content or ""
         )
 
-        queue = await self.channel.declare_queue(f"recomendations.post", durable=True)
+        categories = self.category_model.predict_categories(
+            post.title,
+            post.description,
+            post.content or ""
+        )
 
-        await queue.bind(exchange)
+        self.vector_db.store_embedding(
+            post_id=post.id,
+            embedding=embedding,
+            metadata={
+                "title": post.title,
+                "description": post.description,
+                "categories": categories,
+                "visibility": post.visibility,
+                "status": post.status,
+                "created_at": datetime.utcnow(),
+            },
+        )
 
-        await queue.consume(self.process_message)
+        self.metadata_db.store_categories(categories)
 
-        logging.info("Post consumer started successfully")
-
-    async def process_message(self, message: IncomingMessage):
-        async with message.process():
-            try:
-                post_data = json.loads(message.body.decode())
-
-                post_id = post_data.get("id")
-                title = post_data.get("title", "")
-                description = post_data.get("description", "")
-                content = post_data.get("content", "")
-
-                logging.info(f"Processing post: {post_id}")
-
-                embedding = self.embedding_model.get_combined_embedding(
-                    title, description, content
-                )
-
-                categories = self.category_model.predict_categories(
-                    title, description, content
-                )
-
-                self.vector_db.store_embedding(
-                    post_id=post_id,
-                    embedding=embedding,
-                    metadata={
-                        "title": title,
-                        "description": description,
-                        "categories": categories,
-                        "created_at": post_data.get(
-                            "created_at", datetime.utcnow().isoformat()
-                        ),
-                    },
-                )
-
-                self.metadata_db.store_post(
-                    post_id=post_id,
-                    title=title,
-                    description=description,
-                    categories=categories,
-                )
-
-                self.metadata_db.store_categories(categories)
-
-                logging.info(
-                    f"Post {post_id} processed successfully. Categories: {categories}"
-                )
-
-            except Exception as e:
-                logging.error(f"Error processing post message: {e}")
+        logging.info(f"Post {post.id} processed successfully. Categories: {categories}")
