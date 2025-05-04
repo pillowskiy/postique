@@ -9,7 +9,7 @@ import { PostPreferencesEntity } from '@/domain/preferences';
 import {
   IsBlacklistedPostSpecification,
   IsMutedPostSpecification,
-} from '@/domain/preferences/specificaion';
+} from '@/domain/preferences/specification';
 import { Inject, Injectable } from '@nestjs/common';
 
 @Injectable()

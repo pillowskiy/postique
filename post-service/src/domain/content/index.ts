@@ -1,3 +1,3 @@
-export * from './markup';
-export * from './metadata';
-export * from './paragraph';
+export * from './entity';
+export * from './strategy';
+export * from './specification';

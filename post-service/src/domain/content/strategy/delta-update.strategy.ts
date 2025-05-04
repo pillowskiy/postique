@@ -1,7 +1,6 @@
 import { BulkOperation, BulkOperationType } from '@/domain/common/bulk';
-import { DeltaEntity, DeltaGroup } from '../delta/delta.entity';
-import { DeltaType } from '../delta/delta.interface';
-import { ParagraphAggregate } from '../paragraph';
+import { DeltaEntity, DeltaGroup, DeltaType } from '@/domain/content';
+import { ParagraphAggregate } from '@/domain/content';
 
 export class ContentChangeStrategy {
   private _changeList: BulkOperation<BulkOperationType, ParagraphAggregate>[];

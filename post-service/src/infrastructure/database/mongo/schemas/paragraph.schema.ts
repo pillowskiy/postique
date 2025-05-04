@@ -1,5 +1,5 @@
 import { MarkupType } from '@/domain/content';
-import { ParagraphType } from '@/domain/content/paragraph/content-paragraph.interface';
+import { ParagraphType } from '@/domain/content';
 import { Prop, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument } from 'mongoose';
 import { MongoSchema, PropOptimizedUUID } from '../shared/schema';

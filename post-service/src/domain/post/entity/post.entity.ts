@@ -134,6 +134,8 @@ export class PostEntity implements IPost {
     if (this.isFresh()) {
       this._slug = slugify(this.title);
     }
+
+    this._status = PostStatus.Draft;
     this._description = validMeta.description;
     this._coverImage = validMeta.coverImage;
   }

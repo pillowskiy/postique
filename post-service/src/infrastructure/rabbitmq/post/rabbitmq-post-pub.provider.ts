@@ -1,8 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { AppConfigService } from '@/infrastructure/globals/config';
 import { AmqpConnection } from '@golevelup/nestjs-rabbitmq';
-import { PostPayload, PostPublisher } from '@/app/boundaries/providers';
-import { PostOutput } from '@/app/boundaries/dto/output';
+import {
+  type IPostPayload,
+  type IPostWithContentPayload,
+  PostPublisher,
+} from '@/app/boundaries/providers';
 
 @Injectable()
 export class RabbitMQPostPublisher extends PostPublisher {
@@ -13,12 +16,16 @@ export class RabbitMQPostPublisher extends PostPublisher {
     super();
   }
 
-  async publishCreated(post: PostPayload): Promise<void> {
+  async publishCreated(post: IPostPayload): Promise<void> {
     await this._publish('', 'post.created', post);
   }
 
-  async publishModified(post: PostPayload): Promise<void> {
+  async publishModified(post: IPostPayload): Promise<void> {
     await this._publish('', 'post.modified', post);
+  }
+
+  async publishPublished(post: IPostWithContentPayload): Promise<void> {
+    await this._publish('', 'post.published', post);
   }
 
   private _publish(
