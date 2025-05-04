@@ -69,8 +69,8 @@
         if (tabNode) {
             tabNode.setAttribute('hx-trigger', 'load');
             htmx.process(tabNode);
-            setTimeout(() => {
-                tabs.show(activeTab);
+            customElements.whenDefined('sl-tab').then(() => {
+                tabs.show(tabNode);
             });
         }
     })();
