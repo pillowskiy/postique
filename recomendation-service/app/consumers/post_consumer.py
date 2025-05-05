@@ -53,9 +53,18 @@ class PostConsumer(BaseConsumer):
             metadata={
                 "title": post.title,
                 "description": post.description,
-                "categories": categories,
+                "created_at": datetime.utcnow(),
+            },
+        )
+
+        self.metadata_db.store_post(
+            post_id=post.id,
+            post_data={
+                "title": post.title,
+                "description": post.description,
                 "visibility": post.visibility,
                 "status": post.status,
+                "categories": categories,
                 "created_at": datetime.utcnow(),
             },
         )

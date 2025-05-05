@@ -1,7 +1,7 @@
 import asyncio
 import logging
 
-from app.api import recommendations, search
+from app.api import recommendations, search, category, posts
 from app.config import settings
 from app.consumers.post_consumer import PostConsumer
 from app.consumers.user_consumer import UserConsumer
@@ -39,6 +39,8 @@ api_router.include_router(
     recommendations.router, prefix="/recommendations", tags=["recommendations"]
 )
 api_router.include_router(search.router, prefix="/search", tags=["search"])
+api_router.include_router(category.router, prefix="/categories", tags=["categories"])
+api_router.include_router(posts.router, prefix="/posts", tags=["posts"])
 
 app.include_router(api_router)
 

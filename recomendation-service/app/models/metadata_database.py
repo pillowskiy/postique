@@ -20,6 +20,18 @@ class MetadataDatabase:
                 {"name": category}, {"$set": {"name": category}}, upsert=True
             )
 
+    def store_post(self, post_id: str, post_data: dict):
+        post_data["created_at"] = datetime.utcnow()
+        self.posts.update_one({"_id": post_id}, {"$set": {
+            "_id": post_id,
+            "title": post_data.get("title", ""),
+            "description": post_data.get("description", ""),
+            "categories": post_data.get("categories", []),
+            "status": post_data.get("status", "draft"),
+            "visibility": post_data.get("visibility", "public"),
+            "created_at": post_data.get("created_at", datetime.utcnow()),
+        }}, upsert=True)
+
     def store_user(self, user_id: str, user_data: dict):
         session = self.client.start_session()
         session.start_transaction()

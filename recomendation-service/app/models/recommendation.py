@@ -18,7 +18,6 @@ class RecommendationEngine:
         try:
             user_prefs = self.metadata_db.get_user_preferences(user_id)
 
-            print(f"User preferences for {user_id}: {user_prefs}")
             if not user_prefs["liked_categories"] and not user_prefs["liked_posts"]:
                 return await self._get_popular_posts(limit)
 
@@ -85,7 +84,6 @@ class RecommendationEngine:
                 sorted_recommendations.extend(popular_posts)
 
             return sorted_recommendations[:limit]
-
         except Exception as e:
             logging.error(f"Error generating recommendations: {e}")
             return await self._get_popular_posts(limit)
