@@ -28,8 +28,14 @@ declare namespace render {
         'bookmark/bookmark-popup.oob': {
             targetId: Variable;
         };
-        'bookmark/collection-list.oob': {
+        'collection/collection-detailed-list.partial': {
             collections: Array;
+        };
+        'collection/collection-menu-list.partial': {
+            collections: Array;
+        };
+        'collection/collection-menu-view.oob': {
+            targetId: Variable;
         };
         'comment/comment-replies.loader': {};
         'comment/comment-replies.oob': {
@@ -92,6 +98,11 @@ declare namespace render {
             draftCount: Variable;
             posts: Array;
         };
+        'me/recommendations/partials/author-blacklist-view': {};
+        'me/recommendations/partials/explain-current-view.partial': {};
+        'me/recommendations/partials/post-blacklist-view': {};
+        'me/recommendations/partials/preferences-view.partial': {};
+        'me/recommendations/recommendations-page': {};
         'pages/login-errors.oob': {
             errors: { email: Variable; password: Variable };
         };
@@ -127,11 +138,11 @@ declare namespace render {
             post: {
                 title: Variable;
                 description: Variable;
-                'post.owner': { username: Array };
+                'post.owner': { username: Array; id: Variable };
                 publishedAt: Variable;
                 id: Variable;
             };
-            'post.owner': { username: Array };
+            'post.owner': { username: Array; id: Variable };
             renderer: { raw: Function };
         };
         'post/post-watch-list': {

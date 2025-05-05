@@ -31,6 +31,9 @@ const likeService = asClass(services.rest.LikeService).singleton();
 /** @type {ReturnType<typeof asClass<services.ViewService>>} */
 const viewService = asClass(services.rest.ViewService).singleton();
 
+/** @type {ReturnType<typeof asClass<services.PreferenceService>>} */
+const preferenceService = asClass(services.rest.PreferencesService).singleton();
+
 const providerRegistries = /** @type {const} */ {
     authService,
     fileService,
@@ -41,6 +44,7 @@ const providerRegistries = /** @type {const} */ {
     collectionService,
     likeService,
     viewService,
+    preferenceService,
 };
 
 export default providerRegistries;

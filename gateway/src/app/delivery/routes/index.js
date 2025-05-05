@@ -1,5 +1,6 @@
 export * from './app.js';
 export * from './auth.js';
+export * from './post-facade.js';
 export * from './post.js';
 export * from './me.js';
 export * from './home.js';
@@ -10,3 +11,4 @@ export * from './bookmark.js';
 export * from './collection.js';
 export * from './like.js';
 export * from './view.js';
+export * from './preference.js';

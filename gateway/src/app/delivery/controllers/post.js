@@ -92,8 +92,9 @@ export class PostController {
     async getPopularPartialPostsView(req, res) {
         const cursor = req.query.cursor ?? null;
         const take = req.query.take ?? 3;
+        const token = getAuthToken(req);
 
-        const data = await this.#postService.getPosts(null, take, cursor);
+        const data = await this.#postService.getPosts(token, take, cursor);
 
         return render(res).template('post/post-aside-card-list.swap', {
             posts: data.items,

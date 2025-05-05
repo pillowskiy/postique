@@ -15,6 +15,7 @@ const controllerRegistries = /** @type {const} */ {
     collectionController: asClass(controllers.CollectionController).singleton(),
     likeController: asClass(controllers.LikeController).singleton(),
     viewController: asClass(controllers.ViewController).singleton(),
+    preferenceController: asClass(controllers.PreferenceController).singleton(),
 };
 
 export default controllerRegistries;

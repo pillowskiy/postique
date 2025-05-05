@@ -1,7 +1,7 @@
 import path from 'path';
 
 /**
- * @typedef {AppConfig & LoggerConfig & AuthServiceConfig & FileServiceConfig & PostServiceConfig & ReactionServiceConfig} Config
+ * @typedef {AppConfig & LoggerConfig & AuthServiceConfig & FileServiceConfig & PostServiceConfig & ReactionServiceConfig & RecommendationServiceConfig} Config
  *
  * @typedef {Object} AppConfig
  * @property {number} port
@@ -34,6 +34,11 @@ import path from 'path';
  * @property {Object} reactionService
  * @property {string} reactionService.address
  * @property {number} reactionService.timeout
+ *
+ * @typedef {Object} RecommendationServiceConfig
+ * @property {Object} recommendationService
+ * @property {string} recommendationService.address
+ * @property {number} recommendationService.timeout
  */
 
 const dirname = new URL('.', import.meta.url).pathname;
@@ -65,6 +70,10 @@ export default function Config() {
         reactionService: {
             address: 'http://localhost:8000/api/v1',
             timeout: 5000,
+        },
+        recommendationService: {
+            address: 'http://localhost:9050/api/v1',
+            timeout: 10000,
         },
     };
 }

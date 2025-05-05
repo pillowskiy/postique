@@ -5,3 +5,4 @@ export * from './bookmark.js';
 export * from './collection.js';
 export * from './view.js';
 export * from './like.js';
+export * from './preference.js';

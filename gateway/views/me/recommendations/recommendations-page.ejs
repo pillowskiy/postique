@@ -1,0 +1,100 @@
+<div class="container">
+    <header class="header">
+        <h1>Уточнення рекомендацій</h1>
+        <p>
+            Коригуйте рекомендації, оновлюючи те, на що ви підписані, чому ви
+            надаєте перевагу та тих, кого ви ігнорували.
+        </p>
+    </header>
+
+    <sl-tab-group class="tabs-container" id="library-tabs">
+        <sl-tab
+            slot="nav"
+            panel="explanation"
+            hx-get="/me/recommendations"
+            hx-trigger="click once"
+            hx-target="#recommendations"
+            hx-swap="innerHTML"
+        >
+            Пояснення
+        </sl-tab>
+
+        <sl-tab
+            slot="nav"
+            panel="preferences"
+            hx-get="/me/recommendations/preferences"
+            hx-trigger="click once"
+            hx-target="#preferences"
+            hx-swap="innerHTML"
+        >
+            Переважаючі
+        </sl-tab>
+
+        <sl-tab
+            slot="nav"
+            panel="blacklist"
+            hx-get="/me/recommendations/blacklist"
+            hx-trigger="click once"
+            hx-target="#blacklist"
+            hx-swap="innerHTML"
+        >
+            Блокування
+        </sl-tab>
+
+        <sl-tab-panel id="explanation" name="explanation"></sl-tab-panel>
+        <sl-tab-panel id="preferences" name="preferences"></sl-tab-panel>
+        <sl-tab-panel id="blacklist" name="blacklist"></sl-tab-panel>
+    </sl-tab-group>
+</div>
+
+<script>
+    (async () => {
+        await customElements.whenDefined('sl-tab-group');
+
+        const registeredTabs = ['explanation', 'preferences', 'blacklist'];
+        const path = window.location.pathname;
+        const tabs = document.querySelector('sl-tab-group');
+
+        if (!tabs) {
+            throw new Error('Cannot find tab group');
+        }
+
+        const parts = path.split('/');
+        const collectionIndex = parts.indexOf('collections');
+        const activeTab =
+            parts.length > collectionIndex + 1
+                ? parts[collectionIndex + 1]
+                : parts[0];
+
+        const tabNode = tabs.querySelector(`[panel="${activeTab}"]`);
+        if (tabNode) {
+            tabNode.setAttribute('hx-trigger', 'load');
+            htmx.process(tabNode);
+            customElements.whenDefined('sl-tab').then(() => {
+                tabs.show(tabNode);
+            });
+        }
+    })();
+
+    document.addEventListener('sl-tab-show', (event) => {
+        const activeTab = event.target.activeTab;
+        if (activeTab) {
+            const url = activeTab.getAttribute('hx-get');
+            window.history.pushState({}, '', url);
+        }
+    });
+
+    const pluralRules = new Intl.PluralRules('uk-UA');
+
+    const forms = {
+        one: 'публікацію',
+        few: 'публікації',
+        many: 'публікацій',
+        other: 'публікацій',
+    };
+
+    function getCollectionLabel(count) {
+        const rule = pluralRules.select(count);
+        return `Містить ${count} ${forms[rule]}`;
+    }
+</script>

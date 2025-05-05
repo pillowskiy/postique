@@ -7,3 +7,4 @@ export * from './comment.js';
 export * from './like.js';
 export * from './interaction.js';
 export * from './view.js';
+export * from './preference.js';

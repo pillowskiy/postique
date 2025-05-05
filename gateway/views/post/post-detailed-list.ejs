@@ -79,7 +79,24 @@
                             Показувати менше
                         </sl-menu-item>
                         <sl-divider></sl-divider>
-                        <sl-menu-item>Заблокувати автора</sl-menu-item>
+                        <sl-menu-item
+                            hx-trigger="click"
+                            hx-post="/p/preferences/users/<%= post.owner.id %>"
+                            hx-swap="none"
+                            hx-confirm="Ви впевнені, що хочете заблокувати автора?"
+                            hx-remove="#post-<%= post.id %>"
+                        >
+                            Заблокувати автора
+                        </sl-menu-item>
+                        <sl-menu-item
+                            hx-trigger="click"
+                            hx-post="/p/preferences/posts/<%= post.id %>"
+                            hx-confirm="Ви впевнені, що хочете приховати цю публікацію?"
+                            hx-swap="none"
+                            hx-remove="#post-<%= post.id %>"
+                        >
+                            Приховати публікацію
+                        </sl-menu-item>
                         <sl-menu-item>Поскаржитися</sl-menu-item>
                     </sl-menu>
                 </sl-dropdown>
