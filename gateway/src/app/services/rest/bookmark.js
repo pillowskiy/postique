@@ -13,7 +13,7 @@ export class BookmarkService extends RestClient {
 
     /**
      * @param {string} targetId
-     * @param {string|undefined} collectionId
+     * @param {string|undefined|null} collectionId
      * @param {string} auth
      * @returns {Promise<import("#app/models").BookmarkIdentifier>}
      */

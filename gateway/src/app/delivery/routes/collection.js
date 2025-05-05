@@ -17,6 +17,8 @@ export function CollectionRoutes(collectionController, authMiddlewares) {
             body('name').isString().isLength({ min: 1 }),
             body('description').optional().isString(),
             body('targetId').optional().isString(),
+            query('view').optional().isString(),
+            query('targetId').optional().isString(),
         ],
         handler(collectionController, 'createCollection'),
     );

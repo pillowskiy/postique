@@ -1,0 +1,58 @@
+<% collections.forEach(collection => { %>
+<li id="collection-<%= collection.id %>" class="collection-card" x-data="{}">
+    <div class="collection-card__content">
+        <div class="collection-card__author">
+            <sl-avatar
+                class="collection-card__author--avatar"
+                label="User avatar"
+                initials="<%= collection.author.username.slice(0,2) %>"
+            ></sl-avatar>
+            <%= collection.author.username %>
+        </div>
+
+        <div class="collection-card__info">
+            <a
+                class="pseudo-link"
+                href="/@<%= collection.author.username %>/collections/<%= collection.slug %>"
+            ></a>
+
+            <h2 class="collection-card__info--title"><%= collection.name %></h2>
+            <% if (collection.description) { %>
+            <p class="collection-card__info--decription">
+                <%= collection.description %>
+            </p>
+            <% } %>
+        </div>
+    </div>
+    <div class="collection-card__meta">
+        <span
+            x-text="getCollectionLabel(<%= collection.bookmarksCount %>)"
+        ></span>
+
+        <sl-dropdown>
+            <sl-icon-button
+                slot="trigger"
+                name="three-dots"
+                variant="neutral"
+                size="small"
+            ></sl-icon-button>
+
+            <sl-menu>
+                <sl-menu-item
+                    onclick="copyLink('/@<%= collection.author.username %>/collections/<%= collection.slug %>')"
+                >
+                    Копіювати
+                </sl-menu-item>
+                <sl-menu-item
+                    hx-delete="/r/collections/<%= collection.id %>"
+                    hx-confirm="Ви впевнені, що хочете видалити цей список?"
+                    hx-remove="#collection-<%= collection.id %>"
+                    hx-swap="none"
+                >
+                    Видалити
+                </sl-menu-item>
+            </sl-menu>
+        </sl-dropdown>
+    </div>
+</li>
+<% }); %>

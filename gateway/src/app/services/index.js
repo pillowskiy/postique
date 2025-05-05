@@ -71,16 +71,25 @@
 /**
  * Collection Service API
  * @typedef {Object} CollectionService
- * @property {(auth: string, name: string, description?: string) => Promise<import("#app/models").CollectionIdentifier>} createCollection
+ * @property {(auth: string, name: string, description?: string) => Promise<import("#app/models").Collection>} createCollection
  * @property {(collectionId: string, auth: string) => Promise<import("#app/models").CollectionIdentifier>} deleteCollection
- * @property {(collectionId: string, auth: string, cursor: string|null, pageSize: number|null) => Promise<import("#app/models").BookmarkCursor>} getCollectionBookmarks
  * @property {(userId: string, auth: string) => Promise<import("#app/models").DetailedCollection[]>} getUserCollections
+ * @property {(collectionId: string, auth: string | null) => Promise<import("#app/models").DetailedCollection>} getDetailedCollection
  */
 
 /**
  * Like Service API
  * @typedef {Object} LikeService
  * @property {(targetId: string, auth: string) => Promise<import("#app/models").ToggleLikeResult>} toggleLike
+ */
+
+/**
+ * Preference Service API
+ * @typedef {Object} PreferenceService
+ * @property {(authorId: string, auth: string) => Promise<import("#app/models").MuteResult>} toggleAuthor
+ * @property {(postId: string, auth: string) => Promise<import("#app/models").MuteResult>} togglePost
+ * @property {(take: number, skip: number, auth: string) => Promise<import("#app/models").PreferencePosts>} getPostsBlacklist
+ * @property {(take: number, skip: number, auth: string) => Promise<import("#app/models").PreferenceUsers>} getAuthorBlacklist
  */
 
 export * as grpc from './grpc/index.js';

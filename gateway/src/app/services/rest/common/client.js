@@ -41,7 +41,6 @@ export class RestClient {
             hooks: {
                 beforeRequest: [
                     async (req, opts) => {
-                        console.log(`Request ${req.method} to ${req.url}`);
                         if (req.method !== 'GET' && opts.headers) {
                             opts.headers['Content-Type'] ??= 'application/json';
                         }

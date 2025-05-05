@@ -1,4 +1,4 @@
-<ul class="collections-list">
+<ul id="collections-list" class="collections-list">
     <li
         class="collection-item"
         x-data="{bookmarksCount: 0, targetId: '<%= targetId %>'}"
@@ -15,24 +15,7 @@
         ></sl-icon>
     </li>
 
-    <% collections.forEach((collection) => { %>
-    <li
-        class="collection-item"
-        x-data="{bookmarksCount: <%= collection.bookmarksCount %>, id: '<%= collection.id %>', targetId: '<%= targetId %>'}"
-    >
-        <sl-checkbox
-            x-on:sl-change="handleCheckbox(event)"
-            help-text="<%= collection.description %>"
-        >
-            <%= collection.name %>
-        </sl-checkbox>
-        <span
-            class="collection-item__count"
-            x-text="`${bookmarksCount} закладки`"
-        >
-        </span>
-    </li>
-    <% }); %>
+    <%- await include('../collection/collection-menu-list.partial.ejs', { collections }) %>
 </ul>
 
 <script>

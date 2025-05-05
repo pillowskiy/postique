@@ -8,13 +8,11 @@
 >
     <span slot="anchor"></span>
     <div class="bookmark-popup__container" @mousedown.outside="open = false">
-        <div id="collections-list">
-            <%- await include('./collection-list.oob.ejs') %>
-        </div>
+        <%- await include('../collection/collection-menu-view.oob.ejs') %>
 
         <div
             class="bookmark-popup__collection-form"
-            x-data="{ showForm: false, name: '', description: '' }"
+            x-data="{ showForm: false }"
         >
             <div x-show="!showForm">
                 <button
@@ -28,10 +26,10 @@
 
             <div x-show="showForm">
                 <form
-                    hx-post="/r/collections?targetId=<%= targetId %>"
+                    hx-post="/r/collections?view=menu&targetId=<%= targetId %>"
                     hx-target="#collections-list"
-                    hx-swap="innerHTML"
-                    @submit="showForm = false"
+                    hx-swap="beforeend"
+                    hx-on::after-on-load="if (!event.failed) Alpine.$data(this).showForm = false"
                 >
                     <input
                         type="hidden"
@@ -43,7 +41,6 @@
                             class="collection-form__input"
                             type="text"
                             name="name"
-                            x-model="name"
                             placeholder="Назва колекції"
                             required
                         />
@@ -52,7 +49,6 @@
                         <textarea
                             class="collection-form__input"
                             name="description"
-                            x-model="description"
                             placeholder="Опис (необов'язково)"
                         ></textarea>
                     </div>

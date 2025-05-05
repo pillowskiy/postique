@@ -40,21 +40,40 @@ export class CollectionController {
         }
 
         const { name, description } = req.body;
-        await this.#collectionService.createCollection(
+        const collection = await this.#collectionService.createCollection(
             token,
             name,
             description,
         );
 
-        const userId = req.user.id;
-        const collections = await this.#collectionService.getUserCollections(
-            userId,
-            token,
-        );
+        const view = req.query.view;
+        const targetId = req.query.targetId;
 
-        return render(res).template('bookmark/collection-list.oob', {
-            collections,
-            targetId: req.query.targetId,
+        /** @type {any|null} */
+        let template = null;
+        switch (view) {
+            case 'detail':
+                template = 'collection/collection-detailed-list.partial';
+                break;
+            case 'menu':
+                template = 'collection/collection-menu-list.partial';
+                break;
+        }
+
+        if (!template) {
+            return res.status(204).send();
+        }
+
+        /** @type {import("#app/models").DetailedCollection} */
+        const detailedCollection = {
+            ...collection,
+            bookmarksCount: 0,
+            author: req.user,
+        };
+
+        return render(res).template(template, {
+            collections: [detailedCollection],
+            targetId,
         });
     }
 
@@ -80,16 +99,7 @@ export class CollectionController {
         const { collectionId } = req.params;
         await this.#collectionService.deleteCollection(collectionId, token);
 
-        const userId = req.user.id;
-        const collections = await this.#collectionService.getUserCollections(
-            userId,
-            token,
-        );
-
-        return render(res).template('bookmark/collection-list.oob', {
-            collections,
-            targetId: req.query.targetId,
-        });
+        return res.status(204).send();
     }
 
     /**

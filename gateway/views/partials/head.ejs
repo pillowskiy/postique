@@ -95,3 +95,11 @@
         customElements.whenDefined('sl-dialog').then(() => dialog.show());
     }
 </script>
+
+<script>
+    function copyLink(path) {
+        return navigator.clipboard.writeText(
+            new URL(path, window.location.origin).toString(),
+        );
+    }
+</script>

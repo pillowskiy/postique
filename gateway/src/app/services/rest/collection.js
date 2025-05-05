@@ -15,7 +15,7 @@ export class CollectionService extends RestClient {
      * @param {string} auth
      * @param {string} name
      * @param {string|undefined} description
-     * @returns {Promise<import("#app/models").CollectionIdentifier>}
+     * @returns {Promise<import("#app/models").Collection>}
      */
     async createCollection(auth, name, description) {
         const response = await this._client
@@ -25,7 +25,7 @@ export class CollectionService extends RestClient {
             })
             .json();
 
-        return this.#collectionIdentifierToModel(response);
+        return this.#collectionToModel(response);
     }
 
     /**
@@ -44,24 +44,18 @@ export class CollectionService extends RestClient {
     }
 
     /**
-     * @param {string} collectionId
-     * @param {string} auth
-     * @param {string|null} cursor
-     * @param {number|null} pageSize
-     * @returns {Promise<import("#app/models").BookmarkCursor>}
+     * @param {string} slug
+     * @param {string|null} auth
+     * @returns {Promise<import("#app/models").DetailedCollection>}
      */
-    async getCollectionBookmarks(collectionId, auth, cursor, pageSize) {
-        const params = new URLSearchParams();
-        if (cursor) params.set('cursor', cursor);
-        if (pageSize) params.set('pageSize', pageSize.toString());
-
+    async getDetailedCollection(slug, auth) {
         const response = await this._client
-            .get(`collections/${collectionId}/bookmarks?${params}`, {
+            .get(`collections/${slug}`, {
                 headers: this._withAuth(auth),
             })
             .json();
 
-        return this.#bookmarkCursorToModel(response);
+        return this.#detailedCollectionToModel(response);
     }
 
     /**
@@ -87,54 +81,7 @@ export class CollectionService extends RestClient {
      */
     #collectionIdentifierToModel(data) {
         return {
-            id: data.collectionId,
-        };
-    }
-
-    /**
-     * @param {Object} data
-     * @returns {import("#app/models").BookmarkCursor}
-     */
-    #bookmarkCursorToModel(data) {
-        return {
-            items: data.items.map((bookmark) =>
-                this.#detailedBookmarkToModel(bookmark),
-            ),
-            cursorField: data.cursorField,
-            size: data.size,
-        };
-    }
-
-    /**
-     * @param {Object} bookmark
-     * @returns {import("#app/models").DetailedBookmark}
-     */
-    #detailedBookmarkToModel(bookmark) {
-        return {
-            id: bookmark.id,
-            userId: bookmark.userId,
-            targetId: bookmark.targetId,
-            post: this.#postToModel(bookmark.post),
-            collectionId: bookmark.collectionId,
-            createdAt: bookmark.createdAt
-                ? new Date(bookmark.createdAt)
-                : undefined,
-            updatedAt: bookmark.updatedAt
-                ? new Date(bookmark.updatedAt)
-                : undefined,
-        };
-    }
-
-    /**
-     * @param {Object} post
-     * @returns {import("#app/models").PartialPost}
-     */
-    #postToModel(post) {
-        return {
-            id: post.id,
-            title: post.title,
-            description: post.description,
-            coverImage: post.coverImage,
+            id: data.id,
         };
     }
 
@@ -144,16 +91,27 @@ export class CollectionService extends RestClient {
      */
     #detailedCollectionToModel(collection) {
         return {
-            id: collection.id,
-            userId: collection.userId,
-            name: collection.name,
-            description: collection.description,
-            createdAt: new Date(collection.createdAt),
-            updatedAt: new Date(collection.updatedAt),
+            ...this.#collectionToModel(collection),
             bookmarksCount: collection.bookmarksCount || 0,
             author: collection.author
                 ? this.#userToModel(collection.author)
                 : undefined,
+        };
+    }
+
+    /**
+     * @param {Object} collection
+     * @returns {import("#app/models").Collection}
+     */
+    #collectionToModel(collection) {
+        return {
+            id: collection.id,
+            userId: collection.userId,
+            name: collection.name,
+            slug: collection.slug,
+            description: collection.description,
+            createdAt: new Date(collection.createdAt),
+            updatedAt: new Date(collection.updatedAt),
         };
     }
 

@@ -8,6 +8,7 @@
  * @property {string} id
  * @property {string} userId
  * @property {string} name
+ * @property {string} slug
  * @property {string} description
  * @property {Date} createdAt
  * @property {Date} updatedAt
@@ -18,6 +19,7 @@
  * @property {string} id
  * @property {string} userId
  * @property {string} name
+ * @property {string} slug
  * @property {string} description
  * @property {Date} createdAt
  * @property {Date} updatedAt

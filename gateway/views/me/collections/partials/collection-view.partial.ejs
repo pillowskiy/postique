@@ -1,67 +1,91 @@
-<div class="collection-promo">
-    <div class="collection-promo__content">
-        <h2>Створіть колекцію для легкої організації та обміну історіями</h2>
-        <sl-button variant="neutral" size="small" pill>
-            Створити колекцію
-        </sl-button>
-    </div>
-
-    <div class="collection-promo__decoration">
-        <div class="collection-promo__decoration--icon">
-            <sl-icon name="bookmark-plus"></sl-icon>
-        </div>
-    </div>
-</div>
-
-<ul>
-    <% if (collections && collections.length > 0) { %> <%
-    collections.forEach(collection => { %>
-    <li class="collection-card" x-data="{}">
-        <div class="collection-card__content">
-            <div class="collection-card__author">
-                <sl-avatar
-                    class="collection-card__author--avatar"
-                    label="User avatar"
-                    initials="<%= collection.author.username.slice(0,2) %>"
-                ></sl-avatar>
-                <%= collection.author.username %>
+<div x-data="{ len: <%= collections.length %> }">
+    <sl-dialog
+        x-ref="collectionDialog"
+        id="create-collection-dialog"
+        label="Створення колекції"
+    >
+        <form
+            id="create-collection-form"
+            hx-post="/r/collections?view=detail"
+            hx-target="#collection-list"
+            hx-swap="beforeend"
+            hx-on::after-request="if (!event.failed) {
+                document.querySelector('#create-collection-dialog').hide();
+                Alpine.$data(this).len += 1;
+            }"
+        >
+            <div x-data="{ value: '' }">
+                <sl-input
+                    label="Назва колекції"
+                    placeholder="Наприклад: Саморозвиток"
+                    @input="value = $event.target.value"
+                    maxlength="128"
+                    required
+                ></sl-input>
+                <input name="name" :value="value" type="hidden" />
             </div>
 
-            <div class="collection-card__info">
-                <h2 class="collection-card__info--title">
-                    <%= collection.name %>
-                </h2>
-                <% if (collection.description) { %>
-                <p class="collection-card__info--decription">
-                    <%= collection.description %>
-                </p>
-                <% } %>
+            <div x-data="{ value: '' }">
+                <sl-textarea
+                    label="Опис колекції"
+                    placeholder="Наприклад: Збір статей про саморозвиток"
+                    @input="value = $event.target.value"
+                    maxlength="256"
+                    autofocus
+                ></sl-textarea>
+                <input name="description" :value="value" type="hidden" />
             </div>
+        </form>
 
-            <div class="collection-card__meta">
-                <span
-                    x-text="getCollectionLabel(<%= collection.bookmarksCount %>)"
-                ></span>
-
-                <sl-tooltip content="Більше">
-                    <sl-icon-button
-                        name="three-dots"
-                        variant="neutral"
-                        size="small"
-                    ></sl-icon-button>
-                </sl-tooltip>
-            </div>
-        </div>
-    </li>
-    <% }); %>
-    <% } else { %>
-    <div class="empty-state">
-        <div class="create-list-prompt">
-            <h2>Створіть список для легкої організації та обміну історіями</h2>
-            <sl-button variant="primary" class="start-list-button">
-                Створити список
+        <div slot="footer">
+            <sl-button
+                @click="$refs.collectionDialog.hide()"
+                class="ghost"
+                variant="text"
+            >
+                Скасувати
+            </sl-button>
+            <sl-button
+                form="create-collection-form"
+                style="margin-left: 16px"
+                variant="primary"
+                type="submit"
+            >
+                Опублікувати
             </sl-button>
         </div>
+    </sl-dialog>
+
+    <div class="collection-promo">
+        <div class="collection-promo__content">
+            <h2>
+                Створіть колекцію для легкої організації та обміну історіями
+            </h2>
+            <sl-button
+                @click="$refs.collectionDialog.show()"
+                variant="neutral"
+                size="small"
+                pill
+            >
+                Створити колекцію
+            </sl-button>
+        </div>
+
+        <div class="collection-promo__decoration">
+            <div class="collection-promo__decoration--icon">
+                <sl-icon name="bookmark-plus"></sl-icon>
+            </div>
+        </div>
     </div>
-    <% } %>
-</ul>
+
+    <ul id="collection-list" class="detailed-collection-list" x-show="len > 0">
+        <%- await
+        include('../../../collection/collection-detailed-list.partial.ejs', {
+        collections }) %>
+    </ul>
+
+    <div class="no-posts" x-show="len === 0">
+        <sl-icon name="journal-x" size="large"></sl-icon>
+        <p>Жодної колекції не знайдено</p>
+    </div>
+</div>
