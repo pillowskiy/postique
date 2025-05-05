@@ -17,7 +17,7 @@ export class GetUserCollectionsQueryHandler extends Query<
   protected async invoke(
     query: GetUserCollectionsQuery,
   ): Promise<BookmarkCollectionOutput[]> {
-    const collections = await this._collectionRepository.findByUser(
+    const collections = await this._collectionRepository.getUserCollections(
       query.userId,
     );
 

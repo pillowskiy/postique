@@ -3,14 +3,14 @@ import { Inject } from '@nestjs/common';
 import { Command } from '../../common';
 import { DeleteCollectionCommand } from './delete-collection.command';
 import { BookmarkCollectionRepository } from '@/app/boundaries/repository';
-import { CreateBookmarkCollectionOutput } from '@/app/boundaries/dto/output';
+import { DeleteBookmarkCollectionOutput } from '@/app/boundaries/dto/output';
 import { BookmarkCollectionAccessControlList } from '@/app/boundaries/acl';
 import { ForbiddenException, NotFoundException } from '@/app/boundaries/errors';
 
 @CommandHandler(DeleteCollectionCommand)
 export class DeleteCollectionCommandHandler extends Command<
   DeleteCollectionCommand,
-  CreateBookmarkCollectionOutput
+  DeleteBookmarkCollectionOutput
 > {
   @Inject(BookmarkCollectionAccessControlList)
   private readonly _collectionACL: BookmarkCollectionAccessControlList;
@@ -20,7 +20,7 @@ export class DeleteCollectionCommandHandler extends Command<
 
   protected async invoke(
     input: DeleteCollectionCommand,
-  ): Promise<CreateBookmarkCollectionOutput> {
+  ): Promise<DeleteBookmarkCollectionOutput> {
     const collection = await this._collectionRepository.findById(input.id);
 
     if (!collection) {
@@ -40,6 +40,6 @@ export class DeleteCollectionCommandHandler extends Command<
 
     await this._collectionRepository.delete(collection.id);
 
-    return new CreateBookmarkCollectionOutput(collection.id);
+    return new DeleteBookmarkCollectionOutput(collection.id);
   }
 }

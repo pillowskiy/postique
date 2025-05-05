@@ -31,20 +31,17 @@ export class PostgresBookmarkCollectionRepository extends BookmarkCollectionRepo
     return this.#toEntity(result);
   }
 
-  async findByUser(userId: string): Promise<BookmarkCollectionAggregate[]> {
-    const results = await this._txHost.exec
-      .select({
-        users,
-        bookmarkCollections,
-        count: sql<number>`COUNT(${bookmarks.id}) AS count`,
-      })
+  async findBySlug(slug: string): Promise<BookmarkCollectionEntity | null> {
+    const [result] = await this._txHost.exec
+      .select()
       .from(bookmarkCollections)
-      .leftJoin(users, eq(users.id, bookmarkCollections.userId))
-      .leftJoin(bookmarks, eq(bookmarks.collectionId, bookmarkCollections.id))
-      .groupBy(bookmarkCollections.id, users.id)
-      .where(eq(bookmarkCollections.userId, userId));
+      .where(eq(bookmarkCollections.slug, slug));
 
-    return results.map((res) => this.#toAggregate(res));
+    if (!result) {
+      return null;
+    }
+
+    return this.#toEntity(result);
   }
 
   async save(collection: BookmarkCollectionEntity): Promise<void> {
@@ -54,6 +51,7 @@ export class PostgresBookmarkCollectionRepository extends BookmarkCollectionRepo
         id: collection.id,
         userId: collection.userId,
         name: collection.name,
+        slug: collection.slug,
         description: collection.description,
         createdAt: collection.createdAt,
         updatedAt: collection.updatedAt,
@@ -74,6 +72,44 @@ export class PostgresBookmarkCollectionRepository extends BookmarkCollectionRepo
       .where(eq(bookmarkCollections.id, collectionId));
   }
 
+  async getUserCollections(
+    userId: string,
+  ): Promise<BookmarkCollectionAggregate[]> {
+    const results = await this._txHost.exec
+      .select({
+        users,
+        bookmarkCollections,
+        count: sql<number>`COUNT(${bookmarks.id}) AS count`,
+      })
+      .from(bookmarkCollections)
+      .leftJoin(users, eq(users.id, bookmarkCollections.userId))
+      .leftJoin(bookmarks, eq(bookmarks.collectionId, bookmarkCollections.id))
+      .groupBy(bookmarkCollections.id, users.id)
+      .where(eq(bookmarkCollections.userId, userId));
+
+    return results.map((res) => this.#toAggregate(res));
+  }
+
+  async getBySlug(slug: string): Promise<BookmarkCollectionAggregate | null> {
+    const [result] = await this._txHost.exec
+      .select({
+        users,
+        bookmarkCollections,
+        count: sql<number>`COUNT(${bookmarks.id}) AS count`,
+      })
+      .from(bookmarkCollections)
+      .leftJoin(users, eq(users.id, bookmarkCollections.userId))
+      .leftJoin(bookmarks, eq(bookmarks.collectionId, bookmarkCollections.id))
+      .groupBy(bookmarkCollections.id, users.id)
+      .where(eq(bookmarkCollections.slug, slug));
+
+    if (!result) {
+      return null;
+    }
+
+    return this.#toAggregate(result);
+  }
+
   #toEntity(
     result: InferSelectModel<typeof bookmarkCollections>,
   ): BookmarkCollectionEntity {
@@ -81,6 +117,7 @@ export class PostgresBookmarkCollectionRepository extends BookmarkCollectionRepo
       id: result.id,
       userId: result.userId,
       name: result.name,
+      slug: result.slug,
       description: result.description ?? '',
       createdAt: result.createdAt,
       updatedAt: result.updatedAt,

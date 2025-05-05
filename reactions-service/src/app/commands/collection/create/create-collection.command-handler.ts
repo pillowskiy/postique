@@ -3,6 +3,7 @@ import { CreateBookmarkCollectionOutput } from '@/app/boundaries/dto/output';
 import { ForbiddenException } from '@/app/boundaries/errors';
 import { BookmarkCollectionRepository } from '@/app/boundaries/repository';
 import { BookmarkCollectionEntity } from '@/domain/collection';
+import { slugify } from '@/infrastructure/lib/slugify';
 import { Inject } from '@nestjs/common';
 import { CommandHandler } from '@nestjs/cqrs';
 import { Command } from '../../common';
@@ -35,10 +36,19 @@ export class CreateCollectionCommandHandler extends Command<
     const collection = BookmarkCollectionEntity.create({
       userId: input.initiatedBy,
       name: input.name,
+      slug: slugify(input.name),
       description: input.description,
     });
     await this._collectionRepository.save(collection);
 
-    return new CreateBookmarkCollectionOutput(collection.id);
+    return new CreateBookmarkCollectionOutput(
+      collection.id,
+      collection.userId,
+      collection.name,
+      collection.slug,
+      collection.description,
+      collection.createdAt,
+      collection.updatedAt,
+    );
   }
 }

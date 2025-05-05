@@ -14,6 +14,7 @@ export class BookmarkCollectionEntity {
       validCollection.id!,
       validCollection.userId,
       validCollection.name,
+      validCollection.slug,
       validCollection.description!,
       validCollection.createdAt!,
       validCollection.updatedAt!,
@@ -24,10 +25,15 @@ export class BookmarkCollectionEntity {
     public readonly id: string,
     public readonly userId: string,
     private _name: string,
+    private _slug: string,
     private _description: string,
     public readonly createdAt: Date,
     public readonly updatedAt: Date,
   ) {}
+
+  get slug(): string {
+    return this._slug;
+  }
 
   get name(): string {
     return this._name;

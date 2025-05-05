@@ -1,18 +1,17 @@
-import {
-  Controller,
-  Param,
-  Post,
-  Delete,
-  Body,
-  UseGuards,
-  Get,
-  ParseUUIDPipe,
-  Query,
-} from '@nestjs/common';
 import * as input from '@/app/boundaries/dto/input';
 import * as output from '@/app/boundaries/dto/output';
-import { AuthGuard } from '@/infrastructure/common/guards';
 import { InitiatedBy } from '@/infrastructure/common/decorators';
+import { AuthGuard } from '@/infrastructure/common/guards';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  ParseUUIDPipe,
+  Post,
+  UseGuards,
+} from '@nestjs/common';
 import { CollectionsService } from './collections.service';
 
 @Controller('collections')
@@ -41,20 +40,13 @@ export class CollectionsController {
     return this._collectionsService.deleteCollection(collectionId, initiatedBy);
   }
 
-  @Get(':id/bookmarks')
+  @Get(':slug')
   @UseGuards(AuthGuard)
-  async getCollectionBookmarks(
-    @Param('id', ParseUUIDPipe) collectionId: string,
+  async getDetailedCollection(
+    @Param('slug') slug: string,
     @InitiatedBy() initiatedBy: string,
-    @Query('cursor') cursor?: string,
-    @Query('pageSize') pageSize?: number,
-  ): Promise<output.CursorOutput<output.DetailedBookmarkOutput>> {
-    return this._collectionsService.getCollectionBookmarks(
-      collectionId,
-      initiatedBy,
-      cursor,
-      pageSize,
-    );
+  ): Promise<output.DetailedBookmarkCollectionOutput> {
+    return this._collectionsService.getDetailedCollection(slug, initiatedBy);
   }
 
   @Get('users/:userId')

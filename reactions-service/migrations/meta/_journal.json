@@ -50,6 +50,13 @@
       "when": 1745771827444,
       "tag": "0006_nifty_micromacro",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1746450523022,
+      "tag": "0007_watery_slipstream",
+      "breakpoints": true
     }
   ]
 }

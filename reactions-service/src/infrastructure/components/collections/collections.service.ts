@@ -3,14 +3,12 @@ import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import {
   CreateBookmarkCollectionOutput,
   DetailedBookmarkCollectionOutput,
-  DetailedBookmarkOutput,
-  CursorOutput,
 } from '@/app/boundaries/dto/output';
 import { CreateCollectionCommand } from '@/app/commands/collection/create';
 import { DeleteCollectionCommand } from '@/app/commands/collection/delete';
 import { GetUserCollectionsQuery } from '@/app/queries/collection/get-user';
-import { GetCollectionBookmarksQuery } from '@/app/queries/bookmark/get-collection';
 import { IdentifierDto } from '@/app/boundaries/dto/common';
+import { GetDetailedCollectionQuery } from '@/app/queries/collection/get-detailed';
 
 @Injectable()
 export class CollectionsService {
@@ -39,23 +37,14 @@ export class CollectionsService {
     );
   }
 
-  async getCollectionBookmarks(
-    collectionId: string,
+  async getDetailedCollection(
+    slug: string,
     requestedBy: string,
-    cursor?: string,
-    pageSize?: number,
-  ): Promise<CursorOutput<DetailedBookmarkOutput>> {
+  ): Promise<DetailedBookmarkCollectionOutput> {
     return this._queryBus.execute<
-      GetCollectionBookmarksQuery,
-      CursorOutput<DetailedBookmarkOutput>
-    >(
-      new GetCollectionBookmarksQuery(
-        collectionId,
-        requestedBy,
-        cursor,
-        pageSize,
-      ),
-    );
+      GetDetailedCollectionQuery,
+      DetailedBookmarkCollectionOutput
+    >(new GetDetailedCollectionQuery(slug, requestedBy));
   }
 
   async getUserCollections(

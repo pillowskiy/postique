@@ -10,6 +10,7 @@ export class BookmarkCollectionMapper {
       collection.id,
       collection.userId,
       collection.name,
+      collection.slug,
       collection.description,
       collection.createdAt,
       collection.updatedAt,

@@ -6,6 +6,7 @@ export class BookmarkCollectionOutput {
     public readonly id: string,
     public readonly userId: string,
     public readonly name: string,
+    public readonly slug: string,
     public readonly description: string,
     public readonly createdAt: Date,
     public readonly updatedAt: Date,
@@ -19,6 +20,7 @@ export class DetailedBookmarkCollectionOutput
     public readonly id: string,
     public readonly userId: string,
     public readonly name: string,
+    public readonly slug: string,
     public readonly description: string,
     public readonly createdAt: Date,
     public readonly updatedAt: Date,
@@ -28,4 +30,5 @@ export class DetailedBookmarkCollectionOutput
   ) {}
 }
 
-export class CreateBookmarkCollectionOutput extends IdentifierDto {}
+export class CreateBookmarkCollectionOutput extends BookmarkCollectionOutput {}
+export class DeleteBookmarkCollectionOutput extends IdentifierDto {}
