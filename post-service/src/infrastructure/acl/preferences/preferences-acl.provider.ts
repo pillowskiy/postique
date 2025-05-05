@@ -7,6 +7,7 @@ export class PreferencesAccessControlListProvider extends PreferencesAccessContr
   }
 
   private _isOwner(userId: string, pref: PostPreferencesEntity): boolean {
+    console.log('Checking ownership for userId:', userId, pref);
     return userId === pref.userId;
   }
 }

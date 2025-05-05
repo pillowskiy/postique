@@ -50,9 +50,14 @@ export class PostPreferenceFilterService {
 
   private async _getUserPreferences(
     userId: string | null,
-  ): Promise<PostPreferencesEntity> {
+  ): Promise<
+    Pick<PostPreferencesEntity, 'postsBlacklist' | 'authorBlacklist'>
+  > {
     if (!userId) {
-      return PostPreferencesEntity.empty();
+      return {
+        postsBlacklist: new Set(),
+        authorBlacklist: new Set(),
+      };
     }
 
     return this._preferencesRepository.preferences(userId);

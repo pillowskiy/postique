@@ -7,10 +7,11 @@ import type {
 import { PostPreferencesSchema } from './preferences.schema';
 
 export class PostPreferencesEntity implements IPostPreferences {
-  static empty(userId?: string): PostPreferencesEntity {
-    return new PostPreferencesEntity({
-      postsBlacklist: new Set(),
-      authorBlacklist: new Set(),
+  static empty(userId: string): PostPreferencesEntity {
+    return PostPreferencesEntity.create({
+      userId,
+      postsBlacklist: [],
+      authorBlacklist: [],
     });
   }
 
@@ -22,14 +23,14 @@ export class PostPreferencesEntity implements IPostPreferences {
     return new PostPreferencesEntity(validPreferences);
   }
 
-  public readonly userId?: string;
+  public readonly userId: string;
   public readonly postsBlacklist: Set<string>;
   public readonly authorBlacklist: Set<string>;
 
   private constructor(preferences: IPostPreferences) {
     this.userId = preferences.userId;
-    this.postsBlacklist = preferences.postsBlacklist;
-    this.authorBlacklist = preferences.authorBlacklist;
+    this.postsBlacklist = new Set(preferences.postsBlacklist);
+    this.authorBlacklist = new Set(preferences.authorBlacklist);
   }
 
   public mutePost(postId: string): void {

@@ -1,12 +1,13 @@
-import { CommandHandler } from '@nestjs/cqrs';
+import { PreferencesAccessControlList } from '@/app/boundaries/acl';
+import { ToggleAuthorOutput } from '@/app/boundaries/dto/output';
+import { ForbiddenException } from '@/app/boundaries/errors';
+import { PreferencesRepository } from '@/app/boundaries/repository';
+import { DomainBusinessRuleViolation } from '@/domain/common/error';
+import { PostPreferencesEntity } from '@/domain/preferences';
 import { Inject } from '@nestjs/common';
+import { CommandHandler } from '@nestjs/cqrs';
 import { Command } from '../../common';
 import { ToggleAuthorCommand } from './toggle-author.command';
-import { PreferencesRepository } from '@/app/boundaries/repository';
-import { PostPreferencesEntity } from '@/domain/preferences';
-import { ToggleAuthorOutput } from '@/app/boundaries/dto/output';
-import { PreferencesAccessControlList } from '@/app/boundaries/acl';
-import { ForbiddenException } from '@/app/boundaries/errors';
 
 @CommandHandler(ToggleAuthorCommand)
 export class ToggleAuthorCommandHandler extends Command<
@@ -22,6 +23,10 @@ export class ToggleAuthorCommandHandler extends Command<
   protected async invoke(
     input: ToggleAuthorCommand,
   ): Promise<ToggleAuthorOutput> {
+    if (input.authorId === input.initiatedBy) {
+      throw new DomainBusinessRuleViolation('You cannot mute/unmute yourself');
+    }
+
     let prefs = await this._preferencesRepository.preferences(
       input.initiatedBy,
     );

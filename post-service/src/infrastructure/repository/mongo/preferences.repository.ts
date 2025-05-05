@@ -1,7 +1,6 @@
-import { Inject, Injectable } from '@nestjs/common';
 import { Transactional } from '@/app/boundaries/common';
 import { PreferencesRepository } from '@/app/boundaries/repository/preferences.repository';
-import { IPostPreferences, PostPreferencesEntity } from '@/domain/preferences';
+import { PostPreferencesEntity } from '@/domain/preferences';
 import {
   InjectModel,
   models,
@@ -9,6 +8,7 @@ import {
   Schemas,
 } from '@/infrastructure/database/mongo';
 import { PostPreferences } from '@/infrastructure/database/mongo/schemas';
+import { Inject, Injectable } from '@nestjs/common';
 
 @Injectable()
 export class MongoPreferencesRepository extends PreferencesRepository {
@@ -40,7 +40,7 @@ export class MongoPreferencesRepository extends PreferencesRepository {
       .session(this._transactional.getSession(null))
       .lean();
     if (!userPrefs) {
-      return PostPreferencesEntity.empty();
+      return PostPreferencesEntity.empty(userId);
     }
 
     return this.#getPreferences(userPrefs);
@@ -60,8 +60,8 @@ export class MongoPreferencesRepository extends PreferencesRepository {
   #getPreferences(pref: PostPreferences): PostPreferencesEntity {
     return PostPreferencesEntity.create({
       userId: pref.userId,
-      authorBlacklist: new Set(...pref.authorBlacklist),
-      postsBlacklist: new Set(...pref.postsBlacklist),
-    } satisfies IPostPreferences);
+      authorBlacklist: pref.authorBlacklist,
+      postsBlacklist: pref.postsBlacklist,
+    });
   }
 }

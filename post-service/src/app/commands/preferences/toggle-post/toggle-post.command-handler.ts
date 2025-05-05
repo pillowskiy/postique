@@ -1,12 +1,12 @@
+import { PreferencesAccessControlList } from '@/app/boundaries/acl';
+import { TogglePostOutput } from '@/app/boundaries/dto/output';
+import { ForbiddenException } from '@/app/boundaries/errors';
+import { PreferencesRepository } from '@/app/boundaries/repository';
+import { PostPreferencesEntity } from '@/domain/preferences';
+import { Inject } from '@nestjs/common';
 import { CommandHandler } from '@nestjs/cqrs';
 import { Command } from '../../common';
-import { PreferencesRepository } from '@/app/boundaries/repository';
-import { Inject } from '@nestjs/common';
-import { PostPreferencesEntity } from '@/domain/preferences';
-import { TogglePostOutput } from '@/app/boundaries/dto/output';
 import { TogglePostCommand } from './toggle-post.command';
-import { PreferencesAccessControlList } from '@/app/boundaries/acl';
-import { ForbiddenException } from '@/app/boundaries/errors';
 
 @CommandHandler(TogglePostCommand)
 export class TogglePostCommandHandler extends Command<
