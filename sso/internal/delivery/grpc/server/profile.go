@@ -14,11 +14,12 @@ import (
 
 type ProfileUseCase interface {
 	UpdateProfile(ctx context.Context, userID string, input *dto.UpdateProfileInput) (*dto.Profile, error)
+	UserProfile(ctx context.Context, username string) (*dto.Profile, error)
 }
 
 type profileServer struct {
 	pb.UnimplementedProfileServer
-    profileUC ProfileUseCase
+	profileUC ProfileUseCase
 }
 
 func RegisterProfileServer(server *grpc.Server, profileUC ProfileUseCase) {
@@ -27,21 +28,37 @@ func RegisterProfileServer(server *grpc.Server, profileUC ProfileUseCase) {
 
 func (s *profileServer) UpdateProfile(ctx context.Context, req *pb.UpdateProfileRequest) (*pb.UpdateProfileResponse, error) {
 	dto := &dto.UpdateProfileInput{
-        Username: req.GetUsername(),
-        Bio: req.GetBio(),
-        AvatarPath: req.GetAvatarPath(),
-    }
+		Username:   req.GetUsername(),
+		Bio:        req.GetBio(),
+		AvatarPath: req.GetAvatarPath(),
+	}
 
-	res, err := s.profileUC.UpdateProfile(ctx, req.GetUserId(),  dto)
+	res, err := s.profileUC.UpdateProfile(ctx, req.GetUserId(), dto)
 	if err != nil {
 		return nil, s.parseUseCaseErr(err)
 	}
 
 	return &pb.UpdateProfileResponse{Profile: &pb.UserProfile{
-        Username: res.Username,
-        Bio: res.Bio,
-        AvatarPath: res.AvatarPath,
-    }}, nil
+		Username:   res.Username,
+		Bio:        res.Bio,
+		AvatarPath: res.AvatarPath,
+	}}, nil
+}
+
+func (s *profileServer) GetProfile(ctx context.Context, req *pb.GetProfileRequest) (*pb.GetProfileResponse, error) {
+	res, err := s.profileUC.UserProfile(ctx, req.GetUsername())
+	if err != nil {
+		return nil, s.parseUseCaseErr(err)
+	}
+
+	return &pb.GetProfileResponse{
+		UserId: res.UserID,
+		Profile: &pb.UserProfile{
+			Username:   res.Username,
+			Bio:        res.Bio,
+			AvatarPath: res.AvatarPath,
+		},
+	}, nil
 }
 
 func (s *profileServer) parseUseCaseErr(err error) error {

@@ -21,6 +21,7 @@ type ProfileRepository interface {
 	CreateProfile(ctx context.Context, profile *domain.UserProfile) error
 	SaveProfile(ctx context.Context, userID domain.ID, profile *domain.UserProfile) error
 	Profile(ctx context.Context, userID domain.ID) (*domain.UserProfile, error)
+	ProfileByUsername(ctx context.Context, username string) (*domain.UserProfile, error)
 }
 
 type profileUseCase struct {
@@ -117,6 +118,28 @@ func (uc *profileUseCase) Profile(ctx context.Context, userID domain.PID) (*dto.
 	}
 
 	profile, err := uc.profileRepo.Profile(ctx, uid)
+	if err != nil {
+		if errors.Is(err, storage.ErrProfileNotFound) {
+			return nil, fmt.Errorf("%s: %w", op, ErrProfileNotFound)
+		}
+		log.Error("Failed to get user profile", slog.String("error", err.Error()))
+		return nil, fmt.Errorf("%s: %w", op, err)
+	}
+
+	return &dto.Profile{
+		UserID:     string(profile.UserID),
+		Username:   string(profile.Username),
+		AvatarPath: profile.AvatarPath.String(),
+		Bio:        string(profile.Bio),
+		CreatedAt:  profile.CreatedAt,
+	}, nil
+}
+
+func (uc *profileUseCase) UserProfile(ctx context.Context, username string) (*dto.Profile, error) {
+	const op = "usecase.profileUseCase.UserProfile"
+	log := uc.log.With(slog.String("op", op), slog.Any("username", username))
+
+	profile, err := uc.profileRepo.ProfileByUsername(ctx, username)
 	if err != nil {
 		if errors.Is(err, storage.ErrProfileNotFound) {
 			return nil, fmt.Errorf("%s: %w", op, ErrProfileNotFound)

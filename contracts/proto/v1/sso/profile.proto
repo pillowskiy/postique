@@ -6,6 +6,7 @@ option go_package = "postique.sso.v1;pb";
 
 service Profile {
     rpc UpdateProfile (UpdateProfileRequest) returns (UpdateProfileResponse);
+    rpc GetProfile (GetProfileRequest) returns (GetProfileResponse);
 }
 
 message UpdateProfileRequest {
@@ -17,6 +18,15 @@ message UpdateProfileRequest {
 
 message UpdateProfileResponse {
     UserProfile profile = 1;
+}
+
+message GetProfileRequest {
+    string username = 1;
+}
+
+message GetProfileResponse {
+    string user_id = 1;
+    UserProfile profile = 2;
 }
 
 message UserProfile {

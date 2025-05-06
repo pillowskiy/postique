@@ -1,28 +1,28 @@
 {
-	"name": "@postique/pb",
-	"main": "index.js",
-	"version": "1.0.0",
-	"sideEffects": false,
-	"private": true,
-	"exports": {
-		"./grpc": {
-			"types": "./grpc/index.d.ts",
-			"import": "./grpc/index.js",
-			"default": "./grpc/index.js"
-		},
-		"./v1/*.pb": {
-			"types": "./v1/*.pb.d.ts",
-			"import": "./v1/*.pb.js",
-			"default": "./v1/*.pb.js"
-		}
-	},
-	"scripts": {
-		"build": "tsc --build tsconfig.esm.json"
-	},
-	"devDependencies": {
-		"@types/node": "^22.13.5",
-		"ts-proto": "^2.6.1",
-		"typescript": "^5.7.3",
-		"@grpc/grpc-js": "^1.12.6"
-	}
+  "name": "@postique/pb",
+  "main": "index.js",
+  "version": "1.0.0",
+  "sideEffects": false,
+  "private": true,
+  "exports": {
+    "./grpc": {
+      "types": "./grpc/index.d.ts",
+      "import": "./grpc/index.js",
+      "default": "./grpc/index.js"
+    },
+    "./v1/*.pb": {
+      "types": "./v1/*.pb.d.ts",
+      "import": "./v1/*.pb.js",
+      "default": "./v1/*.pb.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc --build tsconfig.esm.json"
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.5",
+    "ts-proto": "^2.6.1",
+    "typescript": "^5.7.3",
+    "@grpc/grpc-js": "^1.12.6"
+  }
 }

@@ -10,6 +10,13 @@ export interface UpdateProfileRequest {
 export interface UpdateProfileResponse {
     profile: UserProfile | undefined;
 }
+export interface GetProfileRequest {
+    username: string;
+}
+export interface GetProfileResponse {
+    userId: string;
+    profile: UserProfile | undefined;
+}
 export interface UserProfile {
     username: string;
     avatarPath: string;
@@ -17,6 +24,8 @@ export interface UserProfile {
 }
 export declare const UpdateProfileRequest: MessageFns<UpdateProfileRequest>;
 export declare const UpdateProfileResponse: MessageFns<UpdateProfileResponse>;
+export declare const GetProfileRequest: MessageFns<GetProfileRequest>;
+export declare const GetProfileResponse: MessageFns<GetProfileResponse>;
 export declare const UserProfile: MessageFns<UserProfile>;
 export type ProfileService = typeof ProfileService;
 export declare const ProfileService: {
@@ -29,14 +38,27 @@ export declare const ProfileService: {
         readonly responseSerialize: (value: UpdateProfileResponse) => Buffer<ArrayBuffer>;
         readonly responseDeserialize: (value: Buffer) => UpdateProfileResponse;
     };
+    readonly getProfile: {
+        readonly path: "/sso.profile.Profile/GetProfile";
+        readonly requestStream: false;
+        readonly responseStream: false;
+        readonly requestSerialize: (value: GetProfileRequest) => Buffer<ArrayBuffer>;
+        readonly requestDeserialize: (value: Buffer) => GetProfileRequest;
+        readonly responseSerialize: (value: GetProfileResponse) => Buffer<ArrayBuffer>;
+        readonly responseDeserialize: (value: Buffer) => GetProfileResponse;
+    };
 };
 export interface ProfileServer extends UntypedServiceImplementation {
     updateProfile: handleUnaryCall<UpdateProfileRequest, UpdateProfileResponse>;
+    getProfile: handleUnaryCall<GetProfileRequest, GetProfileResponse>;
 }
 export interface ProfileClient extends Client {
     updateProfile(request: UpdateProfileRequest, callback: (error: ServiceError | null, response: UpdateProfileResponse) => void): ClientUnaryCall;
     updateProfile(request: UpdateProfileRequest, metadata: Metadata, callback: (error: ServiceError | null, response: UpdateProfileResponse) => void): ClientUnaryCall;
     updateProfile(request: UpdateProfileRequest, metadata: Metadata, options: Partial<CallOptions>, callback: (error: ServiceError | null, response: UpdateProfileResponse) => void): ClientUnaryCall;
+    getProfile(request: GetProfileRequest, callback: (error: ServiceError | null, response: GetProfileResponse) => void): ClientUnaryCall;
+    getProfile(request: GetProfileRequest, metadata: Metadata, callback: (error: ServiceError | null, response: GetProfileResponse) => void): ClientUnaryCall;
+    getProfile(request: GetProfileRequest, metadata: Metadata, options: Partial<CallOptions>, callback: (error: ServiceError | null, response: GetProfileResponse) => void): ClientUnaryCall;
 }
 export declare const ProfileClient: {
     new (address: string, credentials: ChannelCredentials, options?: Partial<ClientOptions>): ProfileClient;
