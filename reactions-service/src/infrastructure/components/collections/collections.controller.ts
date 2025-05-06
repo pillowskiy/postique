@@ -53,10 +53,10 @@ export class CollectionsController {
   }
 
   @Get('users/:userId')
-  @UseGuards(AuthGuard)
+  @UseGuards(OptionalAuthGuard)
   async getUserCollections(
     @Param('userId', ParseUUIDPipe) userId: string,
-    @InitiatedBy() initiatedBy: string,
+    @OptionalInitiatedBy() initiatedBy?: string,
   ): Promise<output.DetailedBookmarkCollectionOutput[]> {
     return this._collectionsService.getUserCollections(userId, initiatedBy);
   }

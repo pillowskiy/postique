@@ -131,14 +131,15 @@ export class PostsService {
   }
 
   public async getPosts(
-    userId: string,
     take: number,
     cursor: string = new Date().toISOString(),
+    authorId?: string,
+    initiatedBy?: string,
   ): Promise<CursorOutput<DetailedPostOutput>> {
     return this._queryBus.execute<
       GetPostListQuery,
       CursorOutput<DetailedPostOutput>
-    >(new GetPostListQuery(userId, take, cursor));
+    >(new GetPostListQuery(take, cursor, authorId, initiatedBy));
   }
 
   public async getDrafts(

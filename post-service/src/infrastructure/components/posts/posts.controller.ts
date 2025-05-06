@@ -105,9 +105,10 @@ export class PostsController {
   async getPosts(
     @Query('cursor') cursor: string,
     @Query('take') take: number,
-    @OptionalInitiatedBy() initiatedBy: string,
+    @Query('authorId') authorId?: string,
+    @OptionalInitiatedBy() initiatedBy?: string,
   ): Promise<output.CursorOutput<output.DetailedPostOutput>> {
-    return this._postsService.getPosts(initiatedBy, take, cursor);
+    return this._postsService.getPosts(take, cursor, authorId, initiatedBy);
   }
 
   @Post('/batch')

@@ -31,12 +31,13 @@ export class GetPostListQueryHandler extends Query<
       this._cursorField,
       this._defaultSortField,
       pointer,
+      input.authorId ?? undefined,
     );
 
     const cursor = await this._filterService.filterPosts<PostAggregate>(
       postIterator,
       this._cursorField,
-      input.userId,
+      input.initiatedBy ?? null,
       input.take,
     );
 

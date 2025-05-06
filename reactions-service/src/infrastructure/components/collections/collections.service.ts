@@ -49,7 +49,7 @@ export class CollectionsService {
 
   async getUserCollections(
     userId: string,
-    requestedBy: string,
+    requestedBy?: string,
   ): Promise<DetailedBookmarkCollectionOutput[]> {
     return this._queryBus.execute<
       GetUserCollectionsQuery,

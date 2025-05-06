@@ -35,6 +35,7 @@ export abstract class PostRepository {
     field: CursorField,
     sortField: SortField,
     cursor: string | Date,
+    authorId?: string,
   ): AsyncIterable<PostAggregate>;
 
   abstract cursorFromList(

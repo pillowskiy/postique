@@ -157,6 +157,7 @@ export class MongoPostRepository extends PostRepository {
     field: CursorField,
     sortBy: SortField,
     cursor: string | Date,
+    authorId?: string,
   ): AsyncGenerator<PostAggregate> {
     return this._cursor(
       {
@@ -167,6 +168,7 @@ export class MongoPostRepository extends PostRepository {
         visibility: PostVisibility.Public,
         status: PostStatus.Published,
         publishedAt: { $exists: true },
+        ...(authorId ? { authors: authorId } : {}),
       },
     );
   }
