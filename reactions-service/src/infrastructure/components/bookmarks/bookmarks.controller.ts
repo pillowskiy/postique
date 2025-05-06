@@ -72,7 +72,7 @@ export class BookmarksController {
     @InitiatedBy() initiatedBy: string,
     @Query('cursor') cursor?: string,
     @Query('pageSize') pageSize?: number,
-  ): Promise<output.CursorOutput<output.BookmarkOutput>> {
+  ): Promise<output.CursorOutput<output.DetailedBookmarkOutput>> {
     return this.bookmarksService.getWatchlistBookmarks(
       initiatedBy,
       initiatedBy,
@@ -88,7 +88,7 @@ export class BookmarksController {
     @OptionalInitiatedBy() initiatedBy?: string,
     @Query('cursor') cursor?: string,
     @Query('pageSize') pageSize?: number,
-  ): Promise<output.CursorOutput<output.BookmarkOutput>> {
+  ): Promise<output.CursorOutput<output.DetailedBookmarkOutput>> {
     return this.bookmarksService.getCollectionBookmarks(
       collectionId,
       initiatedBy,

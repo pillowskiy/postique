@@ -1,6 +1,7 @@
+import { BookmarkAggregate } from '@/domain/bookmark/bookmark.aggregate';
 import { BookmarkEntity } from '@/domain/bookmark/bookmark.entity';
 import { BookmarkOutput, DetailedBookmarkOutput } from '../dto/output';
-import { BookmarkAggregate } from '@/domain/bookmark/bookmark.aggregate';
+import { PostMapepr } from './post.mapper';
 
 export class BookmarkMapper {
   static toDto(bookmark: BookmarkEntity): BookmarkOutput {
@@ -19,7 +20,7 @@ export class BookmarkMapper {
       bookmark.id,
       bookmark.userId,
       bookmark.targetId,
-      bookmark.post,
+      PostMapepr.toDto(bookmark.post),
       bookmark.collectionId,
       bookmark.createdAt,
       bookmark.updatedAt,

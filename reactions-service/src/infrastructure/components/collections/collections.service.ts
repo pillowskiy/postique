@@ -39,7 +39,7 @@ export class CollectionsService {
 
   async getDetailedCollection(
     slug: string,
-    requestedBy: string,
+    requestedBy?: string,
   ): Promise<DetailedBookmarkCollectionOutput> {
     return this._queryBus.execute<
       GetDetailedCollectionQuery,

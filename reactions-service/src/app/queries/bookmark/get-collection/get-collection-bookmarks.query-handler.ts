@@ -1,10 +1,10 @@
-import { QueryHandler } from '@nestjs/cqrs';
-import { Inject } from '@nestjs/common';
-import { Query } from '../../common';
-import { GetCollectionBookmarksQuery } from './get-collection-bookmarks.query';
-import { BookmarkRepository } from '@/app/boundaries/repository';
 import { BookmarkOutput, CursorOutput } from '@/app/boundaries/dto/output';
 import { BookmarkMapper } from '@/app/boundaries/mapper';
+import { BookmarkRepository } from '@/app/boundaries/repository';
+import { Inject } from '@nestjs/common';
+import { QueryHandler } from '@nestjs/cqrs';
+import { Query } from '../../common';
+import { GetCollectionBookmarksQuery } from './get-collection-bookmarks.query';
 
 @QueryHandler(GetCollectionBookmarksQuery)
 export class GetCollectionBookmarksQueryHandler extends Query<

@@ -1,7 +1,10 @@
 import * as input from '@/app/boundaries/dto/input';
 import * as output from '@/app/boundaries/dto/output';
-import { InitiatedBy } from '@/infrastructure/common/decorators';
-import { AuthGuard } from '@/infrastructure/common/guards';
+import {
+  InitiatedBy,
+  OptionalInitiatedBy,
+} from '@/infrastructure/common/decorators';
+import { AuthGuard, OptionalAuthGuard } from '@/infrastructure/common/guards';
 import {
   Body,
   Controller,
@@ -41,10 +44,10 @@ export class CollectionsController {
   }
 
   @Get(':slug')
-  @UseGuards(AuthGuard)
+  @UseGuards(OptionalAuthGuard)
   async getDetailedCollection(
     @Param('slug') slug: string,
-    @InitiatedBy() initiatedBy: string,
+    @OptionalInitiatedBy() initiatedBy?: string,
   ): Promise<output.DetailedBookmarkCollectionOutput> {
     return this._collectionsService.getDetailedCollection(slug, initiatedBy);
   }
