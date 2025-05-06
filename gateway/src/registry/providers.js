@@ -5,6 +5,9 @@ import { asClass } from 'awilix';
 /** @type {ReturnType<typeof asClass<services.AuthService>>} */
 const authService = asClass(services.grpc.AuthService).singleton();
 
+/** @type {ReturnType<typeof asClass<services.UserService>>} */
+const userService = asClass(services.grpc.UserService).singleton();
+
 /** @type {ReturnType<typeof asClass<services.FileService>>} */
 const fileService = asClass(services.grpc.FileService).singleton();
 
@@ -36,6 +39,7 @@ const preferenceService = asClass(services.rest.PreferencesService).singleton();
 
 const providerRegistries = /** @type {const} */ {
     authService,
+    userService,
     fileService,
     postService,
     interactionService,

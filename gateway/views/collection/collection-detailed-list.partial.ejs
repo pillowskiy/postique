@@ -1,14 +1,17 @@
 <% collections.forEach(collection => { %>
 <li id="collection-<%= collection.id %>" class="collection-card" x-data="{}">
     <div class="collection-card__content">
-        <div class="collection-card__author">
+        <a
+            href="/@<%= collection.author.username %>"
+            class="collection-card__author"
+        >
             <sl-avatar
                 class="collection-card__author--avatar"
                 label="User avatar"
                 initials="<%= collection.author.username.slice(0,2) %>"
             ></sl-avatar>
             <%= collection.author.username %>
-        </div>
+        </a>
 
         <div class="collection-card__info">
             <a
@@ -43,6 +46,7 @@
                 >
                     Копіювати
                 </sl-menu-item>
+                <% if (user && user.id === collection.author.id) { %>
                 <sl-menu-item
                     hx-delete="/r/collections/<%= collection.id %>"
                     hx-confirm="Ви впевнені, що хочете видалити цей список?"
@@ -51,6 +55,7 @@
                 >
                     Видалити
                 </sl-menu-item>
+                <% } %>
             </sl-menu>
         </sl-dropdown>
     </div>

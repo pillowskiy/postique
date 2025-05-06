@@ -30,7 +30,7 @@ declare namespace render {
             targetId: Variable;
         };
         'bookmark/partials/bookmarks-view.partial': {
-            bookmarks: Array;
+            posts: Array;
         };
         'collection/collection-detailed-list.partial': {
             collections: Array;
@@ -47,7 +47,7 @@ declare namespace render {
             user: { id: Variable };
         };
         'comment/post-comments': {
-            user: { username: Array };
+            user: { avatarUrl: Variable; username: Array };
             postId: Variable;
         };
         'comment/post-comments.loader': {
@@ -169,6 +169,22 @@ declare namespace render {
                 id: Variable;
             };
             'collection.author': { username: Array };
+        };
+        'user/partial/user-collections-view.partial': {
+            collections: Array;
+        };
+        'user/partial/user-posts-view.partial': {};
+        'user/user-page': {
+            target: { username: Variable };
+        };
+        'user-layout': {
+            title: Variable;
+            __renderTarget: Variable;
+            target: { username: Array; bio: Variable; id: Variable };
+            '(Math.random() * 30)': Variable;
+            Math: { random: Function };
+            user: { id: Variable };
+            '(Math.random() * 100)': Variable;
         };
         'workbench/components/workbench-header': {
             user: { username: Variable };

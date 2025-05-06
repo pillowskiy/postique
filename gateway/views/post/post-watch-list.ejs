@@ -1,16 +1,36 @@
 <% posts.forEach((post) => { %>
 <li class="post-card detailed" id="post-<%= post.id %>">
-    <a href="#" class="post-card__header post-card__owner">
+    <% if (post.owner && post.owner.username) { %>
+    <a
+        href="/@<%= post.owner.username %>"
+        class="post-card__header post-card__owner"
+    >
         <sl-avatar
             style="--size: 2rem"
             initials="<%= typeof post.owner === 'object' && post.owner ? post.owner.username.slice(0, 2) : '' %>"
             label="User avatar"
         ></sl-avatar>
-        <span class="truncate"
-            ><%= typeof post.owner === 'object' && post.owner ?
-            post.owner.username : 'Невідомий автор' %></span
-        >
+        <span class="truncate">
+            <%= typeof post.owner === 'object' && post.owner ?
+            post.owner.username : 'Невідомий автор' %>
+        </span>
     </a>
+    <% } else { %>
+    <a
+        href="/@<%= post.owner.username %>"
+        class="post-card__header post-card__owner"
+    >
+        <sl-avatar
+            style="--size: 2rem"
+            initials="<%= typeof post.owner === 'object' && post.owner ? post.owner.username.slice(0, 2) : '' %>"
+            label="User avatar"
+        ></sl-avatar>
+        <span class="truncate">
+            <%= typeof post.owner === 'object' && post.owner ?
+            post.owner.username : 'Невідомий автор' %>
+        </span>
+    </a>
+    <% } %>
 
     <div class="post-card__content grid">
         <a href="/p/<%= post.slug %>" class="post-card__content">

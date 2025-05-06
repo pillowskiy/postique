@@ -52,7 +52,6 @@ export function BookmarkRoutes(bookmarkController, authMiddlewares) {
 
     bookmarkRouter.get(
         '/collections/:collectionId',
-        authMiddlewares.withAuth.bind(authMiddlewares),
         [
             param('collectionId').isString().isLength({ min: 1 }),
             query('cursor').optional().isString(),

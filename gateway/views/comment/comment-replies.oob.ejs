@@ -1,17 +1,19 @@
 <% replies.forEach(function(reply) { %>
     <div class="comment slim" id="reply-<%= reply.id %>">
         <div class="comment__author">
-            <sl-avatar
-                <% if (reply.author.avatarUrl) { %>
-                    image="<%= reply.author.avatarUrl %>"
-                <% } else { %>
-                    initials="<%= reply.author.username.slice(0,2) %>"
-                <% } %>
-            ></sl-avatar>
+            <a href="/@<%= reply.author.username %>">
+                <sl-avatar
+                    <% if (reply.author.avatarUrl) { %>
+                        image="<%= reply.author.avatarUrl %>"
+                    <% } else { %>
+                        initials="<%= reply.author.username.slice(0,2) %>"
+                    <% } %>
+                ></sl-avatar>
+            </a>
             <div class="comment__reply-info">
-                <h3 class="comment__reply-info--name">
+                <a href="/@<%= reply.author.username %>" class="comment__reply-info--name">
                     <%= reply.author.username %>
-                </h3>
+                </a>
                 <span class="comment__reply-info--details">
                     <sl-relative-time
                         date="<%= reply.createdAt %>"

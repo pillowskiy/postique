@@ -135,12 +135,14 @@ export class PostService extends RestClient {
      * @param {string|null} auth
      * @param {number} take
      * @param {string|null} cursor
+     * @param {string|null} [authorId]
      * @returns {Promise<import("#app/models").PostCursor>}
      */
-    async getPosts(auth, take, cursor) {
+    async getPosts(auth, take, cursor, authorId = null) {
         const params = new URLSearchParams();
         if (take) params.set('take', take.toString());
         if (cursor) params.set('cursor', cursor);
+        if (authorId) params.set('authorId', authorId);
 
         const response = await this._client
             .get(`posts/cursor?${params}`, {

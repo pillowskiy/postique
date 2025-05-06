@@ -1,16 +1,20 @@
 <% comments.forEach(function(comment) { %>
     <div class="comment" id="comment-<%= comment.id %>" x-data="{repliesCount: <%= comment.repliesCount %>, showReplies: false}">
         <div class="comment__author">
-            <sl-avatar
-                <% if (comment.author.avatarUrl) { %>
-                    image="<%= comment.author.avatarUrl %>"
-                <% } else { %>
-                    initials="<%= comment.author.username.slice(0,2) %>"
-                <% } %>
-            ></sl-avatar>
+            <a href="/@<%= comment.author.username %>">
+                <sl-avatar
+                    <% if (comment.author.avatarUrl) { %>
+                        image="<%= comment.author.avatarUrl %>"
+                    <% } else { %>
+                        initials="<%= comment.author.username.slice(0,2) %>"
+                    <% } %>
+                ></sl-avatar>
+            </a>
 
             <div class="comment__info">
-                <h3 class="comment__info--name"><%= comment.author.username %></h3>
+                <p>
+                    <a href="/@<%= comment.author.username %>" class="comment__info--name"><%= comment.author.username %></a>
+                </p>
                 <span class="comment__info--details">
                     <sl-relative-time
                         date="<%= comment.createdAt %>"

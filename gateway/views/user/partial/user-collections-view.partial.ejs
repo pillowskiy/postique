@@ -1,0 +1,11 @@
+<% if (collections && collections.length > 0) { %>
+<ul id="collection-list" class="detailed-collection-list">
+    <%- await include('../../collection/collection-detailed-list.partial.ejs', {
+    collections }) %>
+</ul>
+<% } else { %>
+<div class="no-posts">
+    <sl-icon name="journal-x" size="large"></sl-icon>
+    <p>Користувач ще не створив жодної колекції</p>
+</div>
+<% } %>

@@ -1,7 +1,7 @@
 <div>
-    <% if (bookmarks && bookmarks.length > 0) { %> <%- await
-    include('../../post/partials/posts-view.partial.ejs', { posts:
-    bookmarks.map((b) => b.post), __postListTemplate:
+    <% if (posts && posts.length > 0) { %>
+    <%- await
+    include('../../post/partials/posts-view.partial.ejs', { posts, __postListTemplate:
     '../post-bookmark-list.ejs' }) %>
     <% } %>
 

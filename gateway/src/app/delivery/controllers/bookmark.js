@@ -191,25 +191,25 @@ export class BookmarkController {
 
         console.log(posts);
 
-        const aggregatedBookmarks = bookmarks.items.map((b) => {
+        const aggregatedPosts = bookmarks.items.map((b) => {
             const post = posts[b.targetId];
             return {
-                ...b,
-                post: post ?? {
+                ...(post ?? {
                     ...b.post,
                     owner: {
                         id: b.userId,
                         username: 'Заблокований автор',
                         avatarUrl: '',
                     },
-                },
+                }),
+                bookmark: b,
             };
         });
 
         return render(res).template(
             'bookmark/partials/bookmarks-view.partial',
             {
-                bookmarks: aggregatedBookmarks,
+                posts: aggregatedPosts,
                 collectionId: req.params.collectionId,
             },
         );

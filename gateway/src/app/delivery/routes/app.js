@@ -1,6 +1,7 @@
 import { render } from '#lib/ejs/render.js';
 
 import express from 'express';
+import { param } from 'express-validator';
 
 /**
  * @param {express.Router} authRouter
@@ -40,7 +41,7 @@ export function AppRoutes(
     appRouter.use(homeRouter);
     appRouter.use('/p', postFacadeRouter);
     appRouter.use('/r', reactionRouter);
-    appRouter.use('/@:username', userRouter);
+    appRouter.use('/@:username', [param('username').isString()], userRouter);
     appRouter.use('/me', meRouter);
     appRouter.use(middlewares.exception.bind(middlewares));
 

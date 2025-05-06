@@ -57,7 +57,11 @@ export class AuthService extends GRPCHandler {
         metadata.add('authorization', `Bearer ${token}`);
         const user = await this.call('verify', {}, metadata);
 
-        return new models.User(user.userId, user.username, user.avatarPath);
+        return {
+            id: user.userId,
+            username: user.username,
+            avatarUrl: user.avatarPath,
+        };
     }
 
     /**
@@ -82,11 +86,11 @@ export class AuthService extends GRPCHandler {
             throw new Error('Invalid session');
         }
 
-        return new models.Session(
-            session.accessToken,
-            session.refreshToken,
-            session.tokenType,
-            session.expiresIn,
-        );
+        return {
+            accessToken: session.accessToken,
+            refreshToken: session.refreshToken,
+            tokenType: session.tokenType,
+            expiresIn: session.expiresIn,
+        };
     }
 }

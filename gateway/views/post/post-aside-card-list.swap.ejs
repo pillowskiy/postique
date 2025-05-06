@@ -1,6 +1,9 @@
 <% posts.forEach((post) => { %>
 <li class="post-card" id="post-<%= post.id %>">
-    <a href="#" class="post-card__header post-card__owner">
+    <a
+        href="/@<%= post.owner.username %>"
+        class="post-card__header post-card__owner"
+    >
         <sl-avatar
             style="--size: 1.5rem"
             initials="<%= typeof post.owner === 'object' && post.owner ? post.owner.username.slice(0, 2) : '' %>"

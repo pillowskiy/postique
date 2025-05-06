@@ -5,8 +5,12 @@
     <div class="comment-form">
         <div class="comment__author">
             <sl-avatar
-                initials="<%= user.username.slice(0,2) %>"
                 label="User avatar"
+                <% if (user.avatarUrl) { %>
+                    image="<%= user.avatarUrl %>"
+                <% } else { %>
+                    initials="<%= user.username.slice(0,2) %>"
+                <% } %>
             ></sl-avatar>
 
             <form

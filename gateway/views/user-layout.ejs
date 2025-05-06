@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <%- await include('./partials/head.ejs') %>
+        <title><%= title %></title>
+    </head>
+
+    <body>
+        <%- await include('./components/header.ejs') %>
+        <div id="root" class="grid-container">
+            <main class="grid-container__content">
+                <%- await include(__renderTarget) %>
+            </main>
+            <aside class="grid-container__sidebar">
+                <div class="user-profile">
+                    <sl-avatar
+                        class="user-profile__avatar"
+                        label="User avatar"
+                        initials="<%= target.username.slice(0,2) %>"
+                    ></sl-avatar>
+                    <h5 class="user-profile__username">
+                        <%= target.username %>
+                    </h5>
+
+                    <p class="user-profile__stats">
+                        <%= (Math.random() * 30).toFixed() %> підписників
+                    </p>
+
+                    <% if (target.bio) { %>
+                    <p class="user-profile__bio"><%= target.bio %></p>
+                    <% } %>
+
+                    <% if (user && target.id === user.id) { %>
+                    <div class="user-profile__actions">
+                        <sl-button variant="primary" pill>
+                            Змінити профіль
+                        </sl-button>
+                    </div>
+                    <% } else { %>
+                    <div class="user-profile__actions">
+                        <sl-button variant="primary" pill>
+                            Підписатися
+                        </sl-button>
+                        <sl-tooltip
+                            style="--max-width: 200px"
+                            content="Надсилати сповіщення про нові публікації від цього автора"
+                        >
+                            <sl-button variant="neutral" square pill>
+                                <sl-icon
+                                    name="envelope-arrow-down"
+                                    label="Get mails"
+                                ></sl-icon>
+                            </sl-button>
+                        </sl-tooltip>
+                    </div>
+                    <% } %>
+                </div>
+                <div class="aside-section">
+                    <h3 class="aside-section__title">Підписки</h3>
+
+                    <ul
+                        id="popular-posts"
+                        class="aside-section__list popular-stories-list"
+                    >
+                        <% for (let i = 0; i < 3; i++) { %>
+                        <li class="skeleton-flex-line">
+                            <sl-skeleton
+                                class="skeleton-avatar"
+                                effect="sheen"
+                            ></sl-skeleton>
+                            <sl-skeleton
+                                class="skeleton-line"
+                                effect="sheen"
+                            ></sl-skeleton>
+                        </li>
+                        <% } %>
+                    </ul>
+
+                    <a href="/u/Postique/list/staff-picks" class="link">
+                        Дивитись всі (<%= (Math.random() * 100).toFixed() %>)
+                    </a>
+                </div>
+
+                <div class="faq-container aside-section">
+                    <h3 class="faq-container__title">
+                        Публікування на Postique
+                    </h3>
+                    <ul class="faq-container__list">
+                        <li>FAQ для початківців</li>
+                        <li>Поради від експертів</li>
+                        <li>Підвищуйте охоплення</li>
+                    </ul>
+                    <% if (!user) { %>
+                    <sl-button
+                        class="faq-container__button"
+                        href="/register"
+                        size="small"
+                        variant="neutral"
+                        pill
+                    >
+                        Увійдіть для публікації
+                    </sl-button>
+                    <%} else { %>
+                    <sl-button
+                        class="faq-container__button"
+                        href="/new-story"
+                        size="small"
+                        variant="neutral"
+                        pill
+                    >
+                        Публікувати
+                    </sl-button>
+                    <% } %>
+                </div>
+            </aside>
+        </div>
+        <%- await include('./partials/toasts.ejs') %>
+    </body>
+</html>

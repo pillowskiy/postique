@@ -18,6 +18,7 @@ const routeRegistries = /** @type {const} */ {
     viewRouter: awilix.asFunction(routes.ViewRoutes).singleton(),
     preferenceRouter: awilix.asFunction(routes.PreferenceRoutes).singleton(),
     userRouter: awilix.asFunction(routes.UserRoutes).singleton(),
+    userViewRouter: awilix.asFunction(routes.UserViewRoutes).singleton(),
     userCollectionsRouter: awilix
         .asFunction(routes.UserCollectionsRoutes)
         .singleton(),

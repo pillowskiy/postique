@@ -1,36 +1,25 @@
-/* eslint-disable max-classes-per-file */
+/**
+ * @typedef {Object} User
+ * @property {string} id
+ * @property {string} username
+ * @property {string} avatarUrl
+ */
 
-export class User {
-    /**
-     * @param {string} id
-     * @param {string} username
-     * @param {string} avatarUrl
-     */
-    constructor(id, username, avatarUrl) {
-        /** @type {string} */
-        this.id = id;
-        /** @type {string} */
-        this.username = username;
-        /** @type {string} */
-        this.avatarUrl = avatarUrl;
-    }
-}
+/**
+ * @typedef {Object} DetailedUser
+ * @property {string} id
+ * @property {string} username
+ * @property {string} avatarUrl
+ * @property {string} bio
+ * @property {Date} createdAt
+ */
 
-export class Session {
-    /**
-     * @param {string} accessToken
-     * @param {string} refreshToken
-     * @param {string} tokenType
-     * @param {number} expiresIn
-     */
-    constructor(accessToken, refreshToken, tokenType, expiresIn) {
-        /** @type {string} */
-        this.accessToken = accessToken;
-        /** @type {string} */
-        this.refreshToken = refreshToken;
-        /** @type {string} */
-        this.tokenType = tokenType;
-        /** @type {number} */
-        this.expiresIn = expiresIn;
-    }
-}
+/**
+ * @typedef {Object} Session
+ * @property {string} accessToken
+ * @property {string} refreshToken
+ * @property {string} tokenType
+ * @property {number} expiresIn
+ */
+
+export {};

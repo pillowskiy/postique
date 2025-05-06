@@ -9,24 +9,19 @@ import { getAuthToken } from '../common/session.js';
  */
 
 export class UserCollectionsController {
-    /** @param {import("#app/services").BookmarkService} */
-    #bookmarkService;
-
-    /** @type {import("#app/services").PostService} */
-    #postService;
+    /** @type {import("#app/services").UserService} */
+    #userService;
 
     /** @type {import("#app/services").CollectionService} */
     #collectionService;
 
     /**
-     * @param {import("#app/services").BookmarkService} bookmarkService
-     * @param {import("#app/services").PostService} postService
      * @param {import("#app/services").CollectionService} collectionService
+     * @param {import("#app/services").UserService} userService
      */
-    constructor(bookmarkService, postService, collectionService) {
-        this.#bookmarkService = bookmarkService;
-        this.#postService = postService;
+    constructor(collectionService, userService) {
         this.#collectionService = collectionService;
+        this.#userService = userService;
     }
 
     /**
@@ -46,15 +41,16 @@ export class UserCollectionsController {
         const { slug } = req.params;
 
         const token = getAuthToken(req);
-        const collection = await this.#collectionService.getDetailedCollection(
-            slug,
-            token,
-        );
+        const [target, collection] = await Promise.all([
+            this.#userService.getProfile(req.params.username),
+            this.#collectionService.getDetailedCollection(slug, token),
+        ]);
 
         return render(res)
             .template('user/collections/collection-page', {
                 collection,
+                target,
             })
-            .layout('grid-layout');
+            .layout('user-layout');
     }
 }

@@ -32,15 +32,21 @@ return Math.ceil(totalWords / wordsPerMinute); } %>
         <p class="post-header__meta--description"><%= post.description %></p>
     </div>
     <div class="post-header__owner">
-        <sl-avatar
+        <a
             class="post-header__owner--avatar"
-            initials="<%= post.owner.username.slice(0,2) %>"
-            label="User avatar"
-        ></sl-avatar>
-        <span class="truncate">
+            href="/@<%= post.owner.username %>"
+        >
+            <sl-avatar
+                initials="<%= post.owner.username.slice(0,2) %>"
+                label="User avatar"
+            ></sl-avatar>
+        </a>
+
+        <a href="/@<%= post.owner.username %>" class="truncate">
             <%= typeof post.owner === 'object' && post.owner ?
             post.owner.username : 'Невідомий автор' %>
-        </span>
+        </a>
+
         <div class="post-header__owner--details">
             <%= estimateTimeToRead(paragraphs) %> хв. читання
             <span>•</span>
@@ -120,7 +126,10 @@ return Math.ceil(totalWords / wordsPerMinute); } %>
 <div class="post-details__wrapper">
     <div class="post-details">
         <div class="post-details__author">
-            <div class="post-details__author--info">
+            <a
+                href="/@<% post.owner.username %>"
+                class="post-details__author--info"
+            >
                 <sl-avatar
                     initials="<%= post.owner.username.slice(0,2) %>"
                     label="User avatar"
@@ -133,7 +142,7 @@ return Math.ceil(totalWords / wordsPerMinute); } %>
                         post.owner.username : 'Невідомий автор' %>
                     </span>
                 </p>
-            </div>
+            </a>
 
             <div class="post-details__author--actions">
                 <sl-tooltip

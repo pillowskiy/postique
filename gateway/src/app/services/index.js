@@ -8,6 +8,13 @@
  */
 
 /**
+ * User Service API
+ * @typedef {Object} UserService
+ * @property {(userId: string, input: import("#app/dto").UpdateProfileDTO) => Promise<void>} updateProfile
+ * @property {(username: string) => Promise<import("#app/models").DetailedUser>} getProfile
+ */
+
+/**
  * File Service API
  * @typedef {Object} FileService
  * @property {(dto: import("#app/dto").UploadFileDTO) => Promise<import("#app/models").FilePath>} upload
@@ -24,7 +31,7 @@
  * @property {(postId: string, auth: string) => Promise<import("#app/models").PostIdentifier>} deletePost
  * @property {(postId: string, newOwner: string, auth: string) => Promise<import("#app/models").PostIdentifier>} transferPostOwnership
  * @property {(postId: string, deltas: Array<Object>, auth: string) => Promise<import("#app/models").PostIdentifier>} deltaSave
- * @property {(auth: string|null, take: number, cursor: string|null) => Promise<import("#app/models").PostCursor>} getPosts
+ * @property {(auth: string|null, take: number, cursor: string|null, authorId?: string | null) => Promise<import("#app/models").PostCursor>} getPosts
  * @property {(slug: string) => Promise<import("#app/models").DetailedPost>} getPost
  * @property {(id: string, auth: string) => Promise<import("#app/models").Post>} getPostInfo
  * @property {(id: string, auth: string) => Promise<import("#app/models").PostParagraph[]>} getPostDraft
@@ -73,7 +80,7 @@
  * @typedef {Object} CollectionService
  * @property {(auth: string, name: string, description?: string) => Promise<import("#app/models").Collection>} createCollection
  * @property {(collectionId: string, auth: string) => Promise<import("#app/models").CollectionIdentifier>} deleteCollection
- * @property {(userId: string, auth: string) => Promise<import("#app/models").DetailedCollection[]>} getUserCollections
+ * @property {(userId: string, auth: string | null) => Promise<import("#app/models").DetailedCollection[]>} getUserCollections
  * @property {(collectionId: string, auth: string | null) => Promise<import("#app/models").DetailedCollection>} getDetailedCollection
  */
 

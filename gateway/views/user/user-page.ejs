@@ -1,0 +1,95 @@
+<div class="container">
+    <header class="header">
+        <h2>
+            <%= target.username %>
+        </h2>
+    </header>
+
+    <sl-tab-group class="tabs-container" id="library-tabs">
+        <sl-tab
+            slot="nav"
+            panel="posts"
+            hx-get="/@<%= target.username %>"
+            hx-trigger="click once"
+            hx-target="#posts"
+            hx-swap="innerHTML"
+        >
+            Авторство
+        </sl-tab>
+
+        <sl-tab
+            slot="nav"
+            panel="collections"
+            hx-get="/@<%= target.username %>/collections"
+            hx-trigger="click once"
+            hx-target="#collections"
+            hx-swap="innerHTML"
+        >
+            Списки
+        </sl-tab>
+
+        <sl-tab-panel
+            style="margin-top: 16px"
+            id="posts"
+            name="posts"
+        ></sl-tab-panel>
+        <sl-tab-panel
+            style="margin-top: 16px"
+            id="collections"
+            name="collections"
+        ></sl-tab-panel>
+    </sl-tab-group>
+</div>
+
+<script>
+    (async () => {
+        await customElements.whenDefined('sl-tab-group');
+
+        const registeredTabs = ['posts', 'collections'];
+        const path = window.location.pathname;
+        const tabs = document.querySelector('sl-tab-group');
+
+        if (!tabs) {
+            throw new Error('Cannot find tab group');
+        }
+
+        const parts = path.split('/');
+        const baseIndex = parts.findIndex((p) => p.startsWith('@'));
+        const activeTab =
+            parts.length > baseIndex + 1
+                ? parts[baseIndex + 1]
+                : registeredTabs[0];
+
+        const tabNode = tabs.querySelector(`[panel="${activeTab}"]`);
+        if (tabNode) {
+            tabNode.setAttribute('hx-trigger', 'load');
+            htmx.process(tabNode);
+            customElements.whenDefined('sl-tab').then(() => {
+                tabs.show(tabNode);
+            });
+        }
+    })();
+
+    document.addEventListener('sl-tab-show', (event) => {
+        const activeTab = event.target.activeTab;
+        if (activeTab) {
+            const url = activeTab.getAttribute('hx-get');
+            window.history.pushState({}, '', url);
+        }
+    });
+
+    const pluralRules = new Intl.PluralRules('uk-UA');
+
+    const forms = {
+        one: 'публікацію',
+        few: 'публікації',
+        many: 'публікацій',
+        other: 'публікацій',
+    };
+
+    function getCollectionLabel(count) {
+        const rule = pluralRules.select(count);
+        return `Містить ${count} ${forms[rule]}`;
+    }
+</script>
+<!-- TEMP: Dry principe, remove dublicates -->

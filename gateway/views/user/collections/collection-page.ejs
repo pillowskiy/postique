@@ -6,9 +6,12 @@
                 label="User avatar"
                 initials="<%= collection.author.username.slice(0,2) %>"
             ></sl-avatar>
-            <span class="inline-user-card__username">
+            <a
+                href="/@<%= collection.author.username %>"
+                class="inline-user-card__username"
+            >
                 @<%= collection.author.username %>
-            </span>
+            </a>
             <div class="inline-user-card__info">
                 <span>
                     Створено
