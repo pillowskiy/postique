@@ -17,6 +17,10 @@ const routeRegistries = /** @type {const} */ {
     likeRouter: awilix.asFunction(routes.LikeRoutes).singleton(),
     viewRouter: awilix.asFunction(routes.ViewRoutes).singleton(),
     preferenceRouter: awilix.asFunction(routes.PreferenceRoutes).singleton(),
+    userRouter: awilix.asFunction(routes.UserRoutes).singleton(),
+    userCollectionsRouter: awilix
+        .asFunction(routes.UserCollectionsRoutes)
+        .singleton(),
 };
 
 export default routeRegistries;

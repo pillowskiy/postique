@@ -1,0 +1,23 @@
+.inline-user-card {
+    display: grid;
+    grid-template-columns: auto auto;
+    align-items: center;
+    gap: 0 12px;
+    margin-top: 24px;
+    margin-bottom: 32px;
+
+    &__avatar {
+        --size: 3rem;
+        grid-row: span 2 / span 2;
+    }
+
+    &__username {
+        font-weight: 600;
+        font-size: var(--sl-font-size-large);
+    }
+
+    &__info {
+        font-size: var(--sl-font-size-small);
+        color: var(--sl-color-neutral-600);
+    }
+}

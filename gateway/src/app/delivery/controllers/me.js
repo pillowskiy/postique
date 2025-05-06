@@ -38,6 +38,21 @@ export class MeController {
      * @param {Request} req
      * @param {Response} res
      */
+    async getRecommendationsView(req, res) {
+        const token = getAuthToken(req);
+        if (!token) {
+            throw new ClientException('Ви повинні бути авторизовані', 401);
+        }
+
+        return render(res)
+            .template('me/recommendations/recommendations-page', {})
+            .layout('grid-layout');
+    }
+
+    /**
+     * @param {Request} req
+     * @param {Response} res
+     */
     async getNotificationsView(req, res) {
         const token = getAuthToken(req);
         if (!token) {

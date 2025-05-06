@@ -46,6 +46,20 @@
  */
 
 /**
+ * Represents a partial view of a post, used in services other than the post service itself.
+ * Initially populated with minimal data (e.g., post ID), it can be enriched later via batch fetching.
+ * If the post service is unavailable, this model provides a fallback using cached user, post metadata or "unknown" results.
+ * Since this model is read-only, data freshness is not critical.
+ * @typedef {Object} FallbackPostView
+ * @property {string} id
+ * @property {string} title
+ * @property {string} description
+ * @property {import('#app/models/user').User} owner
+ * @property {string|null} coverImage
+ * @property {string} slug
+ */
+
+/**
  * @typedef {Object} PostWithOwner
  * @property {string} id
  * @property {string} title

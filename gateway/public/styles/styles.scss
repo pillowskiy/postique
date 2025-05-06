@@ -4,6 +4,7 @@
 @use 'me.scss';
 @use 'comments.scss';
 @use 'bookmarks.scss';
+@use 'user.scss';
 
 :not(:defined) {
     visibility: hidden;

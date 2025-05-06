@@ -18,7 +18,7 @@
  * @property {string} id
  * @property {string} userId
  * @property {string} targetId
- * @property {import('./post').PartialPost} post
+ * @property {import('./post').PartialPost | import('./post').FallbackPostView} post
  * @property {string} [collectionId]
  * @property {Date} [createdAt]
  * @property {Date} [updatedAt]

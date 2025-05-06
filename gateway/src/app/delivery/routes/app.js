@@ -8,6 +8,7 @@ import express from 'express';
  * @param {express.Router} meRouter
  * @param {express.Router} homeRouter
  * @param {express.Router} reactionRouter
+ * @param {express.Router} userRouter
  * @param {import("#app/delivery/middlewares").AuthMiddlewares} authMiddlewares
  * @param {import("#app/delivery/middlewares").GeneralMiddlewares} middlewares
  */
@@ -17,6 +18,7 @@ export function AppRoutes(
     meRouter,
     homeRouter,
     reactionRouter,
+    userRouter,
     authMiddlewares,
     middlewares,
 ) {
@@ -38,6 +40,7 @@ export function AppRoutes(
     appRouter.use(homeRouter);
     appRouter.use('/p', postFacadeRouter);
     appRouter.use('/r', reactionRouter);
+    appRouter.use('/@:username', userRouter);
     appRouter.use('/me', meRouter);
     appRouter.use(middlewares.exception.bind(middlewares));
 

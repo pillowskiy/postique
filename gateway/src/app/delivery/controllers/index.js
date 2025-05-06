@@ -9,3 +9,4 @@ export * from './collection.js';
 export * from './like.js';
 export * from './view.js';
 export * from './preference.js';
+export * from './user-collections.js';

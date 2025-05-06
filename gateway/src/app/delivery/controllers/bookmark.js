@@ -153,4 +153,65 @@ export class BookmarkController {
             collections,
         });
     }
+
+    async getCollectionBookmarksView(req, res) {
+        const errors = validate(req);
+        if (!errors.isEmpty()) {
+            return render(res).template('components/toast.oob', {
+                initiator: 'Колекції',
+                message: JSON.stringify(errors.mapped()),
+                variant: 'danger',
+            });
+        }
+
+        const { cursor, pageSize } = req.query;
+
+        const token = getAuthToken(req);
+        const bookmarks = await this.#bookmarkService.getCollectionBookmarks(
+            token,
+            req.params.collectionId,
+            cursor,
+            pageSize,
+        );
+
+        const posts = await this.#postService
+            .findBatch(
+                token,
+                bookmarks.items.map((b) => b.targetId),
+            )
+            .then((posts) => {
+                /** @type {Record<string, import("#app/models").PostWithOwner>} */
+                const agg = {};
+                return posts.reduce((acc, post) => {
+                    acc[post.id] = post;
+                    return acc;
+                }, agg);
+            })
+            .catch(() => ({}));
+
+        console.log(posts);
+
+        const aggregatedBookmarks = bookmarks.items.map((b) => {
+            const post = posts[b.targetId];
+            return {
+                ...b,
+                post: post ?? {
+                    ...b.post,
+                    owner: {
+                        id: b.userId,
+                        username: 'Заблокований автор',
+                        avatarUrl: '',
+                    },
+                },
+            };
+        });
+
+        return render(res).template(
+            'bookmark/partials/bookmarks-view.partial',
+            {
+                bookmarks: aggregatedBookmarks,
+                collectionId: req.params.collectionId,
+            },
+        );
+    }
 }

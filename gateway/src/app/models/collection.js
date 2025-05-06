@@ -24,7 +24,7 @@
  * @property {Date} createdAt
  * @property {Date} updatedAt
  * @property {number} bookmarksCount
- * @property {import('./user').User} [author]
+ * @property {import('./user').User} author
  */
 
 export {};

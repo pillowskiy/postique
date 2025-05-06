@@ -127,9 +127,12 @@ export class CollectionController {
             token,
         );
 
-        return render(res).template('bookmark/collection-list', {
-            collections,
-            targetId: req.query.targetId,
-        });
+        return render(res).template(
+            'collection/collection-detailed-list.partial',
+            {
+                collections,
+                targetId: req.query.targetId,
+            },
+        );
     }
 }

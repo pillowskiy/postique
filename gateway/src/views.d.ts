@@ -25,8 +25,12 @@ declare namespace render {
             csrfToken: Variable;
         };
         'auth/register/page': {};
+        'bookmark/bookmark-detailed-list.partial': {};
         'bookmark/bookmark-popup.oob': {
             targetId: Variable;
+        };
+        'bookmark/partials/bookmarks-view.partial': {
+            bookmarks: Array;
         };
         'collection/collection-detailed-list.partial': {
             collections: Array;
@@ -126,6 +130,9 @@ declare namespace render {
         'post/post-aside-card-list.swap': {
             posts: Array;
         };
+        'post/post-bookmark-list': {
+            posts: Array;
+        };
         'post/post-detailed-list': {
             posts: Array;
         };
@@ -151,6 +158,17 @@ declare namespace render {
         'shared/error': {
             status: Variable;
             message: Variable;
+        };
+        'user/collections/collection-page': {
+            collection: {
+                bookmarksCount: Variable;
+                'collection.author': { username: Array };
+                createdAt: Variable;
+                name: Variable;
+                description: Variable;
+                id: Variable;
+            };
+            'collection.author': { username: Array };
         };
         'workbench/components/workbench-header': {
             user: { username: Variable };

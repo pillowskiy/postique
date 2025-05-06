@@ -1,0 +1,93 @@
+<div class="container" x-data="{len: <%= collection.bookmarksCount %>}">
+    <header class="header col">
+        <div class="inline-user-card">
+            <sl-avatar
+                class="inline-user-card__avatar"
+                label="User avatar"
+                initials="<%= collection.author.username.slice(0,2) %>"
+            ></sl-avatar>
+            <span class="inline-user-card__username">
+                @<%= collection.author.username %>
+            </span>
+            <div class="inline-user-card__info">
+                <span>
+                    Створено
+                    <sl-relative-time
+                        format="narrow"
+                        date="<%= collection.createdAt %>"
+                        lang="uk-UA"
+                    ></sl-relative-time>
+                </span>
+                •
+                <span x-text="getCollectionLabel(len)"></span>
+            </div>
+        </div>
+
+        <div>
+            <h2>
+                Колекція:
+                <%= collection.name %>
+            </h2>
+            <% if (collection.description) { %>
+            <p><%= collection.description %></p>
+            <% } %>
+        </div>
+    </header>
+
+    <% if (collection.bookmarksCount) { %>
+    <div
+        hx-get="/r/bookmarks/collections/<%= collection.id %>"
+        hx-trigger="load"
+        hx-swap="innerHTML"
+    >
+        <% for (let i = 0; i < collection.bookmarksCount; i++) { %>
+        <div>
+            <div class="post-card__header skeleton-flex-line">
+                <sl-skeleton
+                    class="skeleton-avatar"
+                    effect="sheen"
+                ></sl-skeleton>
+                <sl-skeleton
+                    class="skeleton-md-line"
+                    effect="sheen"
+                ></sl-skeleton>
+            </div>
+            <div class="post-card__content">
+                <div class="skeleton-multiline-text">
+                    <sl-skeleton
+                        class="skeleton-line"
+                        effect="sheen"
+                    ></sl-skeleton>
+                    <sl-skeleton
+                        class="skeleton-line"
+                        effect="sheen"
+                    ></sl-skeleton>
+                </div>
+                <sl-skeleton
+                    class="skeleton-sm-line"
+                    effect="sheen"
+                ></sl-skeleton>
+            </div>
+        </div>
+        <% } %>
+    </div>
+    <%} else { %>
+    <%= await include('../partials/bookmarks-view.partial.ejs', { bookmarks: [] }) %>
+    <% } %>
+</div>
+
+<script>
+    const pluralRules = new Intl.PluralRules('uk-UA');
+
+    const forms = {
+        one: 'публікація',
+        few: 'публікації',
+        many: 'публікацій',
+        other: 'публікацій',
+    };
+
+    function getCollectionLabel(count) {
+        const rule = pluralRules.select(count);
+        return `${count} ${forms[rule]}`;
+    }
+</script>

@@ -54,5 +54,11 @@ export function MeRoutes(meController, authMiddlewares) {
         handler(meController, 'getHistoryTabView'),
     );
 
+    meRouter.get(
+        '/recommendations',
+        authMiddlewares.withAuth.bind(authMiddlewares),
+        handler(meController, 'getRecommendationsView'),
+    );
+
     return meRouter;
 }
