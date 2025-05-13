@@ -77,7 +77,7 @@
                     ></sl-icon-button>
 
                     <sl-menu style="width: 220px">
-                        <% if (user && userId === user.id) { %>
+                        <% if (user && post.bookmark.userId === user.id) { %>
                         <sl-menu-item
                             hx-trigger="click"
                             hx-delete="/r/bookmarks/<%= post.id %>?collectionId=<%= collectionId %>"
