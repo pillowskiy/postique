@@ -4,6 +4,7 @@ import { Query } from '../../common';
 import { CursorOutput, ViewOutput } from '@/app/boundaries/dto/output';
 import { Inject } from '@nestjs/common';
 import { ViewRepository } from '@/app/boundaries/repository';
+import { ViewMapper } from '@/app/boundaries/mapper';
 
 @QueryHandler(GetHistoryQuery)
 export class GetHistoryQueryHandler extends Query<
@@ -22,8 +23,10 @@ export class GetHistoryQueryHandler extends Query<
       input.pageSize,
     );
 
+    const historyDtos = history.map((view) => ViewMapper.toDto(view));
+
     return new CursorOutput(
-      history,
+      historyDtos,
       history.at(-1)?.createdAt ?? null,
       history.length,
     );
