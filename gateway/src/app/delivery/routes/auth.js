@@ -21,14 +21,16 @@ export function AuthRoutes(authController, csrfMiddlewares) {
         [
             body('email')
                 .isEmail()
-                .withMessage('Invalid email format')
+                .withMessage('Вкажіть коректний адрес електронної пошти')
                 .isLength({ max: 256 })
-                .withMessage('Email must be at most 256 characters'),
+                .withMessage(
+                    'Адреса електронної пошти не може бути довшою за 256 символів',
+                ),
             body('password')
                 .isLength({ min: 6 })
-                .withMessage('Password must be at least 6 characters')
+                .withMessage('Пароль має містити принаймні 6 символів')
                 .isLength({ max: 256 })
-                .withMessage('Password must be at most 256 characters'),
+                .withMessage('Пароль не може бути довшим за 256 символів'),
         ],
         handler(authController, 'loginUser'),
     );

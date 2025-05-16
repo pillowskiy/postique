@@ -113,7 +113,10 @@ export class GeneralMiddlewares {
          * @param {import('express').NextFunction} next
          */
         return (req, res, next) => {
-            this.#logger.debug?.('Parsing form');
+            this.#logger.debug?.(
+                { body: req.body, files: req.files },
+                'Parsing form',
+            );
 
             upload(req, res, (err) => {
                 if (err) {

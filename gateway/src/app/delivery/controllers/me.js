@@ -1,5 +1,6 @@
 import { ClientException } from '#app/common/error.js';
 import { render } from '#lib/ejs/render.js';
+import { validate } from '#lib/validator/validator.js';
 
 /**
  * @typedef {import('express').Request} Request
@@ -21,17 +22,78 @@ export class MeController {
     /** @type {import("#app/services").BookmarkService} */
     #bookmarkService;
 
+    /** @type {import("#app/services").UserService} */
+    #userService;
+
+    /** @type {import("#app/services").FileService} */
+    #fileService;
+
     /**
      * @param {import("#app/services").PostService} postService
      * @param {import("#app/services").CollectionService} collectionService
      * @param {import("#app/services").ViewService} viewService
      * @param {import("#app/services").BookmarkService} bookmarkService
+     * @param {import("#app/services").UserService} userService
+     * @param {import("#app/services").FileService} fileService
      */
-    constructor(postService, collectionService, viewService, bookmarkService) {
+    constructor(
+        postService,
+        collectionService,
+        viewService,
+        bookmarkService,
+        userService,
+        fileService,
+    ) {
         this.#postService = postService;
         this.#collectionService = collectionService;
         this.#viewService = viewService;
         this.#bookmarkService = bookmarkService;
+        this.#userService = userService;
+        this.#fileService = fileService;
+    }
+
+    /**
+     * @param {Request} req
+     * @param {Response} res
+     */
+    async updateProfile(req, res) {
+        const token = getAuthToken(req);
+        if (!token) {
+            throw new ClientException('Ви повинні бути авторизовані', 401);
+        }
+
+        const errors = validate(req);
+        if (!errors.isEmpty()) {
+            throw new ClientException(errors.mapped(), 400);
+        }
+
+        const { username, bio } = req.body;
+
+        /** @type {Promise<any>[]} */
+        const promises = [
+            this.#userService
+                .updateProfile(token, {
+                    bio: bio ?? '',
+                    username: username ?? req.user.username,
+                    avatarPath: req.file?.filename ?? '',
+                })
+                .catch((e) => {
+                    if (req.file) {
+                        this.#fileService
+                            .delete({ path: req.file.filename })
+                            .catch(() => null);
+                    }
+                    throw e;
+                }),
+        ];
+
+        if (req.file) {
+            promises.push(this.#fileService.upload(req.file));
+        }
+
+        await Promise.all(promises);
+
+        return res.redirect(301, `/@${req.user.username}`);
     }
 
     /**
@@ -86,7 +148,6 @@ export class MeController {
             cursor,
             pageSize,
         );
-        console.log(views);
         const posts = await this.#postService.findBatch(
             token,
             views.items.map((v) => v.targetId),

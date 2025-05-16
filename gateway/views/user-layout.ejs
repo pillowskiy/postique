@@ -31,10 +31,143 @@
                     <% } %>
 
                     <% if (user && target.id === user.id) { %>
-                    <div class="user-profile__actions">
-                        <sl-button variant="primary" pill>
+                    <div
+                        x-data="{ showProfDial: false }"
+                        class="user-profile__actions"
+                    >
+                        <sl-button
+                            @click="showProfDial = true"
+                            variant="primary"
+                            pill
+                        >
                             Змінити профіль
                         </sl-button>
+
+                        <sl-dialog
+                            label="Інформація про профіль"
+                            :open="showProfDial"
+                            @sl-after-hide="showProfDial = false"
+                        >
+                            <form
+                                hx-ext="ignore:json-enc-custom"
+                                hx-swap="none"
+                                hx-patch="/me/profile"
+                                enctype="multipart/form-data"
+                                id="change-profile-form"
+                                x-data="{
+                                    originalUsername: '<%= target.username %>',
+                                    username: '<%= target.username %>',
+                                    originalBio: '<%= target.bio %>',
+                                    bio: '<%= target.bio %>',
+                                    originalAvatar: 'http://localhost:8000/postique/users/<%= target.avatarPath %>',
+                                    avatar: 'http://localhost:8000/postique/users/<%= target.avatarPath %>',
+                                    avatarChanged: false,
+                                    get formChanged() {
+                                        return this.username !== this.originalUsername || 
+                                               this.bio !== this.originalBio || 
+                                               this.avatarChanged;
+                                    }
+                                }"
+                            >
+                                <div class="profile-section">
+                                    <label for="avatar-input">Photo</label>
+
+                                    <div class="photo-container">
+                                        <div class="avatar-wrapper">
+                                            <sl-avatar
+                                                label="<%= target.username.slice(0,2) %>"
+                                                :image="avatar"
+                                                class="profile-avatar"
+                                            ></sl-avatar>
+                                        </div>
+
+                                        <div class="photo-actions">
+                                            <div class="action-buttons">
+                                                <label
+                                                    for="avatar-input"
+                                                    class="update-button"
+                                                    >Update</label
+                                                >
+                                                <button
+                                                    type="button"
+                                                    class="remove-button"
+                                                    @click="avatar = ''; avatarChanged = true;"
+                                                >
+                                                    Remove
+                                                </button>
+                                            </div>
+
+                                            <p class="photo-requirements">
+                                                Recommended: Square JPG, PNG, or
+                                                GIF, at least 1,000 pixels per
+                                                side.
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    <input
+                                        id="avatar-input"
+                                        type="file"
+                                        accept="image/*"
+                                        @change="avatar = URL.createObjectURL($event.target.files[0]); avatarChanged = true;"
+                                        name="file"
+                                        hidden
+                                    />
+                                </div>
+
+                                <div>
+                                    <sl-input
+                                        id="username"
+                                        @input="username = $event.target.value"
+                                        value="<%= target.username %>"
+                                        label="Ім'я"
+                                        help-text="Як би ви хотіли, щоб вас називали"
+                                        filled
+                                        required
+                                        minlength="3"
+                                        maxlength="60"
+                                    >
+                                        <sl-icon
+                                            name="envelope"
+                                            slot="prefix"
+                                        ></sl-icon>
+                                    </sl-input>
+                                    <input
+                                        name="username"
+                                        :value="username"
+                                        type="hidden"
+                                    />
+                                </div>
+
+                                <div>
+                                    <sl-textarea
+                                        id="bio"
+                                        @input="bio = $event.target.value"
+                                        label="Коротка біографія"
+                                        filled
+                                    >
+                                    </sl-textarea>
+                                    <input
+                                        name="bio"
+                                        :value="bio"
+                                        type="hidden"
+                                    />
+                                </div>
+                            </form>
+
+                            <div slot="footer">
+                                <sl-button variant="text">
+                                    Відмінити
+                                </sl-button>
+                                <sl-button
+                                    form="change-profile-form"
+                                    type="submit"
+                                    variant="primary"
+                                >
+                                    Зберегти
+                                </sl-button>
+                            </div>
+                        </sl-dialog>
                     </div>
                     <% } else { %>
                     <div class="user-profile__actions">
