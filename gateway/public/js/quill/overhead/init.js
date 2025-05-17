@@ -10,8 +10,10 @@ export function Init(quill) {
         }
 
         const contents = await getQuillContents(postId);
-        quill.setContents(contents, 'silent');
-        quill.deltaApplier.updatePreviousParagraphs();
+        if (contents.length) {
+            quill.setContents(contents, 'silent');
+            quill.deltaApplier.updatePreviousParagraphs();
+        }
         updateStatusText();
 
         if (postId) {
@@ -51,7 +53,7 @@ function emptyQuillContents() {
         {
             insert: '\n',
             attributes: {
-                postTitle: { placeholder: 'Tell your story' },
+                postTitle: { placeholder: 'Розкажіть свою історію' },
             },
         },
         {

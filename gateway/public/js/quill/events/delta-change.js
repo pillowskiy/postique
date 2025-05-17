@@ -46,21 +46,17 @@ export const deltaChangeEvent = {
             return saveDeltaWithAdditionalStore(postId, changes);
         } catch (err) {
             showStatusErrorState();
+            deltaStore.push(...changes);
             throw err;
         }
     },
 };
 
 async function saveDeltaWithAdditionalStore(postId, changes) {
-    return saveDelta(postId, deltaStore.concat(changes))
-        .then(() => {
-            deltaStore = [];
-            setTimeout(() => statusState.set('draft'), 1000);
-        })
-        .catch((err) => {
-            deltaStore.push(...changes);
-            throw err;
-        });
+    return saveDelta(postId, deltaStore.concat(changes)).then(() => {
+        deltaStore = [];
+        setTimeout(() => statusState.set('draft'), 1000);
+    });
 }
 
 async function saveDelta(postId, changes) {

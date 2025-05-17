@@ -69,6 +69,7 @@
   },
   "dependencies": {
     "@postique/pb": "file:../contracts/gen/js",
+    "@shoelace-style/shoelace": "^2.20.1",
     "awilix": "^12.0.4",
     "bootstrap": "^5.3.3",
     "compression": "^1.8.0",

@@ -54,28 +54,30 @@ function clean(done) {
 }
 
 function styles() {
-    return gulp
-        .src(paths.styles.src)
-        .pipe(changed(paths.styles.changed, { extension: '.min.css' }))
-        .pipe(gulpSass(sass)())
-        .pipe(autoprefixer({ cascade: false }))
-        .pipe(cleanCSS())
-        .pipe(
-            rename({
-                suffix: '.min',
-            }),
-        )
-        .pipe(
-            purgecss({
-                content: [paths.views.src],
-                safelist: {
-                    standard: [/^ql/, /^sl-/],
-                    deep: [/^ql/, /^sl-/],
-                    greedy: [/^ql/, /^sl-/],
-                },
-            }),
-        )
-        .pipe(gulp.dest(paths.styles.dest));
+    return (
+        gulp
+            .src(paths.styles.src)
+            //.pipe(changed(paths.styles.changed, { extension: '.min.css' }))
+            .pipe(gulpSass(sass)())
+            .pipe(autoprefixer({ cascade: false }))
+            .pipe(cleanCSS())
+            .pipe(
+                rename({
+                    suffix: '.min',
+                }),
+            )
+            .pipe(
+                purgecss({
+                    content: [paths.views.src],
+                    safelist: {
+                        standard: [/^ql/, /^sl-/],
+                        deep: [/^ql/, /^sl-/],
+                        greedy: [/^ql/, /^sl-/],
+                    },
+                }),
+            )
+            .pipe(gulp.dest(paths.styles.dest))
+    );
 }
 
 function scripts() {

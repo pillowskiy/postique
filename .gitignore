@@ -3,5 +3,12 @@
 build
 dist
 .keys
+.cjsescache
+
+node_modules
+vendor
+coverage
+*.log
 
 *.tsbuildinfo
+seeder
