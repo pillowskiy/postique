@@ -11,3 +11,4 @@ export * from './view.js';
 export * from './preference.js';
 export * from './user-view.js';
 export * from './user-collections.js';
+export * from './file.js';

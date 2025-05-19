@@ -15,3 +15,6 @@ export * from './preference.js';
 export * from './user.js';
 export * from './user-view.js';
 export * from './user-collections.js';
+
+export * from './api.js';
+export * from './file.js';

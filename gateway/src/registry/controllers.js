@@ -20,6 +20,7 @@ const controllerRegistries = /** @type {const} */ {
     userCollectionsController: asClass(
         controllers.UserCollectionsController,
     ).singleton(),
+    fileController: asClass(controllers.FileController).singleton(),
 };
 
 export default controllerRegistries;

@@ -11,7 +11,7 @@ const propertiesByPrefix = {
 };
 
 function registerImports(prefix, registry) {
-    Object.values(registry).forEach((obj) => {
+    Object.entries(registry).forEach(([path, obj]) => {
         const prop = propertiesByPrefix[prefix];
         const name = obj.hasOwnProperty(prop)
             ? obj[prop]
@@ -19,7 +19,7 @@ function registerImports(prefix, registry) {
 
         if (!obj.hasOwnProperty(prop)) {
             console.warn(
-                `Registry object ${obj.name} does not have a ${prop} property, registering as ${prefix}/${name}`,
+                `Registry object ${obj.name || path || obj.constructor.name} does not have a ${prop} property, registering as ${prefix}/${name}`,
             );
         }
 

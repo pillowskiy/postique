@@ -10,6 +10,7 @@ import { param } from 'express-validator';
  * @param {express.Router} homeRouter
  * @param {express.Router} reactionRouter
  * @param {express.Router} userRouter
+ * @param {express.Router} apiRouter
  * @param {import("#app/delivery/middlewares").AuthMiddlewares} authMiddlewares
  * @param {import("#app/delivery/middlewares").GeneralMiddlewares} middlewares
  */
@@ -20,6 +21,7 @@ export function AppRoutes(
     homeRouter,
     reactionRouter,
     userRouter,
+    apiRouter,
     authMiddlewares,
     middlewares,
 ) {
@@ -43,6 +45,7 @@ export function AppRoutes(
     appRouter.use('/r', reactionRouter);
     appRouter.use('/@:username', [param('username').isString()], userRouter);
     appRouter.use('/me', meRouter);
+    appRouter.use('/api', apiRouter);
     appRouter.use(middlewares.exception.bind(middlewares));
 
     return appRouter;

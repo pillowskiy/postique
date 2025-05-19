@@ -1,6 +1,7 @@
 import Quill from 'quill';
 
 import { listenEvents } from './events.js';
+import { ImageUploader } from './image-uploader.js';
 import { registerOverhead } from './overhead.js';
 import './registry.js';
 import * as state from './state.js';
@@ -15,19 +16,15 @@ function quill(id = '#editor') {
         <button type="button" class="ql-italic"></button>
         <button type="button" class="ql-link"></button>
     </span>
-    <span class="ql-formats">
-        <button type="button" class="ql-header" value="1"></button>
-        <button type="button" class="ql-header" value="2"></button>
-        <button type="button" class="ql-blockquote"></button>
-    </span>
     `;
 
     const quill = new Quill(id, {
         theme: 'bubble',
         modules: {
-            toolbar: true,
+            toolbar: ['image', 'bold', 'italic'],
             imageTooltip: { toolbar: toolbarRoot },
             deltaApplier: true,
+            imageUploader: { upload: new ImageUploader().upload },
         },
     });
     quill.addContainer(document.querySelector('#sidebar-controls'));
