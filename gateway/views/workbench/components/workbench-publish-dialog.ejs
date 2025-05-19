@@ -1,4 +1,7 @@
-<div id="publish-wrapper" x-data="{ showDialog: false, meta: {} }">
+<div
+    id="publish-wrapper"
+    x-data="{ showDialog: false, meta: { title: '', description: '' } }"
+>
     <sl-button
         @click="showDialog = true; meta = editor.state.getSafePostMetadata()"
         id="publish-button"
