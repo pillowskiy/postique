@@ -189,8 +189,6 @@ export class BookmarkController {
             })
             .catch(() => ({}));
 
-        console.log(posts);
-
         const aggregatedPosts = bookmarks.items.map((b) => {
             const post = posts[b.targetId];
             return {

@@ -31,8 +31,6 @@ export async function ajax(method, url, opts = {}) {
                 const status = xhr.getResponseHeader('X-Error-Code');
                 const message = xhr.getResponseHeader('X-Error-Message');
 
-                console.log('xhr', xhr, status, message, elt);
-
                 if (status || message) {
                     htmx.handleAjaxResponse(elt, info);
                     const statusDec = status ? atob(status) : 500;
